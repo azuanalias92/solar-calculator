@@ -1,0 +1,32 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sun circle -->
+  <circle cx="20" cy="20" r="8" fill="#10b981" stroke="#059669" stroke-width="1.5"/>
+  
+  <!-- Sun rays -->
+  <g stroke="#10b981" stroke-width="2" stroke-linecap="round">
+    <!-- Top ray -->
+    <line x1="20" y1="4" x2="20" y2="8"/>
+    <!-- Top-right ray -->
+    <line x1="31.31" y1="8.69" x2="28.48" y2="11.52"/>
+    <!-- Right ray -->
+    <line x1="36" y1="20" x2="32" y2="20"/>
+    <!-- Bottom-right ray -->
+    <line x1="31.31" y1="31.31" x2="28.48" y2="28.48"/>
+    <!-- Bottom ray -->
+    <line x1="20" y1="36" x2="20" y2="32"/>
+    <!-- Bottom-left ray -->
+    <line x1="8.69" y1="31.31" x2="11.52" y2="28.48"/>
+    <!-- Left ray -->
+    <line x1="4" y1="20" x2="8" y2="20"/>
+    <!-- Top-left ray -->
+    <line x1="8.69" y1="8.69" x2="11.52" y2="11.52"/>
+  </g>
+  
+  <!-- Solar panel representation -->
+  <rect x="15" y="24" width="10" height="6" rx="1" fill="#065f46" stroke="#047857" stroke-width="0.5"/>
+  <line x1="17" y1="24" x2="17" y2="30" stroke="#047857" stroke-width="0.3"/>
+  <line x1="20" y1="24" x2="20" y2="30" stroke="#047857" stroke-width="0.3"/>
+  <line x1="23" y1="24" x2="23" y2="30" stroke="#047857" stroke-width="0.3"/>
+  <line x1="15" y1="26" x2="25" y2="26" stroke="#047857" stroke-width="0.3"/>
+  <line x1="15" y1="28" x2="25" y2="28" stroke="#047857" stroke-width="0.3"/>
+</svg>

@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { exportToPDF } from "@/lib/pdfExport";
+import { Plus, Settings, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee } from "lucide-react";
 import ItemForm from "./items/form";
 import SolarForm from "./solar/form";
 
@@ -89,14 +90,23 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 p-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Solar Calculator Dashboard</h1>
+      <div className="text-center mb-8">
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <img src="/logo.svg" alt="Solar Calculator Logo" className="w-10 h-10" />
+          <h1 className="text-4xl font-bold text-emerald-800">Solar Panel Estimator</h1>
+        </div>
+        <p className="text-emerald-600">Calculate how much solar your need</p>
+      </div>
 
       <div className="flex-1">
         {/* Action Buttons */}
-        <div className="flex justify-end gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
           <Dialog open={itemModalOpen} onOpenChange={setItemModalOpen}>
             <DialogTrigger asChild>
-              <Button size="lg">Add Item</Button>
+              <Button size="lg">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Item
+              </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
@@ -109,6 +119,7 @@ export default function Home() {
           <Dialog open={solarModalOpen} onOpenChange={setSolarModalOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" size="lg">
+                <Settings className="w-4 h-4 mr-2" />
                 Configure Solar System
               </Button>
             </DialogTrigger>
@@ -121,6 +132,7 @@ export default function Home() {
           </Dialog>
 
           <Button variant="secondary" size="lg" onClick={handleExportPDF} disabled={items.length === 0}>
+            <FileUp className="w-4 h-4 mr-2" />
             Export to PDF
           </Button>
         </div>
@@ -129,7 +141,10 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>
             <CardHeader>
-              <CardTitle>Total kWh</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="w-5 h-5 text-emerald-600" />
+                Total kWh
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{stats.totalKwh.toFixed(2)}</p>
@@ -139,7 +154,10 @@ export default function Home() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Total Items</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Package className="w-5 h-5 text-emerald-600" />
+                Total Items
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{stats.totalItems}</p>
@@ -148,7 +166,10 @@ export default function Home() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Avg kWh/Item</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-emerald-600" />
+                Avg kWh/Item
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{stats.avgKwhPerItem.toFixed(2)}</p>
@@ -157,7 +178,10 @@ export default function Home() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Solar Panels</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Sun className="w-5 h-5 text-emerald-600" />
+                Solar Panels Needed
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{stats.solarPanelsNeeded}</p>
@@ -202,9 +226,9 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t bg-card/50 backdrop-blur-sm">
+      <footer className="border-t bg-card/50 backdrop-blur-sm mt-4">
         <div className="flex flex-col mt-2 md:flex-row justify-between items-center gap-4">
-          <div className="text-lg font-semibold text-primary">Solar Calculator</div>
+          <div className="text-lg font-semibold text-primary">Solar Panel Estimator</div>
           <div className="text-sm text-muted-foreground">
             Made by{" "}
             <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:text-outline transitiolors">
@@ -212,10 +236,12 @@ export default function Home() {
             </a>
           </div>
           <div className="flex items-center gap-4">
-            <a href="https://github.com/azuanalias92" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            <a href="https://github.com/azuanalias92" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Github className="w-4 h-4" />
               GitHub
             </a>
-            <a href="https://buymeacoffee.com/azuanalias" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+            <a href="https://buymeacoffee.com/azuanalias" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Coffee className="w-4 h-4" />
               Buy Me Coffee
             </a>
           </div>
