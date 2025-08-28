@@ -4,15 +4,15 @@ import autoTable from 'jspdf-autotable';
 interface Item {
   id: string;
   name: string;
-  kwh: number;
+  watt: number;
   quantity: number;
   hoursUsage: number;
 }
 
 interface Stats {
   totalItems: number;
-  totalKwh: number;
-  avgKwhPerItem: number;
+  totalWatt: number;
+  avgWattPerItem: number;
   solarPanelsNeeded: number;
 }
 
@@ -48,8 +48,8 @@ export const exportToPDF = (items: Item[], stats: Stats, solarConfig: SolarConfi
   
   doc.setFontSize(12);
   doc.text(`Total Items: ${stats.totalItems}`, 20, 125);
-  doc.text(`Total Daily Energy: ${stats.totalKwh.toFixed(2)} kWh/day`, 20, 135);
-  doc.text(`Average Energy per Item: ${stats.avgKwhPerItem.toFixed(2)} kWh/day`, 20, 145);
+  doc.text(`Total Daily Energy: ${stats.totalWatt.toFixed(2)} Watt/day`, 20, 135);
+  doc.text(`Average Energy per Item: ${stats.avgWattPerItem.toFixed(2)} Watt/day`, 20, 145);
   doc.text(`Solar Panels Needed: ${stats.solarPanelsNeeded}`, 20, 155);
   
   // Items Table
@@ -59,15 +59,15 @@ export const exportToPDF = (items: Item[], stats: Stats, solarConfig: SolarConfi
     
     const tableData = items.map(item => [
       item.name,
-      `${item.kwh} kWh`,
+      `${item.watt} Watt`,
       `${item.quantity}`,
       `${item.hoursUsage}h`,
-      `${(item.kwh * item.quantity * item.hoursUsage).toFixed(2)} kWh`
+      `${(item.watt * item.quantity * item.hoursUsage).toFixed(2)} Watt`
     ]);
     
     autoTable(doc, {
       startY: 185,
-      head: [['Item Name', 'kWh per Use', 'Quantity', 'Hours/Day', 'Daily kWh']],
+      head: [['Item Name', 'Watt per Use', 'Quantity', 'Hours/Day', 'Daily Watt']],
       body: tableData,
       theme: 'grid',
       styles: {

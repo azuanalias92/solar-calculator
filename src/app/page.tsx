@@ -13,15 +13,16 @@ import SolarForm from "./solar/form";
 interface Item {
   id: string;
   name: string;
-  kwh: number;
+  watt: number;
   quantity: number;
   hoursUsage: number;
+  estimateKwh: number;
 }
 
 interface Stats {
   totalItems: number;
-  totalKwh: number;
-  avgKwhPerItem: number;
+  totalWatt: number;
+  avgWattPerItem: number;
   solarPanelsNeeded: number;
 }
 
@@ -40,26 +41,28 @@ export default function Home() {
   });
   const [stats, setStats] = useState<Stats>({
     totalItems: 0,
-    totalKwh: 0,
-    avgKwhPerItem: 0,
+    totalWatt: 0,
+    avgWattPerItem: 0,
     solarPanelsNeeded: 0,
   });
   const [itemModalOpen, setItemModalOpen] = useState(false);
   const [solarModalOpen, setSolarModalOpen] = useState(false);
 
   const calculateStats = (itemsList: Item[], config: SolarConfig) => {
+
     const totalItems = itemsList.reduce((sum, item) => sum + item.quantity, 0);
-    const totalKwh = itemsList.reduce((sum, item) => sum + item.kwh * item.quantity * item.hoursUsage, 0);
-    const avgKwhPerItem = totalItems > 0 ? totalKwh / totalItems : 0;
+    console.log('itemsList', itemsList);
+    const totalWatt = itemsList.reduce((sum, item) => sum + item.watt * item.quantity * item.hoursUsage, 0);
+    const avgWattPerItem = totalItems > 0 ? totalWatt / totalItems : 0;
 
     // Calculate solar panels needed based on configuration
     const dailyPanelOutput = (config.panelWatts / 1000) * config.peakSunHours * (config.systemEfficiency / 100);
-    const solarPanelsNeeded = Math.ceil(totalKwh / dailyPanelOutput);
+    const solarPanelsNeeded = Math.ceil(totalWatt / dailyPanelOutput);
 
     return {
       totalItems,
-      totalKwh,
-      avgKwhPerItem,
+      totalWatt,
+      avgWattPerItem,
       solarPanelsNeeded,
     };
   };
@@ -95,7 +98,7 @@ export default function Home() {
           <img src="/logo.svg" alt="Solar Calculator Logo" className="w-10 h-10" />
           <h1 className="text-4xl font-bold text-emerald-800">Solar Panel Estimator</h1>
         </div>
-        <p className="text-emerald-600">Calculate how much solar your need</p>
+        <p className="text-emerald-600">Calculate how much solar panel you need</p>
       </div>
 
       <div className="flex-1">
@@ -143,11 +146,11 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-emerald-600" />
-                Total kWh
+                Total Watt
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{stats.totalKwh.toFixed(2)}</p>
+              <p className="text-2xl font-bold">{stats.totalWatt.toFixed(2)}</p>
               <p className="text-sm text-gray-500">per day</p>
             </CardContent>
           </Card>
@@ -168,11 +171,11 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-emerald-600" />
-                Avg kWh/Item
+                Avg Watt/Item
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{stats.avgKwhPerItem.toFixed(2)}</p>
+              <p className="text-2xl font-bold">{stats.avgWattPerItem.toFixed(2)}</p>
             </CardContent>
           </Card>
 
@@ -202,20 +205,20 @@ export default function Home() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Item Name</TableHead>
-                    <TableHead>kWh per Item</TableHead>
-                    <TableHead>Quantity</TableHead>
+                    <TableHead>Watt per Item</TableHead>
                     <TableHead>Hours/Day</TableHead>
-                    <TableHead>Daily kWh</TableHead>
+                    <TableHead>Quantity</TableHead>
+                    <TableHead>Estimate KWh</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {items.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.kwh}</TableCell>
+                      <TableCell>{item.watt}</TableCell>
                       <TableCell>{item.quantity}</TableCell>
                       <TableCell>{item.hoursUsage}</TableCell>
-                      <TableCell>{(item.kwh * item.quantity * item.hoursUsage).toFixed(2)}</TableCell>
+                      <TableCell>{(item.estimateKwh).toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -236,11 +239,21 @@ export default function Home() {
             </a>
           </div>
           <div className="flex items-center gap-4">
-            <a href="https://github.com/azuanalias92" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
+            <a
+              href="https://github.com/azuanalias92"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
               <Github className="w-4 h-4" />
               GitHub
             </a>
-            <a href="https://buymeacoffee.com/azuanalias" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
+            <a
+              href="https://buymeacoffee.com/azuanalias"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
               <Coffee className="w-4 h-4" />
               Buy Me Coffee
             </a>

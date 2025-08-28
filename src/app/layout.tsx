@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Solar Panel Estimator",
-  description: "Calculate how much solar your need",
+  description: "Calculate how much solar panel your need",
   icons: {
     icon: "/logo.svg",
   },
