@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { exportToPDF } from "@/lib/pdfExport";
-import { Plus, Settings, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee } from "lucide-react";
+import { Plus, Settings, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2 } from "lucide-react";
 import ItemForm from "./items/form";
 import SolarForm from "./solar/form";
 
@@ -53,7 +53,7 @@ export default function Home() {
 
     // Use estimatekwh from the form instead of calculating from watt * hours
     const totalkWh = itemsList.reduce((sum, item) => sum + item.estimatekwh, 0);
-    const totalWatt = itemsList.reduce((sum, item) => sum + item.watt, 0);
+    const totalWatt = itemsList.reduce((sum, item) => sum + item.watt * item.quantity, 0);
     const avgWattPerItem = totalItems > 0 ? totalWatt / totalItems : 0;
 
     // Calculate solar panels needed based on configuration
@@ -79,6 +79,13 @@ export default function Home() {
     const newStats = calculateStats(updatedItems, solarConfig);
     setStats(newStats);
     setItemModalOpen(false); // Close modal after adding item
+  };
+
+  const removeItem = (itemId: string) => {
+    const updatedItems = items.filter((item) => item.id !== itemId);
+    setItems(updatedItems);
+    const newStats = calculateStats(updatedItems, solarConfig);
+    setStats(newStats);
   };
 
   const updateSolarConfig = (config: SolarConfig) => {
@@ -188,7 +195,7 @@ export default function Home() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{stats.solarPanelsNeeded}</p>
+              <p className="text-2xl font-bold text-emerald-600">{stats.solarPanelsNeeded}</p>
             </CardContent>
           </Card>
         </div>
@@ -210,6 +217,7 @@ export default function Home() {
                     <TableHead>Hours/Day</TableHead>
                     <TableHead>Quantity</TableHead>
                     <TableHead>Estimate kWh</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -220,6 +228,11 @@ export default function Home() {
                       <TableCell>{item.hoursUsage}</TableCell>
                       <TableCell>{item.quantity}</TableCell>
                       <TableCell>{item.estimatekwh.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Button variant="outline" size="sm" onClick={() => removeItem(item.id)} className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
