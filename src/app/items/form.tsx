@@ -1,113 +1,113 @@
 "use client";
-import React from "react";
-import { useForm, useFieldArray, SubmitHandler } from "react-hook-form";
-import { FaPlus, FaTrash } from "react-icons/fa";
-import { FaArrowRightFromBracket } from "react-icons/fa6";
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Item {
-  itemName: string;
-  kWh: number;
+  name: string;
+  kwh: number;
   quantity: number;
+  hoursUsage: number;
 }
 
-interface FormValues {
-  items: Item[];
+interface ItemFormProps {
+  onAddItem: (item: Item) => void;
 }
 
-const ItemForm: React.FC = () => {
-  const { control, register, handleSubmit } = useForm<FormValues>({
-    defaultValues: {
-      items: [{ itemName: "", kWh: 0, quantity: 1 }],
-    },
-  });
+export default function ItemForm({ onAddItem }: ItemFormProps) {
+  const [name, setName] = useState<string>("");
+  const [kwh, setKwh] = useState<string>("");
+  const [quantity, setQuantity] = useState<string>("");
+  const [hoursUsage, setHoursUsage] = useState<string>("");
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "items",
-  });
-
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    console.log(data);
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Parse form data
+    const kwhValue = parseFloat(kwh) || 0;
+    const quantityValue = parseInt(quantity) || 0;
+    const hoursUsageValue = parseFloat(hoursUsage) || 0;
+    
+    if (name.trim() && kwhValue > 0 && quantityValue > 0 && hoursUsageValue > 0) {
+      const item: Item = {
+        name: name.trim(),
+        kwh: kwhValue,
+        quantity: quantityValue,
+        hoursUsage: hoursUsageValue,
+      };
+      
+      // Add the item
+      onAddItem(item);
+      
+      // Reset form
+      setName("");
+      setKwh("");
+      setQuantity("");
+      setHoursUsage("");
+    }
   };
 
   return (
-    <div className="w-full">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {fields.map((field, index) => (
-          <div
-            key={field.id}
-            className="flex flex-col md:flex-row flex-grow gap-2 rounded-md mb-2"
-          >
-            <div className="flex flex-col">
-              <label htmlFor="">Item</label>
-              <input
-                {...register(`items.${index}.itemName` as const, {
-                  required: true,
-                })}
-                placeholder=""
-                className="p-2 rounded-md"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="">kWh</label>
-              <input
-                type="number"
-                {...register(`items.${index}.kWh` as const, {
-                  required: true,
-                  valueAsNumber: true,
-                })}
-                placeholder="kWh"
-                className="p-2 rounded-md"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="">Quantity</label>
-              <input
-                type="number"
-                {...register(`items.${index}.quantity` as const, {
-                  required: true,
-                  valueAsNumber: true,
-                })}
-                placeholder="Quantity"
-                className="p-2 rounded-md"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="">Remove </label>
-              <button
-                type="button"
-                onClick={() => remove(index)}
-                className="flex flex-inline bg-red-300 rounded-md justify-center items-center p-3 gap-2"
-              >
-                <FaTrash />
-              </button>
-            </div>
-          </div>
-        ))}
-        <div className="flex flex-row gap-2 pt-2">
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle>Add Item</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={onSubmit} className="space-y-4">
           <div>
-            <button
-              type="button"
-              onClick={() => append({ itemName: "", kWh: 0, quantity: 1 })}
-              className="flex flex-inline bg-gray-300 rounded-md justify-center items-center p-2 gap-2"
-            >
-              <FaPlus />
-              <label htmlFor="">Add Item</label>
-            </button>
+            <Label htmlFor="name">Item Name</Label>
+            <Input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g., Light bulb"
+              required
+            />
           </div>
           <div>
-            <button
-              type="submit"
-              className="flex flex-inline bg-blue-300 rounded-md justify-center items-center p-2 gap-2"
-            >
-              <FaArrowRightFromBracket />
-              Submit
-            </button>
+            <Label htmlFor="kwh">kWh per item</Label>
+            <Input
+              id="kwh"
+              type="number"
+              step="0.01"
+              value={kwh}
+              onChange={(e) => setKwh(e.target.value)}
+              placeholder="e.g., 0.06"
+              required
+            />
           </div>
-        </div>
-      </form>
-    </div>
+          <div>
+             <Label htmlFor="quantity">Quantity</Label>
+             <Input
+               id="quantity"
+               type="number"
+               value={quantity}
+               onChange={(e) => setQuantity(e.target.value)}
+               placeholder="e.g., 5"
+               required
+             />
+           </div>
+           <div>
+             <Label htmlFor="hoursUsage">Hours of Usage per Day</Label>
+             <Input
+               id="hoursUsage"
+               type="number"
+               step="0.1"
+               value={hoursUsage}
+               onChange={(e) => setHoursUsage(e.target.value)}
+               placeholder="e.g., 8"
+               required
+             />
+           </div>
+          <Button type="submit" className="w-full">
+            Add Item
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
-};
-
-export default ItemForm;
+}
