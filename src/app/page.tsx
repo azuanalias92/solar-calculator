@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { exportToPDF } from "@/lib/pdfExport";
-import { Plus, Settings, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2 } from "lucide-react";
+import { Plus, Settings, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2, RotateCcw } from "lucide-react";
 import ItemForm from "./items/form";
 import SolarForm from "./solar/form";
 
@@ -45,40 +45,47 @@ export default function Home() {
     avgWattPerItem: 0,
     solarPanelsNeeded: 0,
   });
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // Load data from localStorage on component mount
   useEffect(() => {
-    const savedItems = localStorage.getItem('solar-calculator-items');
-    const savedConfig = localStorage.getItem('solar-calculator-config');
-    
+    const savedItems = localStorage.getItem("solar-calculator-items");
+    const savedConfig = localStorage.getItem("solar-calculator-config");
+
     if (savedItems) {
       try {
         const parsedItems = JSON.parse(savedItems);
         setItems(parsedItems);
       } catch (error) {
-        console.error('Error parsing saved items:', error);
+        console.error("Error parsing saved items:", error);
       }
     }
-    
+
     if (savedConfig) {
       try {
         const parsedConfig = JSON.parse(savedConfig);
         setSolarConfig(parsedConfig);
       } catch (error) {
-        console.error('Error parsing saved config:', error);
+        console.error("Error parsing saved config:", error);
       }
     }
+
+    setIsLoaded(true);
   }, []);
 
-  // Save items to localStorage whenever items change
+  // Save items to localStorage whenever items change (but only after initial load)
   useEffect(() => {
-    localStorage.setItem('solar-calculator-items', JSON.stringify(items));
-  }, [items]);
+    if (isLoaded) {
+      localStorage.setItem("solar-calculator-items", JSON.stringify(items));
+    }
+  }, [items, isLoaded]);
 
-  // Save solar config to localStorage whenever it changes
+  // Save solar config to localStorage whenever it changes (but only after initial load)
   useEffect(() => {
-    localStorage.setItem('solar-calculator-config', JSON.stringify(solarConfig));
-  }, [solarConfig]);
+    if (isLoaded) {
+      localStorage.setItem("solar-calculator-config", JSON.stringify(solarConfig));
+    }
+  }, [solarConfig, isLoaded]);
 
   // Recalculate stats when items or config change
   useEffect(() => {
@@ -113,30 +120,35 @@ export default function Home() {
       ...item,
       id: Date.now().toString(),
     };
-    const updatedItems = [...items, newItem];
-    setItems(updatedItems);
-
-    const newStats = calculateStats(updatedItems, solarConfig);
-    setStats(newStats);
+    setItems([...items, newItem]);
     setItemModalOpen(false); // Close modal after adding item
   };
 
   const removeItem = (itemId: string) => {
-    const updatedItems = items.filter((item) => item.id !== itemId);
-    setItems(updatedItems);
-    const newStats = calculateStats(updatedItems, solarConfig);
-    setStats(newStats);
+    setItems(items.filter((item) => item.id !== itemId));
   };
 
   const updateSolarConfig = (config: SolarConfig) => {
     setSolarConfig(config);
-    const newStats = calculateStats(items, config);
-    setStats(newStats);
     setSolarModalOpen(false); // Close modal after updating config
   };
 
   const handleExportPDF = () => {
     exportToPDF(items, stats, solarConfig);
+  };
+
+  const handleReset = () => {
+    // Clear localStorage
+    localStorage.removeItem("solar-calculator-items");
+    localStorage.removeItem("solar-calculator-config");
+
+    // Reset state to initial values
+    setItems([]);
+    setSolarConfig({
+      peakSunHours: 5,
+      panelWatts: 300,
+      systemEfficiency: 85,
+    });
   };
 
   return (
@@ -186,6 +198,13 @@ export default function Home() {
             <FileUp className="w-4 h-4 mr-2" />
             Export to PDF
           </Button>
+
+          {items.length > 0 && (
+            <Button variant="destructive" size="lg" onClick={handleReset}>
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Reset All Data
+            </Button>
+          )}
         </div>
 
         {/* Statistics Cards */}
