@@ -10,7 +10,7 @@ interface Item {
   watt: number;
   quantity: number;
   hoursUsage: number;
-  estimatekwh: number;
+  estimatekWh: number;
 }
 
 interface ItemFormProps {
@@ -22,7 +22,7 @@ export default function ItemForm({ onAddItem }: ItemFormProps) {
   const [watt, setWatt] = useState<string>("");
   const [quantity, setQuantity] = useState<string>("");
   const [hoursUsage, setHoursUsage] = useState<string>("");
-  const [estimatekwh, setEstimateKwh] = useState<string>("");
+  const [estimatekWh, setEstimateKwh] = useState<string>("");
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +39,7 @@ export default function ItemForm({ onAddItem }: ItemFormProps) {
         watt: wattValue,
         quantity: quantityValue,
         hoursUsage: hoursUsageValue,
-        estimatekwh: estimateKwhValue,
+        estimatekWh: estimateKwhValue,
       };
 
       // Add the item
@@ -73,8 +73,8 @@ export default function ItemForm({ onAddItem }: ItemFormProps) {
         <Input id="quantity" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="e.g., 5" required />
       </div>
       <div>
-        <Label htmlFor="estimatekwh">Estimate kWh</Label>
-        <Input id="estimatekwh" type="number" step="0.01" value={(parseFloat(watt) / 1000) * parseFloat(hoursUsage) * parseFloat(quantity)} readOnly />
+        <Label htmlFor="estimatekWh">Estimate kWh</Label>
+        <Input id="estimatekWh" type="number" step="0.01" value={(parseFloat(watt) / 1000) * parseFloat(hoursUsage) * parseFloat(quantity)} readOnly />
       </div>
       <Button type="submit" className="w-full">
         Add Item

@@ -7,7 +7,7 @@ interface Item {
   watt: number;
   quantity: number;
   hoursUsage: number;
-  estimatekwh: number;
+  estimatekWh: number;
 }
 
 interface Stats {
@@ -26,60 +26,99 @@ interface SolarConfig {
 export const exportToPDF = (items: Item[], stats: Stats, solarConfig: SolarConfig) => {
   const doc = new jsPDF();
   
-  // Title
-  doc.setFontSize(20);
-  doc.text('Solar Calculator Report', 20, 20);
+  // Header with modern styling
+  doc.setFontSize(24);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(34, 197, 94); // Green theme color
+  doc.text('Solar Calculator Report', 20, 25);
+  
+  // Subtitle line
+  doc.setLineWidth(0.5);
+  doc.setDrawColor(34, 197, 94);
+  doc.line(20, 30, 190, 30);
   
   // Date
-  doc.setFontSize(12);
-  doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 35);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 100, 100);
+  doc.text(`Generated on: ${new Date().toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  })}`, 20, 40);
   
   // Solar Configuration Section
   doc.setFontSize(16);
-  doc.text('Solar System Configuration', 20, 55);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(0, 0, 0);
+  doc.text('Solar System Configuration', 20, 60);
   
-  doc.setFontSize(12);
-  doc.text(`Peak Sun Hours: ${solarConfig.peakSunHours} hours/day`, 20, 70);
-  doc.text(`Panel Watts: ${solarConfig.panelWatts}W`, 20, 80);
-  doc.text(`System Efficiency: ${solarConfig.systemEfficiency}%`, 20, 90);
+  // Configuration background
+  doc.setFillColor(248, 250, 252);
+  doc.rect(20, 65, 170, 35, 'F');
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(60, 60, 60);
+  doc.text(`Peak Sun Hours: ${solarConfig.peakSunHours} hours/day`, 25, 75);
+  doc.text(`Panel Watts: ${solarConfig.panelWatts}W`, 25, 85);
+  doc.text(`System Efficiency: ${solarConfig.systemEfficiency}%`, 25, 95);
   
   // Statistics Section
   doc.setFontSize(16);
-  doc.text('Energy Statistics', 20, 110);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(0, 0, 0);
+  doc.text('Energy Statistics', 20, 115);
   
-  doc.setFontSize(12);
-  doc.text(`Total Items: ${stats.totalItems}`, 20, 125);
-  doc.text(`Total Daily Energy: ${stats.totalkWh.toFixed(2)} Watt/day`, 20, 135);
-  doc.text(`Average Energy per Item: ${stats.avgWattPerItem.toFixed(2)} Watt/day`, 20, 145);
-  doc.text(`Solar Panels Needed: ${stats.solarPanelsNeeded}`, 20, 155);
+  // Statistics background
+  doc.setFillColor(240, 253, 244);
+  doc.rect(20, 120, 170, 45, 'F');
+  
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(60, 60, 60);
+  doc.text(`Total Items: ${stats.totalItems}`, 25, 130);
+  doc.text(`Total Daily Energy: ${stats.totalkWh.toFixed(2)} Watt/day`, 25, 140);
+  doc.text(`Average Energy per Item: ${stats.avgWattPerItem.toFixed(2)} Watt/day`, 25, 150);
+  doc.text(`Solar Panels Needed: ${stats.solarPanelsNeeded}`, 25, 160);
   
   // Items Table
   if (items.length > 0) {
     doc.setFontSize(16);
-    doc.text('Items Breakdown', 20, 175);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text('Items Breakdown', 20, 180);
     
     const tableData = items.map(item => [
       item.name,
       `${item.watt} Watt`,
       `${item.quantity}`,
       `${item.hoursUsage}h`,
-      `${(item.estimatekwh * item.quantity).toFixed(2)} Watt`
+      `${(item.estimatekWh * item.quantity).toFixed(2)} Watt`
     ]);
     
     autoTable(doc, {
-      startY: 185,
+      startY: 190,
       head: [['Item Name', 'Watt per Use', 'Quantity', 'Hours/Day', 'Daily Watt']],
       body: tableData,
-      theme: 'grid',
+      theme: 'striped',
       styles: {
         fontSize: 10,
-        cellPadding: 3,
+        cellPadding: 4,
+        textColor: [60, 60, 60],
+        lineColor: [220, 220, 220],
+        lineWidth: 0.1,
       },
       headStyles: {
-        fillColor: [66, 139, 202],
-        textColor: 255,
+        fillColor: [34, 197, 94],
+        textColor: [255, 255, 255],
         fontStyle: 'bold',
+        fontSize: 11,
       },
+      alternateRowStyles: {
+        fillColor: [248, 250, 252],
+      },
+      margin: { left: 20, right: 20 },
     });
   }
   

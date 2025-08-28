@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -16,7 +16,7 @@ interface Item {
   watt: number;
   quantity: number;
   hoursUsage: number;
-  estimatekwh: number;
+  estimatekWh: number;
 }
 
 interface Stats {
@@ -45,14 +45,54 @@ export default function Home() {
     avgWattPerItem: 0,
     solarPanelsNeeded: 0,
   });
+
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    const savedItems = localStorage.getItem('solar-calculator-items');
+    const savedConfig = localStorage.getItem('solar-calculator-config');
+    
+    if (savedItems) {
+      try {
+        const parsedItems = JSON.parse(savedItems);
+        setItems(parsedItems);
+      } catch (error) {
+        console.error('Error parsing saved items:', error);
+      }
+    }
+    
+    if (savedConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedConfig);
+        setSolarConfig(parsedConfig);
+      } catch (error) {
+        console.error('Error parsing saved config:', error);
+      }
+    }
+  }, []);
+
+  // Save items to localStorage whenever items change
+  useEffect(() => {
+    localStorage.setItem('solar-calculator-items', JSON.stringify(items));
+  }, [items]);
+
+  // Save solar config to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('solar-calculator-config', JSON.stringify(solarConfig));
+  }, [solarConfig]);
+
+  // Recalculate stats when items or config change
+  useEffect(() => {
+    const newStats = calculateStats(items, solarConfig);
+    setStats(newStats);
+  }, [items, solarConfig]);
   const [itemModalOpen, setItemModalOpen] = useState(false);
   const [solarModalOpen, setSolarModalOpen] = useState(false);
 
   const calculateStats = (itemsList: Item[], config: SolarConfig) => {
     const totalItems = itemsList.reduce((sum, item) => sum + item.quantity, 0);
 
-    // Use estimatekwh from the form instead of calculating from watt * hours
-    const totalkWh = itemsList.reduce((sum, item) => sum + item.estimatekwh, 0);
+    // Use estimatekWh from the form instead of calculating from watt * hours
+    const totalkWh = itemsList.reduce((sum, item) => sum + item.estimatekWh, 0);
     const totalWatt = itemsList.reduce((sum, item) => sum + item.watt * item.quantity, 0);
     const avgWattPerItem = totalItems > 0 ? totalWatt / totalItems : 0;
 
@@ -227,7 +267,7 @@ export default function Home() {
                       <TableCell>{item.watt}</TableCell>
                       <TableCell>{item.hoursUsage}</TableCell>
                       <TableCell>{item.quantity}</TableCell>
-                      <TableCell>{item.estimatekwh.toFixed(2)}</TableCell>
+                      <TableCell>{item.estimatekWh.toFixed(2)}</TableCell>
                       <TableCell>
                         <Button variant="outline" size="sm" onClick={() => removeItem(item.id)} className="text-red-600 hover:text-red-700 hover:bg-red-50">
                           <Trash2 className="w-4 h-4" />
