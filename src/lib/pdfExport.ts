@@ -7,11 +7,12 @@ interface Item {
   watt: number;
   quantity: number;
   hoursUsage: number;
+  estimatekwh: number;
 }
 
 interface Stats {
   totalItems: number;
-  totalWatt: number;
+  totalkWh: number;
   avgWattPerItem: number;
   solarPanelsNeeded: number;
 }
@@ -48,7 +49,7 @@ export const exportToPDF = (items: Item[], stats: Stats, solarConfig: SolarConfi
   
   doc.setFontSize(12);
   doc.text(`Total Items: ${stats.totalItems}`, 20, 125);
-  doc.text(`Total Daily Energy: ${stats.totalWatt.toFixed(2)} Watt/day`, 20, 135);
+  doc.text(`Total Daily Energy: ${stats.totalkWh.toFixed(2)} Watt/day`, 20, 135);
   doc.text(`Average Energy per Item: ${stats.avgWattPerItem.toFixed(2)} Watt/day`, 20, 145);
   doc.text(`Solar Panels Needed: ${stats.solarPanelsNeeded}`, 20, 155);
   
@@ -62,7 +63,7 @@ export const exportToPDF = (items: Item[], stats: Stats, solarConfig: SolarConfi
       `${item.watt} Watt`,
       `${item.quantity}`,
       `${item.hoursUsage}h`,
-      `${(item.watt * item.quantity * item.hoursUsage).toFixed(2)} Watt`
+      `${(item.estimatekwh * item.quantity).toFixed(2)} Watt`
     ]);
     
     autoTable(doc, {

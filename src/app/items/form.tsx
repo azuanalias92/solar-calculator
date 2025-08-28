@@ -10,7 +10,7 @@ interface Item {
   watt: number;
   quantity: number;
   hoursUsage: number;
-  estimateKwh: number;
+  estimatekwh: number;
 }
 
 interface ItemFormProps {
@@ -22,7 +22,7 @@ export default function ItemForm({ onAddItem }: ItemFormProps) {
   const [watt, setWatt] = useState<string>("");
   const [quantity, setQuantity] = useState<string>("");
   const [hoursUsage, setHoursUsage] = useState<string>("");
-  const [estimateKwh, setEstimateKwh] = useState<string>("");
+  const [estimatekwh, setEstimateKwh] = useState<string>("");
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,16 +33,13 @@ export default function ItemForm({ onAddItem }: ItemFormProps) {
     const hoursUsageValue = parseFloat(hoursUsage) || 0;
     const estimateKwhValue = (parseFloat(watt) / 1000) * parseFloat(hoursUsage) * parseFloat(quantity) || 0;
 
-    console.log(watt, quantity, hoursUsage, estimateKwh);
-    console.log(wattValue, quantityValue, hoursUsageValue, estimateKwhValue);
-
     if (name.trim() && wattValue > 0 && estimateKwhValue > 0 && quantityValue > 0 && hoursUsageValue > 0) {
       const item: Item = {
         name: name.trim(),
         watt: wattValue,
         quantity: quantityValue,
         hoursUsage: hoursUsageValue,
-        estimateKwh: estimateKwhValue,
+        estimatekwh: estimateKwhValue,
       };
 
       // Add the item
@@ -76,8 +73,8 @@ export default function ItemForm({ onAddItem }: ItemFormProps) {
         <Input id="quantity" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="e.g., 5" required />
       </div>
       <div>
-        <Label htmlFor="estimateKwh">Estimate kWh</Label>
-        <Input id="estimateKwh" type="number" step="0.01" value={(parseFloat(watt) / 1000) * parseFloat(hoursUsage) * parseFloat(quantity)} readOnly />
+        <Label htmlFor="estimatekwh">Estimate kWh</Label>
+        <Input id="estimatekwh" type="number" step="0.01" value={(parseFloat(watt) / 1000) * parseFloat(hoursUsage) * parseFloat(quantity)} readOnly />
       </div>
       <Button type="submit" className="w-full">
         Add Item

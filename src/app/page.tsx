@@ -16,12 +16,12 @@ interface Item {
   watt: number;
   quantity: number;
   hoursUsage: number;
-  estimateKwh: number;
+  estimatekwh: number;
 }
 
 interface Stats {
   totalItems: number;
-  totalWatt: number;
+  totalkWh: number;
   avgWattPerItem: number;
   solarPanelsNeeded: number;
 }
@@ -41,7 +41,7 @@ export default function Home() {
   });
   const [stats, setStats] = useState<Stats>({
     totalItems: 0,
-    totalWatt: 0,
+    totalkWh: 0,
     avgWattPerItem: 0,
     solarPanelsNeeded: 0,
   });
@@ -49,19 +49,20 @@ export default function Home() {
   const [solarModalOpen, setSolarModalOpen] = useState(false);
 
   const calculateStats = (itemsList: Item[], config: SolarConfig) => {
-
     const totalItems = itemsList.reduce((sum, item) => sum + item.quantity, 0);
-    console.log('itemsList', itemsList);
-    const totalWatt = itemsList.reduce((sum, item) => sum + item.watt * item.quantity * item.hoursUsage, 0);
+
+    // Use estimatekwh from the form instead of calculating from watt * hours
+    const totalkWh = itemsList.reduce((sum, item) => sum + item.estimatekwh, 0);
+    const totalWatt = itemsList.reduce((sum, item) => sum + item.watt, 0);
     const avgWattPerItem = totalItems > 0 ? totalWatt / totalItems : 0;
 
     // Calculate solar panels needed based on configuration
     const dailyPanelOutput = (config.panelWatts / 1000) * config.peakSunHours * (config.systemEfficiency / 100);
-    const solarPanelsNeeded = Math.ceil(totalWatt / dailyPanelOutput);
+    const solarPanelsNeeded = Math.ceil(totalkWh / dailyPanelOutput);
 
     return {
       totalItems,
-      totalWatt,
+      totalkWh,
       avgWattPerItem,
       solarPanelsNeeded,
     };
@@ -146,11 +147,11 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-emerald-600" />
-                Total Watt
+                Total kWh
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{stats.totalWatt.toFixed(2)}</p>
+              <p className="text-2xl font-bold">{stats.totalkWh.toFixed(2)}</p>
               <p className="text-sm text-gray-500">per day</p>
             </CardContent>
           </Card>
@@ -208,7 +209,7 @@ export default function Home() {
                     <TableHead>Watt per Item</TableHead>
                     <TableHead>Hours/Day</TableHead>
                     <TableHead>Quantity</TableHead>
-                    <TableHead>Estimate KWh</TableHead>
+                    <TableHead>Estimate kWh</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -216,9 +217,9 @@ export default function Home() {
                     <TableRow key={item.id}>
                       <TableCell>{item.name}</TableCell>
                       <TableCell>{item.watt}</TableCell>
-                      <TableCell>{item.quantity}</TableCell>
                       <TableCell>{item.hoursUsage}</TableCell>
-                      <TableCell>{(item.estimateKwh).toFixed(2)}</TableCell>
+                      <TableCell>{item.quantity}</TableCell>
+                      <TableCell>{item.estimatekwh.toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
