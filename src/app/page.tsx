@@ -48,13 +48,13 @@ export default function Home() {
 
   const calculateStats = (itemsList: Item[], config: SolarConfig) => {
     const totalItems = itemsList.reduce((sum, item) => sum + item.quantity, 0);
-    const totalKwh = itemsList.reduce((sum, item) => sum + (item.kwh * item.quantity * item.hoursUsage), 0);
+    const totalKwh = itemsList.reduce((sum, item) => sum + item.kwh * item.quantity * item.hoursUsage, 0);
     const avgKwhPerItem = totalItems > 0 ? totalKwh / totalItems : 0;
-    
+
     // Calculate solar panels needed based on configuration
     const dailyPanelOutput = (config.panelWatts / 1000) * config.peakSunHours * (config.systemEfficiency / 100);
     const solarPanelsNeeded = Math.ceil(totalKwh / dailyPanelOutput);
-    
+
     return {
       totalItems,
       totalKwh,
@@ -63,14 +63,14 @@ export default function Home() {
     };
   };
 
-  const addItem = (item: Omit<Item, 'id'>) => {
+  const addItem = (item: Omit<Item, "id">) => {
     const newItem = {
       ...item,
       id: Date.now().toString(),
     };
     const updatedItems = [...items, newItem];
     setItems(updatedItems);
-    
+
     const newStats = calculateStats(updatedItems, solarConfig);
     setStats(newStats);
     setItemModalOpen(false); // Close modal after adding item
@@ -88,48 +88,43 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          Solar Calculator Dashboard
-        </h1>
-        
+    <div className="flex flex-col min-h-screen bg-gray-50 p-8">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Solar Calculator Dashboard</h1>
+
+      <div className="flex-1">
         {/* Action Buttons */}
-          <div className="flex gap-4 mb-8">
-            <Dialog open={itemModalOpen} onOpenChange={setItemModalOpen}>
-              <DialogTrigger asChild>
-                <Button size="lg">Add Item</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Item</DialogTitle>
-                </DialogHeader>
-                <ItemForm onAddItem={addItem} />
-              </DialogContent>
-            </Dialog>
-            
-            <Dialog open={solarModalOpen} onOpenChange={setSolarModalOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="lg">Configure Solar System</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Solar Panel Configuration</DialogTitle>
-                </DialogHeader>
-                <SolarForm onConfigUpdate={updateSolarConfig} currentConfig={solarConfig} />
-              </DialogContent>
-            </Dialog>
-            
-            <Button 
-              variant="secondary" 
-              size="lg" 
-              onClick={handleExportPDF}
-              disabled={items.length === 0}
-            >
-              Export to PDF
-            </Button>
-          </div>
-        
+        <div className="flex justify-end gap-4 mb-8">
+          <Dialog open={itemModalOpen} onOpenChange={setItemModalOpen}>
+            <DialogTrigger asChild>
+              <Button size="lg">Add Item</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Item</DialogTitle>
+              </DialogHeader>
+              <ItemForm onAddItem={addItem} />
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={solarModalOpen} onOpenChange={setSolarModalOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="lg">
+                Configure Solar System
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Solar Panel Configuration</DialogTitle>
+              </DialogHeader>
+              <SolarForm onConfigUpdate={updateSolarConfig} currentConfig={solarConfig} />
+            </DialogContent>
+          </Dialog>
+
+          <Button variant="secondary" size="lg" onClick={handleExportPDF} disabled={items.length === 0}>
+            Export to PDF
+          </Button>
+        </div>
+
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card>
@@ -137,11 +132,11 @@ export default function Home() {
               <CardTitle>Total kWh</CardTitle>
             </CardHeader>
             <CardContent>
-               <p className="text-2xl font-bold">{stats.totalKwh.toFixed(2)}</p>
-               <p className="text-sm text-gray-500">per day</p>
-             </CardContent>
+              <p className="text-2xl font-bold">{stats.totalKwh.toFixed(2)}</p>
+              <p className="text-sm text-gray-500">per day</p>
+            </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Total Items</CardTitle>
@@ -150,7 +145,7 @@ export default function Home() {
               <p className="text-2xl font-bold">{stats.totalItems}</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Avg kWh/Item</CardTitle>
@@ -159,7 +154,7 @@ export default function Home() {
               <p className="text-2xl font-bold">{stats.avgKwhPerItem.toFixed(2)}</p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Solar Panels</CardTitle>
@@ -169,7 +164,7 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
-        
+
         {/* Items Table */}
         <Card>
           <CardHeader>
@@ -181,30 +176,51 @@ export default function Home() {
             ) : (
               <Table>
                 <TableHeader>
-                   <TableRow>
-                     <TableHead>Item Name</TableHead>
-                     <TableHead>kWh per Item</TableHead>
-                     <TableHead>Quantity</TableHead>
-                     <TableHead>Hours/Day</TableHead>
-                     <TableHead>Daily kWh</TableHead>
-                   </TableRow>
-                 </TableHeader>
-                 <TableBody>
-                   {items.map((item) => (
-                     <TableRow key={item.id}>
-                       <TableCell>{item.name}</TableCell>
-                       <TableCell>{item.kwh}</TableCell>
-                       <TableCell>{item.quantity}</TableCell>
-                       <TableCell>{item.hoursUsage}</TableCell>
-                       <TableCell>{(item.kwh * item.quantity * item.hoursUsage).toFixed(2)}</TableCell>
-                     </TableRow>
-                   ))}
-                 </TableBody>
+                  <TableRow>
+                    <TableHead>Item Name</TableHead>
+                    <TableHead>kWh per Item</TableHead>
+                    <TableHead>Quantity</TableHead>
+                    <TableHead>Hours/Day</TableHead>
+                    <TableHead>Daily kWh</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {items.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>{item.kwh}</TableCell>
+                      <TableCell>{item.quantity}</TableCell>
+                      <TableCell>{item.hoursUsage}</TableCell>
+                      <TableCell>{(item.kwh * item.quantity * item.hoursUsage).toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
               </Table>
             )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Footer */}
+      <footer className="border-t bg-card/50 backdrop-blur-sm">
+        <div className="flex flex-col mt-2 md:flex-row justify-between items-center gap-4">
+          <div className="text-lg font-semibold text-primary">Solar Calculator</div>
+          <div className="text-sm text-muted-foreground">
+            Made by{" "}
+            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:text-outline transitiolors">
+              Azuan Alias
+            </a>
+          </div>
+          <div className="flex items-center gap-4">
+            <a href="https://github.com/azuanalias92" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              GitHub
+            </a>
+            <a href="https://buymeacoffee.com/azuanalias" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              Buy Me Coffee
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
