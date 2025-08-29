@@ -1,0 +1,21 @@
+{
+  "name": "Solar Panel Estimator - Calculate Your Solar Energy Needs",
+  "short_name": "Solar Calculator",
+  "description": "Free solar panel calculator to estimate how many solar panels you need for your home. Calculate energy consumption, solar system requirements, and potential savings.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#059669",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity", "lifestyle"],
+  "lang": "en",
+  "scope": "/"
+}
