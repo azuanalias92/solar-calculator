@@ -7,8 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { exportToPDF } from "@/lib/pdfExport";
 import { Plus, Settings, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2, RotateCcw } from "lucide-react";
-import ItemForm from "./[locale]/items/form";
-import SolarForm from "./[locale]/solar/form";
+import ItemForm from "./items/form";
+import SolarForm from "./solar/form";
 import { useTranslation } from "@/lib/useTranslation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
@@ -157,11 +157,20 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 p-8">
       <div className="text-center mb-8">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          {/* <img src="/logo.svg" alt={t('common.logoAlt')} className="w-10 h-10" /> */}
-          <h1 className="text-4xl font-bold text-emerald-800">{t('common.title')}</h1>
+        <div className="flex items-center justify-between">
+          {/* Centered Title */}
+          <div className="flex flex-1 items-center justify-center gap-3">
+            <img src="/logo.svg" alt={t("common.logoAlt")} className="w-10 h-10" />
+            <h1 className="text-4xl font-bold text-emerald-800">{t("common.title")}</h1>
+          </div>
+
+          {/* Language Switcher aligned to end */}
+          <div className="ml-auto">
+            <LanguageSwitcher />
+          </div>
         </div>
-        <p className="text-emerald-600">{t('common.subtitle')}</p>
+
+        <p className="text-emerald-600">{t("common.description")}</p>
       </div>
 
       <div className="flex-1">
@@ -171,12 +180,12 @@ export default function Home() {
             <DialogTrigger asChild>
               <Button size="lg">
                 <Plus className="w-4 h-4 mr-2" />
-                {t('buttons.addItem')}
+                {t("buttons.addItem")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>{t('dialogs.addNewItem')}</DialogTitle>
+                <DialogTitle>{t("form.addNewItem")}</DialogTitle>
               </DialogHeader>
               <ItemForm onAddItem={addItem} />
             </DialogContent>
@@ -186,12 +195,12 @@ export default function Home() {
             <DialogTrigger asChild>
               <Button variant="outline" size="lg">
                 <Settings className="w-4 h-4 mr-2" />
-                {t('buttons.configureSolar')}
+                {t("buttons.configureSolar")}
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>{t('dialogs.solarConfiguration')}</DialogTitle>
+                <DialogTitle>{t("form.solarConfiguration")}</DialogTitle>
               </DialogHeader>
               <SolarForm onConfigUpdate={updateSolarConfig} currentConfig={solarConfig} />
             </DialogContent>
@@ -199,13 +208,13 @@ export default function Home() {
 
           <Button variant="secondary" size="lg" onClick={handleExportPDF} disabled={items.length === 0}>
             <FileUp className="w-4 h-4 mr-2" />
-            {t('buttons.exportPDF')}
+            {t("buttons.exportPDF")}
           </Button>
 
           {items.length > 0 && (
             <Button variant="destructive" size="lg" onClick={handleReset}>
               <RotateCcw className="w-4 h-4 mr-2" />
-              {t('buttons.resetData')}
+              {t("buttons.resetData")}
             </Button>
           )}
         </div>
@@ -216,12 +225,12 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-emerald-600" />
-                {t('stats.totalKwh')}
+                {t("stats.totalKwh")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">{stats.totalkWh.toFixed(2)}</p>
-              <p className="text-sm text-gray-500">{t('stats.perDay')}</p>
+              <p className="text-sm text-gray-500">{t("stats.perDay")}</p>
             </CardContent>
           </Card>
 
@@ -229,7 +238,7 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Package className="w-5 h-5 text-emerald-600" />
-                {t('stats.totalItems')}
+                {t("stats.totalItems")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -241,7 +250,7 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-emerald-600" />
-                {t('stats.avgWattPerItem')}
+                {t("stats.avgWattPerItem")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -253,7 +262,7 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sun className="w-5 h-5 text-emerald-600" />
-                {t('stats.solarPanelsNeeded')}
+                {t("stats.solarPanelsNeeded")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -265,21 +274,21 @@ export default function Home() {
         {/* Items Table */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('table.itemsList')}</CardTitle>
+            <CardTitle>{t("table.itemsList")}</CardTitle>
           </CardHeader>
           <CardContent>
             {items.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">{t('table.noItems')}</p>
+              <p className="text-gray-500 text-center py-8">{t("table.noItems")}</p>
             ) : (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t('table.itemName')}</TableHead>
-                    <TableHead>{t('table.wattPerItem')}</TableHead>
-                    <TableHead>{t('table.hoursPerDay')}</TableHead>
-                    <TableHead>{t('table.quantity')}</TableHead>
-                    <TableHead>{t('table.estimateKwh')}</TableHead>
-                    <TableHead>{t('table.actions')}</TableHead>
+                    <TableHead>{t("table.itemName")}</TableHead>
+                    <TableHead>{t("table.wattPerItem")}</TableHead>
+                    <TableHead>{t("table.hoursPerDay")}</TableHead>
+                    <TableHead>{t("table.quantity")}</TableHead>
+                    <TableHead>{t("table.estimateKwh")}</TableHead>
+                    <TableHead>{t("table.actions")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -307,9 +316,9 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t bg-card/50 backdrop-blur-sm mt-4">
         <div className="flex flex-col mt-2 md:flex-row justify-between items-center gap-4">
-          <div className="text-lg font-semibold text-primary">{t('common.title')}</div>
+          <div className="text-lg font-semibold text-primary">{t("common.title")}</div>
           <div className="text-sm text-muted-foreground">
-            {t('footer.madeBy')}{" "}
+            {t("footer.madeBy")}{" "}
             <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:text-outline transitiolors">
               Azuan Alias
             </a>
@@ -322,7 +331,7 @@ export default function Home() {
               className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               <Github className="w-4 h-4" />
-              {t('footer.github')}
+              {t("footer.github")}
             </a>
             <a
               href="https://buymeacoffee.com/azuanalias"
@@ -331,7 +340,7 @@ export default function Home() {
               className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               <Coffee className="w-4 h-4" />
-              {t('footer.buyMeCoffee')}
+              {t("footer.buyMeCoffee")}
             </a>
           </div>
         </div>

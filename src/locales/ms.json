@@ -1,0 +1,108 @@
+{
+  "common": {
+    "title": "Solar Panel Estimator",
+    "description": "Kira berapa banyak panel solar yang anda perlukan",
+    "addItem": "Tambah Barang",
+    "configureSolar": "Konfigurasi Sistem Solar",
+    "exportPDF": "Eksport ke PDF",
+    "reset": "Set Semula Semua Data",
+    "cancel": "Batal",
+    "save": "Simpan",
+    "delete": "Padam",
+    "edit": "Edit",
+    "close": "Tutup"
+  },
+  "buttons": {
+    "addItem": "Tambah Barang",
+    "configureSolar": "Konfigurasi Sistem Solar",
+    "exportPDF": "Eksport ke PDF",
+    "resetData": "Reset Semua Data",
+    "updateConfiguration": "Kemas Kini Konfigurasi"
+  },
+  "seo": {
+    "title": "Pengira Panel Solar - Kira Keperluan Tenaga Solar Anda",
+    "description": "Kalkulator panel solar percuma untuk menganggar berapa banyak panel solar yang anda perlukan untuk rumah anda. Kira penggunaan tenaga, keperluan sistem solar, dan potensi penjimatan dengan alat penganggar solar yang mudah digunakan.",
+    "keywords": "kalkulator panel solar, penganggar tenaga solar, kalkulator sistem solar, panel solar diperlukan, kalkulator tenaga boleh diperbaharui, kalkulator solar rumah, penganggar kuasa solar, kalkulator penggunaan tenaga, kalkulator pemasangan solar, kalkulator tenaga hijau"
+  },
+  "stats": {
+    "totalKwh": "Jumlah kWh",
+    "totalItems": "Jumlah Barang",
+    "totalConsumption": "Jumlah Penggunaan Harian",
+    "avgWattPerItem": "Purata Watt per Barang",
+    "solarPanelsNeeded": "Panel Solar Diperlukan",
+    "items": "barang",
+    "kwh": "kWh",
+    "watts": "W",
+    "panels": "panel",
+    "perDay": "sehari"
+  },
+  "table": {
+    "itemsList": "Senarai Barang",
+    "item": "Barang",
+    "watt": "Watt",
+    "quantity": "Kuantiti",
+    "hoursUsage": "Jam Penggunaan",
+    "estimateKwh": "Anggaran kWh",
+    "actions": "Tindakan",
+    "noItems": "Tiada item ditambah lagi. Klik 'Tambah Item' untuk bermula.",
+    "itemName": "Nama Barang",
+    "wattPerItem": "Watt per Barang",
+    "hoursPerDay": "Jam per Hari"
+  },
+  "forms": {
+    "addNewItem": "Tambah Barang Baru",
+    "itemName": "Nama Barang",
+    "itemNamePlaceholder": "cth: Lampu LED, Penghawa Dingin",
+    "wattage": "Wattage (W)",
+    "wattagePlaceholder": "Masukkan wattage",
+    "quantity": "Kuantiti",
+    "quantityPlaceholder": "Masukkan kuantiti",
+    "hoursPerDay": "Jam per Hari",
+    "hoursPlaceholder": "Masukkan jam penggunaan per hari",
+    "solarPanelConfig": "Konfigurasi Panel Solar",
+    "peakSunHours": "Jam Puncak Matahari",
+    "peakSunHoursDesc": "Purata jam puncak matahari harian di lokasi anda",
+    "panelWatts": "Watt Panel",
+    "panelWattsDesc": "Wattage setiap panel solar",
+    "systemEfficiency": "Kecekapan Sistem (%)",
+    "systemEfficiencyDesc": "Kecekapan keseluruhan sistem termasuk kehilangan inverter"
+  },
+  "form": {
+    "addNewItem": "Tambah Barang Baru",
+    "solarConfiguration": "Konfigurasi Solar",
+    "itemName": "Nama Barang",
+    "wattPerItem": "Watt per Barang",
+    "hoursUsage": "Jam Penggunaan per Hari",
+    "quantity": "Kuantiti",
+    "estimateKwh": "Anggaran kWh",
+    "itemNamePlaceholder": "cth., Mentol lampu",
+    "wattPlaceholder": "cth., 10",
+    "hoursPlaceholder": "cth., 8",
+    "quantityPlaceholder": "cth., 5",
+    "validation": {
+      "required": "Medan ini diperlukan",
+      "positiveNumber": "Mesti nombor positif",
+      "validEmail": "Sila masukkan email yang sah"
+    }
+  },
+  "solarForm": {
+    "peakSunHours": "Jam Matahari Puncak per Hari",
+    "panelWatts": "Watt Panel",
+    "systemEfficiency": "Kecekapan Sistem (%)",
+    "peakSunHoursPlaceholder": "cth., 5.5",
+    "panelWattsPlaceholder": "cth., 300",
+    "systemEfficiencyPlaceholder": "cth., 85"
+  },
+  "validation": {
+    "required": "Medan ini diperlukan",
+    "minValue": "Nilai mesti lebih besar daripada 0",
+    "maxValue": "Nilai terlalu tinggi"
+  },
+  "footer": {
+    "madeBy": "Dibuat oleh",
+    "madeWith": "Dibuat dengan",
+    "by": "oleh",
+    "github": "Lihat di GitHub",
+    "buyMeCoffee": "Belanja saya kopi"
+  }
+}

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslation } from "@/lib/useTranslation";
 
 interface SolarConfig {
   peakSunHours: number;
@@ -18,6 +18,7 @@ interface SolarFormProps {
 }
 
 export default function SolarForm({ onConfigUpdate, currentConfig }: SolarFormProps) {
+  const { t } = useTranslation();
   const [peakSunHours, setPeakSunHours] = useState<string>(currentConfig.peakSunHours.toString());
   const [panelWatts, setPanelWatts] = useState<string>(currentConfig.panelWatts.toString());
   const [systemEfficiency, setSystemEfficiency] = useState<string>(currentConfig.systemEfficiency.toString());
@@ -45,15 +46,15 @@ export default function SolarForm({ onConfigUpdate, currentConfig }: SolarFormPr
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="peakSunHours">Peak Sun Hours per Day</Label>
-        <Input id="peakSunHours" type="number" step="0.1" value={peakSunHours} onChange={(e) => setPeakSunHours(e.target.value)} placeholder="e.g., 5.5" required />
+        <Label htmlFor="peakSunHours">{t('solarForm.peakSunHours')}</Label>
+        <Input id="peakSunHours" type="number" step="0.1" value={peakSunHours} onChange={(e) => setPeakSunHours(e.target.value)} placeholder={t('solarForm.peakSunHoursPlaceholder')} required />
       </div>
       <div>
-        <Label htmlFor="panelWatts">Panel Watts</Label>
-        <Input id="panelWatts" type="number" value={panelWatts} onChange={(e) => setPanelWatts(e.target.value)} placeholder="e.g., 300" required />
+        <Label htmlFor="panelWatts">{t('solarForm.panelWatts')}</Label>
+        <Input id="panelWatts" type="number" value={panelWatts} onChange={(e) => setPanelWatts(e.target.value)} placeholder={t('solarForm.panelWattsPlaceholder')} required />
       </div>
       <div>
-        <Label htmlFor="systemEfficiency">System Efficiency (%)</Label>
+        <Label htmlFor="systemEfficiency">{t('solarForm.systemEfficiency')}</Label>
         <Input
           id="systemEfficiency"
           type="number"
@@ -62,12 +63,12 @@ export default function SolarForm({ onConfigUpdate, currentConfig }: SolarFormPr
           max="100"
           value={systemEfficiency}
           onChange={(e) => setSystemEfficiency(e.target.value)}
-          placeholder="e.g., 85"
+          placeholder={t('solarForm.systemEfficiencyPlaceholder')}
           required
         />
       </div>
       <Button type="submit" className="w-full">
-        Update Configuration
+        {t('buttons.updateConfiguration')}
       </Button>
     </form>
   );

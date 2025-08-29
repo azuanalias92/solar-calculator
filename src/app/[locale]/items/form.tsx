@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from "@/lib/useTranslation";
 
 interface Item {
   name: string;
@@ -18,6 +19,7 @@ interface ItemFormProps {
 }
 
 export default function ItemForm({ onAddItem }: ItemFormProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState<string>("");
   const [watt, setWatt] = useState<string>("");
   const [quantity, setQuantity] = useState<string>("");
@@ -57,27 +59,27 @@ export default function ItemForm({ onAddItem }: ItemFormProps) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="name">Item Name</Label>
-        <Input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Light bulb" required />
+        <Label htmlFor="name">{t('form.itemName')}</Label>
+        <Input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('form.itemNamePlaceholder')} required />
       </div>
       <div>
-        <Label htmlFor="watt">Watt per item</Label>
-        <Input id="watt" type="number" step="0.01" value={watt} onChange={(e) => setWatt(e.target.value)} placeholder="e.g., 10" required />
+        <Label htmlFor="watt">{t('form.wattPerItem')}</Label>
+        <Input id="watt" type="number" step="0.01" value={watt} onChange={(e) => setWatt(e.target.value)} placeholder={t('form.wattPlaceholder')} required />
       </div>
       <div>
-        <Label htmlFor="hoursUsage">Hours of Usage per Day</Label>
-        <Input id="hoursUsage" type="number" step="0.1" value={hoursUsage} onChange={(e) => setHoursUsage(e.target.value)} placeholder="e.g., 8" required />
+        <Label htmlFor="hoursUsage">{t('form.hoursUsage')}</Label>
+        <Input id="hoursUsage" type="number" step="0.1" value={hoursUsage} onChange={(e) => setHoursUsage(e.target.value)} placeholder={t('form.hoursPlaceholder')} required />
       </div>
       <div>
-        <Label htmlFor="quantity">Quantity</Label>
-        <Input id="quantity" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder="e.g., 5" required />
+        <Label htmlFor="quantity">{t('form.quantity')}</Label>
+        <Input id="quantity" type="number" value={quantity} onChange={(e) => setQuantity(e.target.value)} placeholder={t('form.quantityPlaceholder')} required />
       </div>
       <div>
-        <Label htmlFor="estimatekWh">Estimate kWh</Label>
+        <Label htmlFor="estimatekWh">{t('form.estimateKwh')}</Label>
         <Input id="estimatekWh" type="number" step="0.01" value={(parseFloat(watt) / 1000) * parseFloat(hoursUsage) * parseFloat(quantity)} readOnly />
       </div>
       <Button type="submit" className="w-full">
-        Add Item
+        {t('buttons.addItem')}
       </Button>
     </form>
   );

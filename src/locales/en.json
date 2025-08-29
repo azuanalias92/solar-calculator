@@ -1,0 +1,108 @@
+{
+  "common": {
+    "title": "Solar Panel Estimator",
+    "description": "Calculate how much solar panel you need",
+    "addItem": "Add Item",
+    "configureSolar": "Configure Solar System",
+    "exportPDF": "Export to PDF",
+    "reset": "Reset All Data",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close"
+  },
+  "buttons": {
+    "addItem": "Add Item",
+    "configureSolar": "Configure Solar System",
+    "exportPDF": "Export to PDF",
+    "resetData": "Reset All Data",
+    "updateConfiguration": "Update Configuration"
+  },
+  "seo": {
+    "title": "Solar Panel Estimator - Calculate Your Solar Energy Needs",
+    "description": "Free solar panel calculator to estimate how many solar panels you need for your home. Calculate energy consumption, solar system requirements, and potential savings with our easy-to-use solar estimator tool.",
+    "keywords": "solar panel calculator, solar energy estimator, solar system calculator, solar panels needed, renewable energy calculator, home solar calculator, solar power estimator, energy consumption calculator, solar installation calculator, green energy calculator"
+  },
+  "stats": {
+    "totalKwh": "Total kWh",
+    "totalItems": "Total Items",
+    "totalConsumption": "Total Daily Consumption",
+    "avgWattPerItem": "Average Watt per Item",
+    "solarPanelsNeeded": "Solar Panels Needed",
+    "items": "items",
+    "kwh": "kWh",
+    "watts": "Watts",
+    "panels": "panels",
+    "perDay": "per day"
+  },
+  "table": {
+    "itemsList": "Items List",
+    "item": "Item",
+    "watt": "Watt",
+    "quantity": "Quantity",
+    "hoursUsage": "Hours Usage",
+    "estimateKwh": "Estimate kWh",
+    "actions": "Actions",
+    "noItems": "No items added yet. Click 'Add Item' to get started.",
+    "itemName": "Item Name",
+    "wattPerItem": "Watt per Item",
+    "hoursPerDay": "Hours per Day"
+  },
+  "forms": {
+    "addNewItem": "Add New Item",
+    "itemName": "Item Name",
+    "itemNamePlaceholder": "e.g., LED Light, Air Conditioner",
+    "wattage": "Wattage (W)",
+    "wattagePlaceholder": "Enter wattage",
+    "quantity": "Quantity",
+    "quantityPlaceholder": "Enter quantity",
+    "hoursPerDay": "Hours per Day",
+    "hoursPlaceholder": "Enter hours of usage per day",
+    "solarPanelConfig": "Solar Panel Configuration",
+    "peakSunHours": "Peak Sun Hours",
+    "peakSunHoursDesc": "Average daily peak sun hours in your location",
+    "panelWatts": "Panel Watts",
+    "panelWattsDesc": "Wattage of each solar panel",
+    "systemEfficiency": "System Efficiency (%)",
+    "systemEfficiencyDesc": "Overall system efficiency including inverter losses"
+  },
+  "form": {
+    "addNewItem": "Add New Item",
+    "solarConfiguration": "Solar Configuration",
+    "itemName": "Item Name",
+    "wattPerItem": "Watt per Item",
+    "hoursUsage": "Hours of Usage per Day",
+    "quantity": "Quantity",
+    "estimateKwh": "Estimate kWh",
+    "itemNamePlaceholder": "e.g., Light bulb",
+    "wattPlaceholder": "e.g., 10",
+    "hoursPlaceholder": "e.g., 8",
+    "quantityPlaceholder": "e.g., 5",
+    "validation": {
+      "required": "This field is required",
+      "positiveNumber": "Must be a positive number",
+      "validEmail": "Please enter a valid email"
+    }
+  },
+  "solarForm": {
+    "peakSunHours": "Peak Sun Hours per Day",
+    "panelWatts": "Panel Watts",
+    "systemEfficiency": "System Efficiency (%)",
+    "peakSunHoursPlaceholder": "e.g., 5.5",
+    "panelWattsPlaceholder": "e.g., 300",
+    "systemEfficiencyPlaceholder": "e.g., 85"
+  },
+  "validation": {
+    "required": "This field is required",
+    "minValue": "Value must be greater than 0",
+    "maxValue": "Value is too high"
+  },
+  "footer": {
+    "madeBy": "Made by",
+    "madeWith": "Made with",
+    "by": "by",
+    "github": "View on GitHub",
+    "buyMeCoffee": "Buy me a coffee"
+  }
+}
