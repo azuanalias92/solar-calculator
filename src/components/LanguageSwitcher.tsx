@@ -3,6 +3,7 @@
 import { useTranslation } from "@/lib/useTranslation";
 import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
+import { ModeToggle } from "@/components/ModeToggle";
 
 const LanguageSwitcher = () => {
   const { locale, switchLanguage } = useTranslation();
@@ -17,10 +18,13 @@ const LanguageSwitcher = () => {
   };
 
   return (
-    <Button variant="outline" size="sm" onClick={toggleLanguage} className="flex items-center gap-2">
-      <Globe className="w-4 h-4" />
-      {getLanguageLabel()}
-    </Button>
+    <div className="flex items-center gap-2">
+      <Button variant="outline" size="sm" onClick={toggleLanguage} className="flex items-center gap-2">
+        <Globe className="w-4 h-4" />
+        {getLanguageLabel()}
+      </Button>
+      <ModeToggle />
+    </div>
   );
 };
 

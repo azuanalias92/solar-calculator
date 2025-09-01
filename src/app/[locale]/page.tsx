@@ -155,7 +155,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 p-8">
+    <div className="flex flex-col min-h-screen p-8 bg-background">
       <div className="text-center mb-8">
         <div className="flex items-center justify-between">
           {/* Centered Title */}
@@ -193,7 +193,7 @@ export default function Home() {
 
           <Dialog open={solarModalOpen} onOpenChange={setSolarModalOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" size="lg">
+              <Button variant="accent" size="lg">
                 <Settings className="w-4 h-4 mr-2" />
                 {t("buttons.configureSolar")}
               </Button>

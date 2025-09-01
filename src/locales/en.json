@@ -10,7 +10,13 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "close": "Close"
+    "close": "Close",
+    "logoAlt": "Solar Panel Calculator Logo",
+    "language": "Language",
+    "english": "English",
+    "malay": "Bahasa Malaysia",
+    "goHome": "Go Home",
+    "goBack": "Go Back"
   },
   "buttons": {
     "addItem": "Add Item",
@@ -104,5 +110,20 @@
     "by": "by",
     "github": "View on GitHub",
     "buyMeCoffee": "Buy me a coffee"
+  },
+  "results": {
+    "title": "Solar Panel Calculation Results",
+    "monthlyConsumption": "Monthly Energy Consumption",
+    "recommendedCapacity": "Recommended Solar Panel Capacity",
+    "estimatedCost": "Estimated Installation Cost",
+    "monthlySavings": "Estimated Monthly Savings",
+    "paybackPeriod": "Payback Period",
+    "co2Reduction": "Annual CO₂ Reduction",
+    "downloadPdf": "Download PDF Report",
+    "recalculate": "Recalculate"
+  },
+  "error": {
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundDescription": "Sorry, the page you are looking for does not exist or has been moved."
   }
 }

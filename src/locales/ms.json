@@ -10,7 +10,13 @@
     "save": "Simpan",
     "delete": "Padam",
     "edit": "Edit",
-    "close": "Tutup"
+    "close": "Tutup",
+    "logoAlt": "Logo Kalkulator Panel Solar",
+    "language": "Bahasa",
+    "english": "English",
+    "malay": "Bahasa Malaysia",
+    "goHome": "Kembali ke Utama",
+    "goBack": "Kembali"
   },
   "buttons": {
     "addItem": "Tambah Barang",
@@ -97,6 +103,21 @@
     "required": "Medan ini diperlukan",
     "minValue": "Nilai mesti lebih besar daripada 0",
     "maxValue": "Nilai terlalu tinggi"
+  },
+  "results": {
+    "title": "Keputusan Pengiraan Panel Solar",
+    "monthlyConsumption": "Penggunaan Tenaga Bulanan",
+    "recommendedCapacity": "Kapasiti Panel Solar yang Disyorkan",
+    "estimatedCost": "Anggaran Kos Pemasangan",
+    "monthlySavings": "Anggaran Penjimatan Bulanan",
+    "paybackPeriod": "Tempoh Pulangan Modal",
+    "co2Reduction": "Pengurangan CO₂ Tahunan",
+    "downloadPdf": "Muat Turun Laporan PDF",
+    "recalculate": "Kira Semula"
+  },
+  "error": {
+    "pageNotFound": "Halaman Tidak Dijumpai",
+    "pageNotFoundDescription": "Maaf, halaman yang anda cari tidak wujud atau telah dipindahkan."
   },
   "footer": {
     "madeBy": "Dibuat oleh",
