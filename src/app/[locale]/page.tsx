@@ -155,30 +155,30 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen p-8 bg-background">
-      <div className="text-center mb-8">
-        <div className="flex items-center justify-between">
-          {/* Centered Title */}
-          <div className="flex flex-1 items-center justify-center gap-3">
-            <img src="/logo.svg" alt={t("common.logoAlt")} className="w-10 h-10" />
-            <h1 className="text-4xl font-bold text-emerald-800">{t("common.title")}</h1>
+    <div className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
+      <div className="text-center mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          {/* Title Section */}
+          <div className="flex items-center justify-center gap-2 sm:gap-3 flex-1">
+            <img src="/logo.svg" alt={t("common.logoAlt")} className="w-8 h-8 sm:w-10 sm:h-10" />
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-800">{t("common.title")}</h1>
           </div>
 
-          {/* Language Switcher aligned to end */}
-          <div className="ml-auto">
+          {/* Language Switcher */}
+          <div className="flex justify-center sm:justify-end">
             <LanguageSwitcher />
           </div>
         </div>
 
-        <p className="text-emerald-600">{t("common.description")}</p>
+        <p className="text-sm sm:text-base text-emerald-600 mt-2">{t("common.description")}</p>
       </div>
 
       <div className="flex-1">
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-6 sm:mb-8 px-2 sm:px-0">
           <Dialog open={itemModalOpen} onOpenChange={setItemModalOpen}>
             <DialogTrigger asChild>
-              <Button size="lg">
+              <Button size="lg" className="w-full sm:w-auto">
                 <Plus className="w-4 h-4 mr-2" />
                 {t("buttons.addItem")}
               </Button>
@@ -193,7 +193,7 @@ export default function Home() {
 
           <Dialog open={solarModalOpen} onOpenChange={setSolarModalOpen}>
             <DialogTrigger asChild>
-              <Button variant="accent" size="lg">
+              <Button variant="accent" size="lg" className="w-full sm:w-auto">
                 <Settings className="w-4 h-4 mr-2" />
                 {t("buttons.configureSolar")}
               </Button>
@@ -206,13 +206,13 @@ export default function Home() {
             </DialogContent>
           </Dialog>
 
-          <Button variant="secondary" size="lg" onClick={handleExportPDF} disabled={items.length === 0}>
+          <Button variant="secondary" size="lg" onClick={handleExportPDF} disabled={items.length === 0} className="w-full sm:w-auto">
             <FileUp className="w-4 h-4 mr-2" />
             {t("buttons.exportPDF")}
           </Button>
 
           {items.length > 0 && (
-            <Button variant="destructive" size="lg" onClick={handleReset}>
+            <Button variant="destructive" size="lg" onClick={handleReset} className="w-full sm:w-auto">
               <RotateCcw className="w-4 h-4 mr-2" />
               {t("buttons.resetData")}
             </Button>
@@ -220,53 +220,53 @@ export default function Home() {
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8 px-2 sm:px-0">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-emerald-600" />
+            <CardHeader className="pb-2 sm:pb-6">
+              <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
                 {t("stats.totalKwh")}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{stats.totalkWh.toFixed(2)}</p>
-              <p className="text-sm text-gray-500">{t("stats.perDay")}</p>
+            <CardContent className="pt-0 sm:pt-6">
+              <p className="text-xl sm:text-2xl font-bold">{stats.totalkWh.toFixed(2)}</p>
+              <p className="text-xs sm:text-sm text-gray-500">{t("stats.perDay")}</p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-emerald-600" />
+            <CardHeader className="pb-2 sm:pb-6">
+              <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                <Package className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
                 {t("stats.totalItems")}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{stats.totalItems}</p>
+            <CardContent className="pt-0 sm:pt-6">
+              <p className="text-xl sm:text-2xl font-bold">{stats.totalItems}</p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-emerald-600" />
+            <CardHeader className="pb-2 sm:pb-6">
+              <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
                 {t("stats.avgWattPerItem")}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">{stats.avgWattPerItem.toFixed(2)}</p>
+            <CardContent className="pt-0 sm:pt-6">
+              <p className="text-xl sm:text-2xl font-bold">{stats.avgWattPerItem.toFixed(2)}</p>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sun className="w-5 h-5 text-emerald-600" />
+            <CardHeader className="pb-2 sm:pb-6">
+              <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
                 {t("stats.solarPanelsNeeded")}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold text-emerald-600">{stats.solarPanelsNeeded}</p>
+            <CardContent className="pt-0 sm:pt-6">
+              <p className="text-xl sm:text-2xl font-bold text-emerald-600">{stats.solarPanelsNeeded}</p>
             </CardContent>
           </Card>
         </div>
@@ -274,40 +274,49 @@ export default function Home() {
         {/* Items Table */}
         <Card>
           <CardHeader>
-            <CardTitle>{t("table.itemsList")}</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">{t("table.itemsList")}</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 sm:p-6">
             {items.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">{t("table.noItems")}</p>
+              <p className="text-gray-500 text-center py-8 text-sm sm:text-base">{t("table.noItems")}</p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t("table.itemName")}</TableHead>
-                    <TableHead>{t("table.wattPerItem")}</TableHead>
-                    <TableHead>{t("table.hoursPerDay")}</TableHead>
-                    <TableHead>{t("table.quantity")}</TableHead>
-                    <TableHead>{t("table.estimateKwh")}</TableHead>
-                    <TableHead>{t("table.actions")}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.name}</TableCell>
-                      <TableCell>{item.watt}</TableCell>
-                      <TableCell>{item.hoursUsage}</TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell>{item.estimatekWh.toFixed(2)}</TableCell>
-                      <TableCell>
-                        <Button variant="outline" size="sm" onClick={() => removeItem(item.id)} className="text-red-600 hover:text-red-700 hover:bg-red-50">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="overflow-x-auto -mx-3 sm:mx-0">
+                <div className="min-w-full inline-block align-middle">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="min-w-[120px] text-xs sm:text-sm">{t("table.itemName")}</TableHead>
+                        <TableHead className="min-w-[80px] text-xs sm:text-sm">{t("table.wattPerItem")}</TableHead>
+                        <TableHead className="min-w-[80px] text-xs sm:text-sm">{t("table.hoursPerDay")}</TableHead>
+                        <TableHead className="min-w-[70px] text-xs sm:text-sm">{t("table.quantity")}</TableHead>
+                        <TableHead className="min-w-[90px] text-xs sm:text-sm">{t("table.estimateKwh")}</TableHead>
+                        <TableHead className="min-w-[80px] text-xs sm:text-sm">{t("table.actions")}</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {items.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium text-xs sm:text-sm">{item.name}</TableCell>
+                          <TableCell className="text-xs sm:text-sm">{item.watt}W</TableCell>
+                          <TableCell className="text-xs sm:text-sm">{item.hoursUsage}h</TableCell>
+                          <TableCell className="text-xs sm:text-sm">{item.quantity}</TableCell>
+                          <TableCell className="text-xs sm:text-sm font-medium">{item.estimatekWh.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => removeItem(item.id)} 
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
+                            >
+                              <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -315,32 +324,34 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t bg-card/50 backdrop-blur-sm mt-4">
-        <div className="flex flex-col mt-2 md:flex-row justify-between items-center gap-4">
-          <div className="text-lg font-semibold text-primary">{t("common.title")}</div>
-          <div className="text-sm text-muted-foreground">
+        <div className="flex flex-col gap-3 sm:gap-4 mt-3 sm:mt-4 md:flex-row md:justify-between md:items-center px-2 sm:px-0">
+          <div className="text-base sm:text-lg font-semibold text-primary text-center md:text-left">{t("common.title")}</div>
+          
+          <div className="text-xs sm:text-sm text-muted-foreground text-center md:text-left order-3 md:order-2">
             {t("footer.madeBy")}{" "}
-            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:text-outline transitiolors">
+            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-primary hover:text-outline transition-colors">
               Azuan Alias
             </a>
           </div>
-          <div className="flex items-center gap-4">
+          
+          <div className="flex items-center justify-center gap-3 sm:gap-4 order-2 md:order-3">
             <a
               href="https://github.com/azuanalias92"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
+              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
             >
-              <Github className="w-4 h-4" />
-              {t("footer.github")}
+              <Github className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{t("footer.github")}</span>
             </a>
             <a
               href="https://buymeacoffee.com/azuanalias"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
+              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
             >
-              <Coffee className="w-4 h-4" />
-              {t("footer.buyMeCoffee")}
+              <Coffee className="w-3 h-3 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{t("footer.buyMeCoffee")}</span>
             </a>
           </div>
         </div>

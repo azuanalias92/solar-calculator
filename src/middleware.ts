@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const locales = ['en', 'ms'];
-const defaultLocale = 'en';
+const defaultLocale = 'ms';
 
 function getLocale(request: NextRequest): string {
   // Check if there is any supported locale in the pathname
@@ -53,8 +53,8 @@ export function middleware(request: NextRequest) {
   // For the root path, redirect to locale-specific path
   if (pathname === '/') {
     if (locale === defaultLocale) {
-      // For default locale (English), redirect to /en
-      return NextResponse.redirect(new URL('/en', request.url));
+      // For default locale (Malay), redirect to /ms
+      return NextResponse.redirect(new URL('/ms', request.url));
     } else {
       return NextResponse.redirect(new URL(`/${locale}`, request.url));
     }

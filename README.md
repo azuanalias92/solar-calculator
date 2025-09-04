@@ -1,4 +1,4 @@
-# Solar Panel Estimator
+# Kira Solar
 
 A comprehensive solar panel calculator that helps you estimate your solar energy needs and potential savings. This web application provides accurate calculations for solar panel requirements based on your energy consumption, location, and system preferences.
 

@@ -1,6 +1,6 @@
 {
   "common": {
-    "title": "Solar Panel Estimator",
+    "title": "Kira Solar",
     "description": "Calculate how much solar panel you need",
     "addItem": "Add Item",
     "configureSolar": "Configure Solar System",
@@ -26,7 +26,7 @@
     "updateConfiguration": "Update Configuration"
   },
   "seo": {
-    "title": "Solar Panel Estimator - Calculate Your Solar Energy Needs",
+    "title": "Kira Solar - Calculate Your Solar Energy Needs",
     "description": "Free solar panel calculator to estimate how many solar panels you need for your home. Calculate energy consumption, solar system requirements, and potential savings with our easy-to-use solar estimator tool.",
     "keywords": "solar panel calculator, solar energy estimator, solar system calculator, solar panels needed, renewable energy calculator, home solar calculator, solar power estimator, energy consumption calculator, solar installation calculator, green energy calculator"
   },

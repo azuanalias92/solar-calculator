@@ -9,8 +9,8 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "Solar Panel Estimator - Calculate Your Solar Energy Needs",
-    template: "%s | Solar Panel Estimator",
+    default: "Kira Solar - Calculate Your Solar Energy Needs",
+    template: "%s | Kira Solar",
   },
   description:
     "Free solar panel calculator to estimate how many solar panels you need for your home. Calculate energy consumption, solar system requirements, and potential savings with our easy-to-use solar estimator tool.",
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     "solar installation calculator",
     "green energy calculator",
   ],
-  authors: [{ name: "Solar Panel Estimator" }],
-  creator: "Solar Panel Estimator",
-  publisher: "Solar Panel Estimator",
+  authors: [{ name: "Kira Solar" }],
+  creator: "Kira Solar",
+  publisher: "Kira Solar",
   formatDetection: {
     email: false,
     address: false,
@@ -39,17 +39,17 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Solar Panel Estimator - Calculate Your Solar Energy Needs",
+    title: "Kira Solar - Calculate Your Solar Energy Needs",
     description:
       "Free solar panel calculator to estimate how many solar panels you need for your home. Calculate energy consumption, solar system requirements, and potential savings.",
     url: "https://solar-calculator.vercel.app",
-    siteName: "Solar Panel Estimator",
+    siteName: "Kira Solar",
     images: [
       {
         url: "/logo.svg",
         width: 1200,
         height: 630,
-        alt: "Solar Panel Estimator - Calculate Your Solar Energy Needs",
+        alt: "Kira Solar - Calculate Your Solar Energy Needs",
       },
     ],
     locale: "en_US",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Solar Panel Estimator - Calculate Your Solar Energy Needs",
+    title: "Kira Solar - Calculate Your Solar Energy Needs",
     description: "Free solar panel calculator to estimate how many solar panels you need for your home. Calculate energy consumption and solar system requirements.",
     images: ["/logo.svg"],
     creator: "@solarcalculator",
@@ -91,7 +91,7 @@ export default function RootLayout({
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "Solar Panel Estimator",
+    name: "Kira Solar",
     description:
       "Free solar panel calculator to estimate how many solar panels you need for your home. Calculate energy consumption, solar system requirements, and potential savings.",
     url: "https://solar-panel-estimator.vercel.app",
@@ -105,11 +105,11 @@ export default function RootLayout({
     featureList: ["Solar panel calculation", "Energy consumption analysis", "Solar system configuration", "PDF export functionality", "Real-time calculations"],
     author: {
       "@type": "Organization",
-      name: "Solar Panel Estimator",
+      name: "Kira Solar",
     },
     publisher: {
       "@type": "Organization",
-      name: "Solar Panel Estimator",
+      name: "Kira Solar",
     },
   };
 

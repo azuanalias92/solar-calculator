@@ -30,7 +30,7 @@ export const exportToPDF = (items: Item[], stats: Stats, solarConfig: SolarConfi
   doc.setFontSize(24);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(34, 197, 94); // Green theme color
-  doc.text("Solar Panel Estimator Report", 20, 25);
+  doc.text("Kira Solar Report", 20, 25);
 
   // Subtitle line
   doc.setLineWidth(0.5);

@@ -1,6 +1,6 @@
 {
   "common": {
-    "title": "Solar Panel Estimator",
+    "title": "Kira Solar",
     "description": "Kira berapa banyak panel solar yang anda perlukan",
     "addItem": "Tambah Barang",
     "configureSolar": "Konfigurasi Sistem Solar",
@@ -11,7 +11,7 @@
     "delete": "Padam",
     "edit": "Edit",
     "close": "Tutup",
-    "logoAlt": "Logo Kalkulator Panel Solar",
+    "logoAlt": "Logo Kira Solar",
     "language": "Bahasa",
     "english": "English",
     "malay": "Bahasa Malaysia",
@@ -26,9 +26,9 @@
     "updateConfiguration": "Kemas Kini Konfigurasi"
   },
   "seo": {
-    "title": "Pengira Panel Solar - Kira Keperluan Tenaga Solar Anda",
-    "description": "Kalkulator panel solar percuma untuk menganggar berapa banyak panel solar yang anda perlukan untuk rumah anda. Kira penggunaan tenaga, keperluan sistem solar, dan potensi penjimatan dengan alat penganggar solar yang mudah digunakan.",
-    "keywords": "kalkulator panel solar, penganggar tenaga solar, kalkulator sistem solar, panel solar diperlukan, kalkulator tenaga boleh diperbaharui, kalkulator solar rumah, penganggar kuasa solar, kalkulator penggunaan tenaga, kalkulator pemasangan solar, kalkulator tenaga hijau"
+    "title": "Kira Solar- Pengira Tenaga Solar Percuma",
+    "description": "Kira panel solar terbaik di Malaysia untuk mengira berapa banyak panel solar yang diperlukan untuk rumah anda. Dapatkan anggaran kos, penjimatan bil elektrik TNB, dan ROI sistem solar dengan mudah. Sesuai untuk rumah teres, banglo, dan kondominium di Malaysia.",
+    "keywords": "Kira panel solar malaysia, pengira solar malaysia, panel solar rumah malaysia, kalkulator tenaga solar, sistem solar malaysia, bil elektrik TNB, penjimatan elektrik malaysia, solar calculator malaysia, renewable energy malaysia, green energy calculator, kalkulator tenaga hijau malaysia, pemasangan solar malaysia, subsidi solar malaysia, feed in tariff malaysia, net energy metering malaysia"
   },
   "stats": {
     "totalKwh": "Jumlah kWh",
