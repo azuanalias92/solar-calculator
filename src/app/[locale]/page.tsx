@@ -345,7 +345,7 @@ export default function Home() {
               <span className="hidden sm:inline">{t("footer.github")}</span>
             </a>
             <a
-              href="https://buymeacoffee.com/azuanalias"
+              href="https://ko-fi.com/azuanalias"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
