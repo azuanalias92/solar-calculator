@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         "x-default": "/ms",
       },
     },
-    other: {
-      "google-site-verification": process.env.GOOGLE_SITE_VERIFICATION || "",
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION || "",
     },
     openGraph: {
       title: t.seo.title,

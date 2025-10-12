@@ -81,6 +81,9 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   category: "technology",
   classification: "Solar Energy Calculator",
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION ?? "",
+  },
 };
 
 export default function RootLayout({
@@ -122,7 +125,7 @@ export default function RootLayout({
             __html: JSON.stringify(structuredData),
           }}
         />
-        <meta name="google-site-verification" content="4lKZH8KcO9eLi7zabiRr44VFolbxR2Q6MZw1Tt0pZk8" /> <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="canonical" href="https://solar-calculator.vercel.app" />
       </head>
       <body className={inter.className}>
