@@ -1,11 +1,7 @@
-import { Inter } from "next/font/google";
-import "../globals.css";
 import { Metadata } from "next";
 import en from "../../locales/en.json";
 import ms from "../../locales/ms.json";
 import Script from "next/script";
-
-const inter = Inter({ subsets: ["latin"] });
 
 const translations = {
   en,
@@ -13,11 +9,12 @@ const translations = {
 };
 
 type Props = {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const locale = params.locale || "ms";
+  const { locale: rawLocale } = await params;
+  const locale = rawLocale || "ms";
   const t = translations[locale as keyof typeof translations] || translations.ms;
 
   return {
@@ -75,8 +72,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function LocaleLayout({ children, params }: { children: React.ReactNode; params: { locale: string } }) {
-  const locale = params.locale || "ms";
+export default async function LocaleLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale: rawLocale } = await params;
+  const locale = rawLocale || "ms";
   const t = translations[locale as keyof typeof translations] || translations.ms;
 
   const baseStructuredData = {
@@ -125,21 +129,20 @@ export default function LocaleLayout({ children, params }: { children: React.Rea
   const structuredData = [baseStructuredData, localBusinessData].filter(Boolean);
 
   return (
-    <html lang={locale}>
-      <head>
-        {structuredData.map((data, index) => (
-          <Script
-            key={`structured-data-${index}`}
-            id={`structured-data-${index}`}
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: JSON.stringify(data),
-            }}
-          />
-        ))}
-      </head>
-      <body className={inter.className}>{children}</body>
-    </html>
+    <>
+      {structuredData.map((data, index) => (
+        <Script
+          key={`structured-data-${index}`}
+          id={`structured-data-${index}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(data),
+          }}
+        />
+      ))}
+      <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
+      {children}
+    </>
   );
 }
 

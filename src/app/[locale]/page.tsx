@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -11,6 +13,8 @@ import ItemForm from "./items/form";
 import SolarForm from "./solar/form";
 import { useTranslation } from "@/lib/useTranslation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import GoogleAuthButton from "@/components/GoogleAuthButton";
+import { getAuthState, type AuthState } from "@/lib/auth";
 
 interface Item {
   id: string;
@@ -35,7 +39,10 @@ interface SolarConfig {
 }
 
 export default function Home() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const pathname = usePathname();
+  const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
+  const [auth, setAuth] = useState<AuthState | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [solarConfig, setSolarConfig] = useState<SolarConfig>({
     peakSunHours: 5,
@@ -49,46 +56,115 @@ export default function Home() {
     solarPanelsNeeded: 0,
   });
   const [isLoaded, setIsLoaded] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const saveTimerRef = useRef<number | null>(null);
+  const skipNextSaveRef = useRef(true);
 
-  // Load data from localStorage on component mount
   useEffect(() => {
-    const savedItems = localStorage.getItem("solar-calculator-items");
-    const savedConfig = localStorage.getItem("solar-calculator-config");
-
-    if (savedItems) {
-      try {
-        const parsedItems = JSON.parse(savedItems);
-        setItems(parsedItems);
-      } catch (error) {
-        console.error("Error parsing saved items:", error);
-      }
-    }
-
-    if (savedConfig) {
-      try {
-        const parsedConfig = JSON.parse(savedConfig);
-        setSolarConfig(parsedConfig);
-      } catch (error) {
-        console.error("Error parsing saved config:", error);
-      }
-    }
-
-    setIsLoaded(true);
+    const refresh = () => setAuth(getAuthState());
+    refresh();
+    window.addEventListener("storage", refresh);
+    window.addEventListener("kirasolar:auth", refresh);
+    return () => {
+      window.removeEventListener("storage", refresh);
+      window.removeEventListener("kirasolar:auth", refresh);
+    };
   }, []);
 
-  // Save items to localStorage whenever items change (but only after initial load)
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem("solar-calculator-items", JSON.stringify(items));
-    }
-  }, [items, isLoaded]);
+    let canceled = false;
+    const run = async () => {
+      setMessage(null);
+      setLoading(true);
+      setIsLoaded(false);
+      skipNextSaveRef.current = true;
 
-  // Save solar config to localStorage whenever it changes (but only after initial load)
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem("solar-calculator-config", JSON.stringify(solarConfig));
+      if (!auth?.token) {
+        if (!canceled) {
+          setItems([]);
+          setSolarConfig({ peakSunHours: 5, panelWatts: 300, systemEfficiency: 85 });
+        }
+        if (!canceled) setIsLoaded(true);
+        if (!canceled) setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${apiBaseUrl}/calculator/state`, {
+          headers: { Authorization: `Bearer ${auth.token}` },
+        });
+        if (!res.ok) {
+          if (!canceled) setMessage("Failed to load from backend");
+          if (!canceled) setIsLoaded(true);
+          if (!canceled) setLoading(false);
+          return;
+        }
+        const payload = (await res.json()) as {
+          data: { items: Item[]; config: SolarConfig };
+        };
+        if (!canceled) {
+          setItems(payload.data.items ?? []);
+          setSolarConfig(
+            payload.data.config ?? { peakSunHours: 5, panelWatts: 300, systemEfficiency: 85 },
+          );
+          setIsLoaded(true);
+        }
+      } catch {
+        if (!canceled) {
+          setMessage(`Unable to reach API at ${apiBaseUrl}. Start the backend or set NEXT_PUBLIC_API_BASE_URL.`);
+          setIsLoaded(true);
+        }
+      } finally {
+        if (!canceled) setLoading(false);
+      }
+    };
+
+    void run();
+    return () => {
+      canceled = true;
+    };
+  }, [apiBaseUrl, auth?.token]);
+
+  const saveRemote = async (nextItems: Item[], nextConfig: SolarConfig) => {
+    if (!auth?.token) return;
+    setSaving(true);
+    setMessage(null);
+    try {
+      const res = await fetch(`${apiBaseUrl}/calculator/state`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
+        body: JSON.stringify({ items: nextItems, config: nextConfig }),
+      });
+      if (!res.ok) {
+        setMessage("Failed to save");
+        return;
+      }
+      setMessage("Saved");
+      window.setTimeout(() => setMessage(null), 1200);
+    } catch {
+      setMessage(`Unable to reach API at ${apiBaseUrl}. Start the backend or set NEXT_PUBLIC_API_BASE_URL.`);
+    } finally {
+      setSaving(false);
     }
-  }, [solarConfig, isLoaded]);
+  };
+
+  useEffect(() => {
+    if (!auth?.token) return;
+    if (!isLoaded) return;
+    if (skipNextSaveRef.current) {
+      skipNextSaveRef.current = false;
+      return;
+    }
+    if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = window.setTimeout(() => {
+      void saveRemote(items, solarConfig);
+    }, 800);
+    return () => {
+      if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
+    };
+  }, [auth?.token, isLoaded, items, solarConfig]);
 
   // Recalculate stats when items or config change
   useEffect(() => {
@@ -121,7 +197,7 @@ export default function Home() {
   const addItem = (item: Omit<Item, "id">) => {
     const newItem = {
       ...item,
-      id: Date.now().toString(),
+      id: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     };
     setItems([...items, newItem]);
     setItemModalOpen(false); // Close modal after adding item
@@ -141,39 +217,53 @@ export default function Home() {
   };
 
   const handleReset = () => {
-    // Clear localStorage
-    localStorage.removeItem("solar-calculator-items");
-    localStorage.removeItem("solar-calculator-config");
-
     // Reset state to initial values
-    setItems([]);
-    setSolarConfig({
+    const nextItems: Item[] = [];
+    const nextConfig: SolarConfig = {
       peakSunHours: 5,
       panelWatts: 300,
       systemEfficiency: 85,
-    });
+    };
+    setItems(nextItems);
+    setSolarConfig(nextConfig);
+    if (auth?.token) void saveRemote(nextItems, nextConfig);
   };
 
   return (
     <div className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
-      <div className="text-center mb-6 sm:mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          {/* Title Section */}
-          <div className="flex items-center justify-center gap-2 sm:gap-3 flex-1">
+      <div className="w-full max-w-6xl mx-auto text-center mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-4">
+          <div className="hidden sm:block" />
+
+          <div className="flex items-center justify-center gap-2 sm:gap-3">
             <img src="/logo.svg" alt={t("common.logoAlt")} className="w-8 h-8 sm:w-10 sm:h-10" />
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-800">{t("common.title")}</h1>
           </div>
 
-          {/* Language Switcher */}
-          <div className="flex justify-center sm:justify-end">
+          <div className="flex justify-center sm:justify-end items-center gap-3">
+            <GoogleAuthButton locale={locale} />
             <LanguageSwitcher />
+          </div>
+        </div>
+
+        <div className="flex justify-center mt-4">
+          <div className="inline-flex gap-2 rounded-lg border border-input bg-background p-1">
+            <Button asChild size="sm" variant={pathname.includes("/bill-ev") || pathname.includes("/rates") ? "outline" : "secondary"}>
+              <Link href={`/${locale}`}>Calculator</Link>
+            </Button>
+            <Button asChild size="sm" variant={pathname.includes("/bill-ev") ? "secondary" : "outline"}>
+              <Link href={`/${locale}/bill-ev`}>Bill EV</Link>
+            </Button>
+            <Button asChild size="sm" variant={pathname.includes("/rates") ? "secondary" : "outline"}>
+              <Link href={`/${locale}/rates`}>Rates</Link>
+            </Button>
           </div>
         </div>
 
         <p className="text-sm sm:text-base text-emerald-600 mt-2">{t("common.description")}</p>
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 w-full max-w-6xl mx-auto">
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mb-6 sm:mb-8 px-2 sm:px-0">
           <Dialog open={itemModalOpen} onOpenChange={setItemModalOpen}>
@@ -217,6 +307,13 @@ export default function Home() {
               {t("buttons.resetData")}
             </Button>
           )}
+        </div>
+
+        <div className="text-center text-sm text-muted-foreground mb-6">
+          <span>{auth?.token ? "Synced to backend" : "Login to save to backend"}</span>
+          {loading ? <span> • Loading…</span> : null}
+          {saving ? <span> • Saving…</span> : null}
+          {message ? <span className="text-foreground"> • {message}</span> : null}
         </div>
 
         {/* Statistics Cards */}
@@ -324,7 +421,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t bg-card/50 backdrop-blur-sm mt-4">
-        <div className="flex flex-col gap-3 sm:gap-4 mt-3 sm:mt-4 md:flex-row md:justify-between md:items-center px-2 sm:px-0">
+        <div className="w-full max-w-6xl mx-auto flex flex-col gap-3 sm:gap-4 mt-3 sm:mt-4 md:flex-row md:justify-between md:items-center px-2 sm:px-0">
           <div className="text-base sm:text-lg font-semibold text-primary text-center md:text-left">{t("common.title")}</div>
           
           <div className="text-xs sm:text-sm text-muted-foreground text-center md:text-left order-3 md:order-2">

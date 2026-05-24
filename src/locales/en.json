@@ -1,7 +1,7 @@
 {
   "common": {
     "title": "Kira Solar",
-    "description": "Calculate how much solar panel you need",
+    "description": "All about solar calculation",
     "addItem": "Add Item",
     "configureSolar": "Configure Solar System",
     "exportPDF": "Export to PDF",
