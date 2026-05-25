@@ -294,6 +294,9 @@ export default function UsagePage() {
             <Button asChild size="sm" variant={pathname.includes("/ev") ? "secondary" : "outline"}>
               <Link href={`/${locale}/ev`}>EV</Link>
             </Button>
+            <Button asChild size="sm" variant={pathname.includes("/settings") ? "secondary" : "outline"}>
+              <Link href={`/${locale}/settings`}>Settings</Link>
+            </Button>
           </div>
         </div>
 

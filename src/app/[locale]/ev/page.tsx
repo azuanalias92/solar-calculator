@@ -272,6 +272,9 @@ export default function EvPage() {
             <Button asChild size="sm" variant="secondary">
               <Link href={`/${locale}/ev`}>EV</Link>
             </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href={`/${locale}/settings`}>Settings</Link>
+            </Button>
           </div>
         </div>
         <p className="text-sm sm:text-base text-emerald-600 mt-2">{t("common.description")}</p>
