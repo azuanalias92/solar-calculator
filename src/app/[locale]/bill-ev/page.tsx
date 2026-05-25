@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { getAuthState, type AuthState } from "@/lib/auth";
@@ -13,61 +12,20 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
 import { Coffee, Github } from "lucide-react";
 
-type MonthUsage = {
+type MonthSummary = {
   month: number;
+  totalKwh: number;
   evKwh: number;
   nonEvKwh: number;
 };
 
-function storageKey(year: number): string {
-  return `kirasolar.bill-ev.v2.${year}`;
-}
-
-function dedupeYears(years: number[]): number[] {
-  const unique = Array.from(new Set(years.filter((y) => Number.isFinite(y))));
-  unique.sort((a, b) => b - a);
-  return unique;
-}
-
-function getLocalYears(): number[] {
-  if (typeof window === "undefined") return [];
-  const prefix = "kirasolar.bill-ev.v2.";
-  const years: number[] = [];
-  for (let i = 0; i < window.localStorage.length; i += 1) {
-    const key = window.localStorage.key(i);
-    if (!key) continue;
-    if (!key.startsWith(prefix)) continue;
-    const rawYear = key.slice(prefix.length);
-    const parsed = Number.parseInt(rawYear, 10);
-    if (!Number.isFinite(parsed)) continue;
-    years.push(parsed);
-  }
-  return dedupeYears(years);
-}
-
-function emptyYearData(): MonthUsage[] {
-  return Array.from({ length: 12 }, (_, idx) => ({ month: idx + 1, evKwh: 0, nonEvKwh: 0 }));
-}
-
-function clampNumber(value: number): number {
-  if (!Number.isFinite(value)) return 0;
-  return Math.max(0, Math.min(value, 100000));
-}
-
-function parseNumberInput(value: string): number {
-  const normalized = value.replace(/,/g, "").trim();
-  if (!normalized) return 0;
-  const parsed = Number.parseFloat(normalized);
-  return clampNumber(parsed);
+function monthLabel(month: number): string {
+  const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return labels[month - 1] ?? String(month);
 }
 
 function formatKwh(value: number): string {
   return new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(value);
-}
-
-function monthLabel(month: number): string {
-  const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return labels[month - 1] ?? String(month);
 }
 
 function getBarHeights(total: number, ev: number, maxTotal: number): { nonEvPct: number; evPct: number } {
@@ -85,15 +43,10 @@ export default function BillEvPage() {
 
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [year, setYear] = useState<number>(() => new Date().getFullYear());
-  const [availableYears, setAvailableYears] = useState<number[]>(() => [new Date().getFullYear()]);
-  const [data, setData] = useState<MonthUsage[]>(() => emptyYearData());
+  const [availableYears, setAvailableYears] = useState<number[]>([new Date().getFullYear()]);
+  const [data, setData] = useState<MonthSummary[]>([]);
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [dirty, setDirty] = useState(false);
-
-  const skipNextSaveRef = useRef(true);
-  const saveTimerRef = useRef<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const refresh = () => setAuth(getAuthState());
@@ -106,181 +59,134 @@ export default function BillEvPage() {
     };
   }, []);
 
+  // Discover available years from years endpoints
   useEffect(() => {
     const currentYear = new Date().getFullYear();
     let canceled = false;
 
     const run = async () => {
       if (!auth?.token) {
-        const years = dedupeYears([currentYear, ...getLocalYears()]);
-        if (!canceled) setAvailableYears(years.length ? years : [currentYear]);
+        if (!canceled) setAvailableYears([currentYear]);
         return;
       }
 
+      const yearsSet = new Set<number>([currentYear]);
+
+      // Fetch from usage years
       try {
-        const res = await fetch(`${apiBaseUrl}/ev-usage/years`, {
+        const usageRes = await fetch(`${apiBaseUrl}/daily-usage/years`, {
           headers: { Authorization: `Bearer ${auth.token}` },
         });
-        if (!res.ok) {
-          const years = dedupeYears([currentYear]);
-          if (!canceled) setAvailableYears(years);
-          return;
+        if (usageRes.ok) {
+          const usagePayload = (await usageRes.json()) as { years: number[] };
+          for (const y of usagePayload.years ?? []) yearsSet.add(y);
         }
-        const payload = (await res.json()) as { years: number[] };
-        const years = dedupeYears([currentYear, ...(payload.years ?? [])]);
-        if (!canceled) setAvailableYears(years.length ? years : [currentYear]);
-      } catch {
-        const years = dedupeYears([currentYear]);
-        if (!canceled) setAvailableYears(years);
-      }
+      } catch { /* ignore */ }
+
+      // Fetch from ev-usage years
+      try {
+        const evRes = await fetch(`${apiBaseUrl}/ev-usage/years`, {
+          headers: { Authorization: `Bearer ${auth.token}` },
+        });
+        if (evRes.ok) {
+          const evPayload = (await evRes.json()) as { years: number[] };
+          for (const y of evPayload.years ?? []) yearsSet.add(y);
+        }
+      } catch { /* ignore */ }
+
+      const sorted = Array.from(yearsSet).filter((y) => Number.isFinite(y)).sort((a, b) => b - a);
+      if (!canceled) setAvailableYears(sorted.length ? sorted : [currentYear]);
     };
 
     void run();
-    return () => {
-      canceled = true;
-    };
+    return () => { canceled = true; };
   }, [apiBaseUrl, auth?.token]);
 
+  // When available years change, ensure selected year is valid
   useEffect(() => {
     if (availableYears.includes(year)) return;
     if (availableYears.length === 0) return;
     setYear(availableYears[0]);
   }, [availableYears, year]);
 
-  const loadLocal = (targetYear: number): MonthUsage[] => {
-    const raw = window.localStorage.getItem(storageKey(targetYear));
-    if (!raw) return emptyYearData();
-    try {
-      const parsed = JSON.parse(raw) as Array<Partial<MonthUsage>>;
-      const merged = emptyYearData().map((m, idx) => {
-        const entry = parsed[idx] ?? {};
-        return {
-          month: m.month,
-          evKwh: clampNumber(Number(entry.evKwh ?? m.evKwh)),
-          nonEvKwh: clampNumber(Number(entry.nonEvKwh ?? m.nonEvKwh)),
-        };
-      });
-      return merged;
-    } catch {
-      return emptyYearData();
-    }
-  };
-
-  const saveLocal = (targetYear: number, nextData: MonthUsage[]) => {
-    window.localStorage.setItem(storageKey(targetYear), JSON.stringify(nextData));
-  };
-
+  // Fetch data from both APIs
   useEffect(() => {
     let canceled = false;
 
     const run = async () => {
-      setMessage(null);
+      setError(null);
       setLoading(true);
-      skipNextSaveRef.current = true;
 
       if (!auth?.token) {
-        const local = loadLocal(year);
-        if (!canceled) setData(local);
+        if (!canceled) setData([]);
         setLoading(false);
         return;
       }
 
       try {
-        const res = await fetch(`${apiBaseUrl}/ev-usage?year=${encodeURIComponent(String(year))}`, {
-          headers: { Authorization: `Bearer ${auth.token}` },
-        });
-        if (!res.ok) {
-          const local = loadLocal(year);
-          if (!canceled) setData(local);
+        // Fetch usage summary and EV data in parallel
+        const [usageRes, evRes] = await Promise.all([
+          fetch(`${apiBaseUrl}/daily-usage/summary?year=${encodeURIComponent(String(year))}`, {
+            headers: { Authorization: `Bearer ${auth.token}` },
+          }),
+          fetch(`${apiBaseUrl}/ev-usage?year=${encodeURIComponent(String(year))}`, {
+            headers: { Authorization: `Bearer ${auth.token}` },
+          }),
+        ]);
+
+        if (!usageRes.ok) {
+          if (!canceled) setError("Failed to load usage data");
           setLoading(false);
           return;
         }
-        const payload = (await res.json()) as { year: number; data: Array<{ month: number; evKwh: number; nonEvKwh: number }> };
-        const normalized = emptyYearData().map((m) => {
-          const found = payload.data.find((d) => d.month === m.month);
-          return {
-            month: m.month,
-            evKwh: clampNumber(Number(found?.evKwh ?? 0)),
-            nonEvKwh: clampNumber(Number(found?.nonEvKwh ?? 0)),
+
+        const usagePayload = (await usageRes.json()) as {
+          year: number;
+          data: Array<{ month: number; totalKwh: number }>;
+        };
+
+        let evByMonth = new Map<number, number>();
+        if (evRes.ok) {
+          const evPayload = (await evRes.json()) as {
+            year: number;
+            data: Array<{ month: number; evKwh: number }>;
           };
+          for (const d of evPayload.data) {
+            evByMonth.set(d.month, d.evKwh);
+          }
+        }
+
+        const merged: MonthSummary[] = usagePayload.data.map((m) => {
+          const evKwh = evByMonth.get(m.month) ?? 0;
+          const totalKwh = m.totalKwh;
+          const nonEvKwh = Math.max(0, totalKwh - evKwh);
+          return { month: m.month, totalKwh, evKwh, nonEvKwh };
         });
-        if (!canceled) { setData(normalized); setDirty(false); }
-        saveLocal(year, normalized);
+
+        if (!canceled) setData(merged);
+      } catch {
+        if (!canceled) setError("Failed to load data");
       } finally {
         setLoading(false);
       }
     };
 
     void run();
-    return () => {
-      canceled = true;
-    };
+    return () => { canceled = true; };
   }, [apiBaseUrl, auth?.token, year]);
-
-  useEffect(() => {
-    saveLocal(year, data);
-  }, [data, year]);
-
-  const saveRemote = async (targetYear: number, nextData: MonthUsage[]) => {
-    if (!auth?.token) return;
-      setSaving(true);
-    setDirty(true);
-    setMessage(null);
-    try {
-      const res = await fetch(`${apiBaseUrl}/ev-usage?year=${encodeURIComponent(String(targetYear))}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
-        body: JSON.stringify({ data: nextData }),
-      });
-      if (!res.ok) {
-        setMessage("Failed to save");
-        return;
-      }
-      const payload = (await res.json()) as { year: number; data: Array<{ month: number; evKwh: number; nonEvKwh: number }> };
-      const normalized = emptyYearData().map((m) => {
-        const found = payload.data.find((d) => d.month === m.month);
-        return {
-          month: m.month,
-          evKwh: clampNumber(Number(found?.evKwh ?? 0)),
-          nonEvKwh: clampNumber(Number(found?.nonEvKwh ?? 0)),
-        };
-      });
-      setData(normalized);
-      setDirty(false);
-      saveLocal(targetYear, normalized);
-      setAvailableYears((prev) => dedupeYears([targetYear, ...prev]));
-      setMessage("Saved");
-      window.setTimeout(() => setMessage(null), 1200);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!auth?.token) return;
-    if (skipNextSaveRef.current) {
-      skipNextSaveRef.current = false;
-      return;
-    }
-    if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
-    setDirty(true);
-    saveTimerRef.current = window.setTimeout(() => {
-      void saveRemote(year, data);
-    }, 800);
-    return () => {
-      if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
-    };
-  }, [auth?.token, data, year]);
 
   const totals = useMemo(() => {
     const evTotal = data.reduce((sum, m) => sum + m.evKwh, 0);
     const nonEvTotal = data.reduce((sum, m) => sum + m.nonEvKwh, 0);
-    return { evTotal, nonEvTotal, grandTotal: evTotal + nonEvTotal };
+    const grandTotal = data.reduce((sum, m) => sum + m.totalKwh, 0);
+    return { evTotal, nonEvTotal, grandTotal };
   }, [data]);
 
   const maxTotal = useMemo(() => {
-    return data.reduce((max, m) => Math.max(max, m.evKwh + m.nonEvKwh), 0);
+    return data.reduce((max, m) => Math.max(max, m.totalKwh), 0);
   }, [data]);
+
+  const monthsWithData = useMemo(() => data.filter((m) => m.totalKwh > 0).length, [data]);
 
   return (
     <div className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
@@ -349,33 +255,17 @@ export default function BillEvPage() {
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  {!auth?.token ? <span>Login to sync to backend</span> :
-                    loading ? <span>Loading…</span> :
-                    saving ? <span>Saving…</span> :
-                    dirty ? <span className="text-amber-600">Unsaved • auto-saving…</span> :
-                    message ? <span className="text-foreground">{message}</span> :
-                    <span className="text-emerald-600">Synced ✓</span>}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="secondary"
-                    disabled={!auth?.token || saving || loading}
-                    onClick={() => void saveRemote(year, data)}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    disabled={saving || loading}
-                    onClick={() => {
-                      const cleared = emptyYearData();
-                      setData(cleared);
-                      window.localStorage.removeItem(storageKey(year));
-                      if (auth?.token) void saveRemote(year, cleared);
-                    }}
-                  >
-                    Reset
-                  </Button>
+                  {!auth?.token ? (
+                    <span>Login to view data</span>
+                  ) : loading ? (
+                    <span>Loading…</span>
+                  ) : error ? (
+                    <span className="text-red-600">{error}</span>
+                  ) : monthsWithData > 0 ? (
+                    <span className="text-emerald-600">Data from Usage &amp; EV tabs ✓</span>
+                  ) : (
+                    <span className="text-muted-foreground">No data for {year}</span>
+                  )}
                 </div>
               </div>
             </CardHeader>
@@ -392,54 +282,58 @@ export default function BillEvPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />
-                  <span>Non-EV</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="inline-block h-3 w-3 rounded-sm bg-sky-500" />
-                  <span>EV Charging</span>
-                </div>
-              </div>
-
-              <div className="w-full overflow-x-auto">
-                <div className="min-w-[760px]">
-                  <div className="flex items-end gap-2 h-64">
-                    {data.map((m) => {
-                      const total = m.evKwh + m.nonEvKwh;
-                      const { nonEvPct, evPct } = getBarHeights(total, m.evKwh, maxTotal);
-                      const nonEvHeight = Math.round(nonEvPct * 100);
-                      const evHeight = Math.round(evPct * 100);
-                      const label = monthLabel(m.month);
-                      return (
-                        <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
-                          <div className="w-full h-56 flex flex-col justify-end">
-                            <div
-                              className="w-full bg-sky-500 rounded-t-sm"
-                              style={{ height: `${evHeight}%` }}
-                              aria-label={`${label} EV charging ${formatKwh(m.evKwh)} kWh`}
-                            />
-                            <div
-                              className="w-full bg-emerald-600 rounded-b-sm"
-                              style={{ height: `${nonEvHeight}%` }}
-                              aria-label={`${label} non-EV ${formatKwh(m.nonEvKwh)} kWh`}
-                            />
-                          </div>
-                          <div className="text-xs text-muted-foreground">{label}</div>
-                          <div className="text-xs font-medium">{formatKwh(total)} kWh</div>
-                        </div>
-                      );
-                    })}
+              {monthsWithData > 0 && (
+                <>
+                  <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />
+                      <span>Non-EV</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-block h-3 w-3 rounded-sm bg-sky-500" />
+                      <span>EV Charging</span>
+                    </div>
                   </div>
-                </div>
-              </div>
+
+                  <div className="w-full overflow-x-auto">
+                    <div className="min-w-[760px]">
+                      <div className="flex items-end gap-2 h-64">
+                        {data.map((m) => {
+                          const total = m.totalKwh;
+                          const { nonEvPct, evPct } = getBarHeights(total, m.evKwh, maxTotal);
+                          const nonEvHeight = Math.round(nonEvPct * 100);
+                          const evHeight = Math.round(evPct * 100);
+                          const label = monthLabel(m.month);
+                          return (
+                            <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
+                              <div className="w-full h-56 flex flex-col justify-end">
+                                <div
+                                  className="w-full bg-sky-500 rounded-t-sm"
+                                  style={{ height: `${evHeight}%` }}
+                                  aria-label={`${label} EV charging ${formatKwh(m.evKwh)} kWh`}
+                                />
+                                <div
+                                  className="w-full bg-emerald-600 rounded-b-sm"
+                                  style={{ height: `${nonEvHeight}%` }}
+                                  aria-label={`${label} non-EV ${formatKwh(m.nonEvKwh)} kWh`}
+                                />
+                              </div>
+                              <div className="text-xs text-muted-foreground">{label}</div>
+                              <div className="text-xs font-medium">{formatKwh(total)} kWh</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Monthly Input (kWh)</CardTitle>
+              <CardTitle>Monthly Breakdown (kWh)</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="w-full overflow-x-auto">
@@ -447,49 +341,62 @@ export default function BillEvPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Month</TableHead>
-                      <TableHead>EV Charging (kWh)</TableHead>
-                      <TableHead>Non-EV (kWh)</TableHead>
-                      <TableHead className="text-right">Total (kWh)</TableHead>
+                      <TableHead>Total Usage</TableHead>
+                      <TableHead>EV Charging</TableHead>
+                      <TableHead>Non-EV</TableHead>
+                      <TableHead className="text-right">EV %</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {data.map((m, idx) => (
-                      <TableRow key={m.month}>
-                        <TableCell className="font-medium">{monthLabel(m.month)}</TableCell>
-                        <TableCell>
-                          <Input
-                            inputMode="decimal"
-                            value={String(m.evKwh)}
-                            onChange={(e) => {
-                              const next = parseNumberInput(e.target.value);
-                              setData((prev) => {
-                                const copy = [...prev];
-                                copy[idx] = { ...copy[idx], evKwh: next };
-                                return copy;
-                              });
-                            }}
-                          />
+                    {data.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground py-6">
+                          {!auth?.token
+                            ? "Login to view data"
+                            : loading
+                              ? "Loading…"
+                              : "No data for " + year + ". Upload CSV in Usage tab and add EV sessions in EV tab first."}
                         </TableCell>
-                        <TableCell>
-                          <Input
-                            inputMode="decimal"
-                            value={String(m.nonEvKwh)}
-                            onChange={(e) => {
-                              const next = parseNumberInput(e.target.value);
-                              setData((prev) => {
-                                const copy = [...prev];
-                                copy[idx] = { ...copy[idx], nonEvKwh: next };
-                                return copy;
-                              });
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell className="text-right">{formatKwh(m.evKwh + m.nonEvKwh)}</TableCell>
                       </TableRow>
-                    ))}
+                    ) : (
+                      data.map((m) => {
+                        const evPct = m.totalKwh > 0 ? ((m.evKwh / m.totalKwh) * 100) : 0;
+                        return (
+                          <TableRow key={m.month}>
+                            <TableCell className="font-medium">{monthLabel(m.month)}</TableCell>
+                            <TableCell>{formatKwh(m.totalKwh)}</TableCell>
+                            <TableCell>
+                              <span className="text-sky-600">{formatKwh(m.evKwh)}</span>
+                            </TableCell>
+                            <TableCell>
+                              <span className="text-emerald-600">{formatKwh(m.nonEvKwh)}</span>
+                            </TableCell>
+                            <TableCell className="text-right">{evPct.toFixed(1)}%</TableCell>
+                          </TableRow>
+                        );
+                      })
+                    )}
                   </TableBody>
                 </Table>
               </div>
+
+              {!auth?.token && (
+                <div className="text-center py-4">
+                  <p className="text-sm text-muted-foreground mb-2">Sign in to fetch data from the server</p>
+                  <GoogleAuthButton locale={locale} />
+                </div>
+              )}
+
+              {auth?.token && monthsWithData === 0 && !loading && (
+                <div className="text-center py-4 space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    No data found for {year}. Start by uploading your myTNB CSV in the{" "}
+                    <Link href={`/${locale}/usage`} className="text-primary underline">Usage</Link> tab
+                    and adding EV sessions in the{" "}
+                    <Link href={`/${locale}/ev`} className="text-primary underline">EV</Link> tab.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
