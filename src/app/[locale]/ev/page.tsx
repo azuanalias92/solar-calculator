@@ -62,6 +62,7 @@ export default function EvPage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
 
   // Charging sessions from PDF
   const [sessions, setSessions] = useState<ChargingSession[]>([]);
@@ -108,7 +109,7 @@ export default function EvPage() {
         });
         if (!res.ok) return;
         const payload = (await res.json()) as { year: number; data: MonthUsage[] };
-        if (!canceled) setExistingData(payload.data ?? emptyYearData());
+        if (!canceled) { setExistingData(payload.data ?? emptyYearData()); setDirty(false); }
       } catch {}
       finally { if (!canceled) setLoading(false); }
     };
@@ -201,6 +202,7 @@ export default function EvPage() {
   const handleSave = async () => {
     if (!auth?.token) return;
     setSaving(true);
+    setDirty(true);
     setMessage(null);
 
     // Merge session data into existing data
@@ -225,6 +227,7 @@ export default function EvPage() {
 
       const result = (await res.json()) as { year: number; data: MonthUsage[] };
       setExistingData(result.data ?? emptyYearData());
+      setDirty(false);
       setSessions([]);
       setRawInput("");
       setAvailableYears((prev) => dedupeYears([year, ...prev]));
