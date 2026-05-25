@@ -8,9 +8,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { exportToPDF } from "@/lib/pdfExport";
-import { Plus, Settings, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2, RotateCcw } from "lucide-react";
+import { Plus, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2, RotateCcw } from "lucide-react";
 import ItemForm from "./items/form";
-import SolarForm from "./solar/form";
 import { useTranslation } from "@/lib/useTranslation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
@@ -199,7 +198,6 @@ export default function Home() {
     setStats(newStats);
   }, [items, solarConfig]);
   const [itemModalOpen, setItemModalOpen] = useState(false);
-  const [solarModalOpen, setSolarModalOpen] = useState(false);
 
   const calculateStats = (itemsList: Item[], config: SolarConfig) => {
     const totalItems = itemsList.reduce((sum, item) => sum + item.quantity, 0);
@@ -232,11 +230,6 @@ export default function Home() {
 
   const removeItem = (itemId: string) => {
     setItems(items.filter((item) => item.id !== itemId));
-  };
-
-  const updateSolarConfig = (config: SolarConfig) => {
-    setSolarConfig(config);
-    setSolarModalOpen(false); // Close modal after updating config
   };
 
   const handleExportPDF = () => {
@@ -314,21 +307,6 @@ export default function Home() {
                 <DialogTitle>{t("form.addNewItem")}</DialogTitle>
               </DialogHeader>
               <ItemForm onAddItem={addItem} />
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={solarModalOpen} onOpenChange={setSolarModalOpen}>
-            <DialogTrigger asChild>
-              <Button variant="accent" size="lg" className="w-full sm:w-auto">
-                <Settings className="w-4 h-4 mr-2" />
-                {t("buttons.configureSolar")}
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{t("form.solarConfiguration")}</DialogTitle>
-              </DialogHeader>
-              <SolarForm onConfigUpdate={updateSolarConfig} currentConfig={solarConfig} />
             </DialogContent>
           </Dialog>
 

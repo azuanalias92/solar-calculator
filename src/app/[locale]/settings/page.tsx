@@ -6,11 +6,19 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { getAuthState, clearAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
-import { Coffee, Github, LogOut, Zap } from "lucide-react";
+import { Coffee, Github, LogOut, Sun, Zap } from "lucide-react";
+
+interface SolarConfig {
+  peakSunHours: number;
+  panelWatts: number;
+  systemEfficiency: number;
+}
 
 const TARIFF_TYPES = [
   { value: "TNB_DOMESTIC_TOU", label: "TNB Domestic TOU", desc: "Peak & Off-Peak rates" },
@@ -29,12 +37,26 @@ function saveTariff(value: string) {
   } catch { /* ignore */ }
 }
 
+const DEFAULT_SOLAR: SolarConfig = {
+  peakSunHours: 5,
+  panelWatts: 300,
+  systemEfficiency: 85,
+};
+
 export default function SettingsPage() {
   const { t, locale } = useTranslation();
   const pathname = usePathname();
+  const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
 
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [tariff, setTariff] = useState(loadTariff);
+
+  // Solar config state (form values as strings for controlled inputs)
+  const [solarConfig, setSolarConfig] = useState<SolarConfig>(DEFAULT_SOLAR);
+  const [solarLoading, setSolarLoading] = useState(false);
+  const [solarSaving, setSolarSaving] = useState(false);
+  const [solarMessage, setSolarMessage] = useState<string | null>(null);
+  const [solarLoaded, setSolarLoaded] = useState(false);
 
   useEffect(() => {
     const refresh = () => setAuth(getAuthState());
@@ -46,6 +68,81 @@ export default function SettingsPage() {
       window.removeEventListener("kirasolar:auth", refresh);
     };
   }, []);
+
+  // Fetch solar config from API
+  useEffect(() => {
+    let canceled = false;
+
+    const run = async () => {
+      if (!auth?.token) {
+        if (!canceled) { setSolarConfig(DEFAULT_SOLAR); setSolarLoaded(true); }
+        return;
+      }
+
+      setSolarLoading(true);
+      try {
+        const res = await fetch(`${apiBaseUrl}/calculator/state`, {
+          headers: { Authorization: `Bearer ${auth.token}` },
+        });
+        if (res.ok) {
+          const payload = (await res.json()) as {
+            data: { items: unknown[]; config: SolarConfig };
+          };
+          if (payload.data?.config && !canceled) {
+            setSolarConfig({
+              peakSunHours: payload.data.config.peakSunHours ?? DEFAULT_SOLAR.peakSunHours,
+              panelWatts: payload.data.config.panelWatts ?? DEFAULT_SOLAR.panelWatts,
+              systemEfficiency: payload.data.config.systemEfficiency ?? DEFAULT_SOLAR.systemEfficiency,
+            });
+          }
+        }
+      } catch { /* ignore */ } finally {
+        if (!canceled) { setSolarLoaded(true); setSolarLoading(false); }
+      }
+    };
+
+    void run();
+    return () => { canceled = true; };
+  }, [apiBaseUrl, auth?.token]);
+
+  const saveSolarConfig = async () => {
+    if (!auth?.token) return;
+
+    setSolarSaving(true);
+    setSolarMessage(null);
+
+    try {
+      // Fetch current state first (to preserve items)
+      const getRes = await fetch(`${apiBaseUrl}/calculator/state`, {
+        headers: { Authorization: `Bearer ${auth.token}` },
+      });
+      const existing = getRes.ok
+        ? (await getRes.json()) as { data: { items: unknown[]; config: SolarConfig } }
+        : { data: { items: [], config: DEFAULT_SOLAR } };
+
+      // PUT with existing items + updated config
+      const res = await fetch(`${apiBaseUrl}/calculator/state`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
+        body: JSON.stringify({
+          items: existing.data.items ?? [],
+          config: solarConfig,
+        }),
+      });
+
+      if (res.ok) {
+        setSolarMessage("Solar configuration saved ✓");
+        window.dispatchEvent(new CustomEvent("kirasolar:solar-config", { detail: solarConfig }));
+      } else {
+        setSolarMessage("Failed to save");
+      }
+    } catch {
+      setSolarMessage("Failed to save");
+    } finally {
+      setSolarSaving(false);
+      setTimeout(() => setSolarMessage(null), 2000);
+    }
+  };
 
   const handleTariffChange = useCallback((value: string) => {
     setTariff(value);
@@ -145,6 +242,104 @@ export default function SettingsPage() {
                     Sign Out
                   </Button>
                 </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Solar System Configuration */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sun className="w-5 h-5 text-emerald-600" />
+              Solar System Configuration
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {!auth?.token ? (
+              <div className="text-sm text-muted-foreground py-2">
+                Sign in to configure your solar system settings and sync them to the cloud.
+              </div>
+            ) : solarLoading ? (
+              <div className="text-sm text-muted-foreground py-2">Loading…</div>
+            ) : (
+              <div className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="peakSunHours">Peak Sun Hours</Label>
+                    <Input
+                      id="peakSunHours"
+                      type="number"
+                      step="0.1"
+                      min="0.5"
+                      max="12"
+                      value={String(solarConfig.peakSunHours)}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val)) setSolarConfig((prev) => ({ ...prev, peakSunHours: val }));
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Avg daily peak sun hours at your location (e.g. Malaysia ~4.5–5.5)
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="panelWatts">Panel Wattage (W)</Label>
+                    <Input
+                      id="panelWatts"
+                      type="number"
+                      step="10"
+                      min="100"
+                      max="1000"
+                      value={String(solarConfig.panelWatts)}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val)) setSolarConfig((prev) => ({ ...prev, panelWatts: val }));
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Wattage per solar panel (typical: 300–600W)
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="systemEfficiency">System Efficiency (%)</Label>
+                    <Input
+                      id="systemEfficiency"
+                      type="number"
+                      step="0.1"
+                      min="1"
+                      max="100"
+                      value={String(solarConfig.systemEfficiency)}
+                      onChange={(e) => {
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val)) setSolarConfig((prev) => ({ ...prev, systemEfficiency: Math.min(100, Math.max(1, val)) }));
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Overall system efficiency including inverter losses (typical: 80–90%)
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Button onClick={() => void saveSolarConfig()} disabled={solarSaving}>
+                    {solarSaving ? "Saving…" : "Save Solar Configuration"}
+                  </Button>
+                  {solarMessage && (
+                    <span className={`text-sm ${solarMessage.includes("✓") ? "text-emerald-600" : "text-red-600"}`}>
+                      {solarMessage}
+                    </span>
+                  )}
+                </div>
+
+                {solarLoaded && (
+                  <div className="rounded-lg bg-muted p-3 text-sm">
+                    <strong>Summary:</strong>{" "}
+                    {solarConfig.panelWatts}W panels × {solarConfig.peakSunHours}h peak sun ×{" "}
+                    {solarConfig.systemEfficiency}% efficiency =
+                    {" "}{(solarConfig.panelWatts / 1000 * solarConfig.peakSunHours * solarConfig.systemEfficiency / 100).toFixed(2)} kWh/day per panel
+                  </div>
+                )}
               </div>
             )}
           </CardContent>
