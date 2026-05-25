@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -62,6 +62,29 @@ export default function Home() {
   const [dirty, setDirty] = useState(false);
   const saveTimerRef = useRef<number | null>(null);
   const skipNextSaveRef = useRef(true);
+
+  // Tariff configuration
+  const [tariff, setTariff] = useState(() => {
+    if (typeof window === "undefined") return "TNB_DOMESTIC_TOU";
+    return window.localStorage.getItem("kirasolar.tariff") ?? "TNB_DOMESTIC_TOU";
+  });
+  const currentTariffLabel = tariff === "TNB_DOMESTIC_TOU" ? "TNB Domestic TOU" : "TNB Domestic AM";
+
+  const saveTariff = useCallback((value: string) => {
+    try {
+      window.localStorage.setItem("kirasolar.tariff", value);
+      window.dispatchEvent(new CustomEvent("kirasolar:tariff", { detail: value }));
+    } catch { /* ignore */ }
+  }, []);
+
+  // Listen for tariff changes from other tabs/pages
+  useEffect(() => {
+    const handler = (e: CustomEvent) => {
+      if (e.detail) setTariff(e.detail);
+    };
+    window.addEventListener("kirasolar:tariff", handler as EventListener);
+    return () => window.removeEventListener("kirasolar:tariff", handler as EventListener);
+  }, []);
 
   useEffect(() => {
     const refresh = () => setAuth(getAuthState());
@@ -382,6 +405,45 @@ export default function Home() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Tariff Configuration */}
+        <Card className="mb-6 sm:mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Zap className="w-4 h-4 text-emerald-600" />
+              Tariff Configuration
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-4">
+                <p className="text-sm text-muted-foreground">
+                  Home tariff:{" "}
+                  <strong className="text-foreground">
+                    {currentTariffLabel}
+                  </strong>
+                </p>
+                <select
+                  value={tariff}
+                  onChange={(e) => {
+                    setTariff(e.target.value);
+                    saveTariff(e.target.value);
+                  }}
+                  className="flex h-9 w-56 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <option value="TNB_DOMESTIC_TOU">TNB Domestic TOU (Peak/Off-Peak)</option>
+                  <option value="TNB_DOMESTIC_AM">TNB Domestic AM (Flat Rate)</option>
+                </select>
+              </div>
+              <Link
+                href={`/${locale}/settings`}
+                className="text-xs text-muted-foreground hover:text-primary underline transition-colors"
+              >
+                Manage in Settings →
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Items Table */}
         <Card>

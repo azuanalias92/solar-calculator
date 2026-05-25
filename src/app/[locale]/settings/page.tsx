@@ -1,24 +1,40 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { getAuthState, clearAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
-import { Coffee, Github, Eye, EyeOff, RefreshCw, LogOut } from "lucide-react";
+import { Coffee, Github, LogOut, Zap } from "lucide-react";
+
+const TARIFF_TYPES = [
+  { value: "TNB_DOMESTIC_TOU", label: "TNB Domestic TOU", desc: "Peak & Off-Peak rates" },
+  { value: "TNB_DOMESTIC_AM", label: "TNB Domestic AM", desc: "Flat rate" },
+] as const;
+
+function loadTariff(): string {
+  if (typeof window === "undefined") return "TNB_DOMESTIC_TOU";
+  return window.localStorage.getItem("kirasolar.tariff") ?? "TNB_DOMESTIC_TOU";
+}
+
+function saveTariff(value: string) {
+  try {
+    window.localStorage.setItem("kirasolar.tariff", value);
+    window.dispatchEvent(new CustomEvent("kirasolar:tariff", { detail: value }));
+  } catch { /* ignore */ }
+}
 
 export default function SettingsPage() {
   const { t, locale } = useTranslation();
   const pathname = usePathname();
 
   const [auth, setAuth] = useState<AuthState | null>(null);
-  const [showToken, setShowToken] = useState(false);
+  const [tariff, setTariff] = useState(loadTariff);
 
   useEffect(() => {
     const refresh = () => setAuth(getAuthState());
@@ -30,6 +46,13 @@ export default function SettingsPage() {
       window.removeEventListener("kirasolar:auth", refresh);
     };
   }, []);
+
+  const handleTariffChange = useCallback((value: string) => {
+    setTariff(value);
+    saveTariff(value);
+  }, []);
+
+  const currentTariff = TARIFF_TYPES.find((t) => t.value === tariff);
 
   return (
     <div className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
@@ -127,57 +150,53 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Integrations Section */}
+        {/* Tariff Configuration */}
         <Card>
           <CardHeader>
-            <CardTitle>Integrations</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Zap className="w-5 h-5 text-emerald-600" />
+              Tariff Configuration
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Configure external services to enable advanced features like weekly traffic reports.
+              Select your home's TNB electricity tariff to use in bill calculations and the solar calculator.
             </p>
 
-            {/* Vercel API Token */}
-            <div className="rounded-lg border p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-medium">Vercel Analytics</h3>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Enables weekly traffic reports for <strong>kirasolar.my</strong>.{" "}
-                    <a
-                      href="https://vercel.com/account/tokens"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary underline"
-                    >
-                      Create a token →
-                    </a>
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <Input
-                    type={showToken ? "text" : "password"}
-                    placeholder="vcrl_xxxxxxxxxxxx"
-                    className="pr-8"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowToken(!showToken)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    aria-label={showToken ? "Hide token" : "Show token"}
-                  >
-                    {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-                <Button variant="outline" size="icon" aria-label="Test connection">
-                  <RefreshCw className="w-4 h-4" />
-                </Button>
-                <Button disabled>Save</Button>
-              </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {TARIFF_TYPES.map((t) => (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => handleTariffChange(t.value)}
+                  className={`text-left rounded-lg border p-4 transition-all cursor-pointer ${
+                    tariff === t.value
+                      ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500"
+                      : "border-input hover:border-emerald-200 hover:bg-accent"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium text-sm">{t.label}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{t.desc}</p>
+                    </div>
+                    {tariff === t.value && (
+                      <span className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                      </span>
+                    )}
+                  </div>
+                </button>
+              ))}
             </div>
+
+            {currentTariff && (
+              <div className="rounded-lg bg-muted p-3 text-sm">
+                Active: <strong>{currentTariff.label}</strong> — {currentTariff.desc}.
+                Learn more on the{" "}
+                <Link href={`/${locale}/rates`} className="text-primary underline">Rates</Link> page.
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
