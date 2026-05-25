@@ -120,49 +120,49 @@ export default function EvPage() {
   const handleParse = () => {
     const lines = rawInput.split("\n").filter((l) => l.trim());
     const parsed: ChargingSession[] = [];
-    let isHeaderSkipped = false;
 
     for (const line of lines) {
-      // Skip header lines
-      if (!isHeaderSkipped) {
-        if (line.includes("Start time") || line.includes("End time") || line.includes("Charging duration")) {
-          isHeaderSkipped = true;
-          continue;
-        }
-        if (line.includes("Charging station") || line.includes("User") || line.includes("Total")) continue;
-        if (!line.match(/\d{4}-\d{2}-\d{2}/)) continue;
-      }
-      if (line.includes("Total")) continue;
+      // Skip obvious headers and totals
+      const upper = line.toUpperCase();
+      if (upper.includes("CHARGING STATION") || upper.includes("TOTAL") || upper.includes("START TIME") || upper.includes("EASY CHARGING")) continue;
+      if (upper.includes("USER") || upper.includes("END TIME") || upper.includes("CHARGING DURATION") || upper.includes("CHARGING AMOUNT")) continue;
 
-      // Extract data - format: station, user, date, startTime, date, endTime, duration, kWh, cost
-      const parts = line.trim().split(/\s+/);
-      // Find date patterns
+      // Must have at least one date
       const dates = line.match(/\d{4}-\d{2}-\d{2}/g);
+      if (!dates || dates.length === 0) continue;
+
+      // Must have at least 2 times
       const times = line.match(/\d{2}:\d{2}:\d{2}/g);
-      const kwhMatch = line.match(/(\d+\.?\d*)\s*kWh/i) || line.match(/(\d+\.?\d*)\s*$/);
-      const costMatch = line.match(/(\d+\.?\d{2})\s*$/);
+      if (!times || times.length < 2) continue;
 
-      if (dates && times && times.length >= 4) {
-        // Determine kWh and cost
-        const nums = line.split(/\s+/).filter(s => /^\d+\.?\d*$/.test(s)).map(Number);
-        const kwh = nums.length >= 2 ? nums[nums.length - 2] : 0;
-        const cost = nums.length >= 1 ? nums[nums.length - 1] : 0;
+      // Find kWh and cost - they're numeric values near the end of the line
+      // The format is: station user date start date end duration kwh cost
+      const tokens = line.trim().split(/\s+/);
+      const numbers = tokens
+        .map((t) => Number.parseFloat(t))
+        .filter((n) => Number.isFinite(n) && n >= 0);
 
-        parsed.push({
-          date: dates[0],
-          startTime: times[0],
-          endTime: times[2] || times[1],
-          duration: parts.find(p => p.includes("H") && p.includes("M")) || "",
-          kwh,
-          cost,
-        });
-      }
+      // Last number is cost, second-to-last is kWh (if we have enough numbers)
+      const cost = numbers.length >= 1 ? numbers[numbers.length - 1] : 0;
+      const kwh = numbers.length >= 2 ? numbers[numbers.length - 2] : 0;
+
+      // Find duration string
+      const duration = tokens.find((t) => t.includes("H") && t.includes("M")) || "";
+
+      parsed.push({
+        date: dates[0],
+        startTime: times[0],
+        endTime: times.length >= 3 ? times[2] : times[1],
+        duration,
+        kwh,
+        cost,
+      });
     }
 
     setSessions(parsed);
-    if (parsed.length === 0) setMessage("No sessions parsed. Try pasting the raw PDF text.");
+    if (parsed.length === 0) setMessage("No sessions parsed. Make sure the data contains dates and times.");
     else setMessage(`Parsed ${parsed.length} charging sessions!`);
-    setTimeout(() => setMessage(null), 3000);
+    setTimeout(() => setMessage(null), 5000);
   };
 
   // Aggregate sessions by month
