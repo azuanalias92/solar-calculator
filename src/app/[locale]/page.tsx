@@ -59,6 +59,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
   const saveTimerRef = useRef<number | null>(null);
   const skipNextSaveRef = useRef(true);
 
@@ -109,6 +110,7 @@ export default function Home() {
           setSolarConfig(
             payload.data.config ?? { peakSunHours: 5, panelWatts: 300, systemEfficiency: 85 },
           );
+          if (!canceled) setDirty(false);
           setIsLoaded(true);
         }
       } catch {
@@ -141,6 +143,7 @@ export default function Home() {
         setMessage("Failed to save");
         return;
       }
+      setDirty(false);
       setMessage("Saved");
       window.setTimeout(() => setMessage(null), 1200);
     } catch {
@@ -158,6 +161,7 @@ export default function Home() {
       return;
     }
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
+    setDirty(true);
     saveTimerRef.current = window.setTimeout(() => {
       void saveRemote(items, solarConfig);
     }, 800);
@@ -316,10 +320,12 @@ export default function Home() {
         </div>
 
         <div className="text-center text-sm text-muted-foreground mb-6">
-          <span>{auth?.token ? "Synced to backend" : "Login to save to backend"}</span>
-          {loading ? <span> • Loading…</span> : null}
-          {saving ? <span> • Saving…</span> : null}
-          {message ? <span className="text-foreground"> • {message}</span> : null}
+          {!auth?.token ? <span>Login to save to backend</span> :
+            loading ? <span>Loading…</span> :
+            saving ? <span>Saving…</span> :
+            dirty ? <span className="text-amber-600">Unsaved changes • auto-saving…</span> :
+            message ? <span className="text-foreground">{message}</span> :
+            <span className="text-emerald-600">Synced ✓</span>}
         </div>
 
         {/* Statistics Cards */}

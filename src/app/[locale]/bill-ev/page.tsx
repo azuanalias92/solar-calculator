@@ -90,6 +90,7 @@ export default function BillEvPage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
 
   const skipNextSaveRef = useRef(true);
   const saveTimerRef = useRef<number | null>(null);
@@ -203,7 +204,7 @@ export default function BillEvPage() {
             nonEvKwh: clampNumber(Number(found?.nonEvKwh ?? 0)),
           };
         });
-        if (!canceled) setData(normalized);
+        if (!canceled) { setData(normalized); setDirty(false); }
         saveLocal(year, normalized);
       } finally {
         setLoading(false);
@@ -222,7 +223,8 @@ export default function BillEvPage() {
 
   const saveRemote = async (targetYear: number, nextData: MonthUsage[]) => {
     if (!auth?.token) return;
-    setSaving(true);
+      setSaving(true);
+    setDirty(true);
     setMessage(null);
     try {
       const res = await fetch(`${apiBaseUrl}/ev-usage?year=${encodeURIComponent(String(targetYear))}`, {
@@ -244,6 +246,7 @@ export default function BillEvPage() {
         };
       });
       setData(normalized);
+      setDirty(false);
       saveLocal(targetYear, normalized);
       setAvailableYears((prev) => dedupeYears([targetYear, ...prev]));
       setMessage("Saved");
@@ -260,6 +263,7 @@ export default function BillEvPage() {
       return;
     }
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
+    setDirty(true);
     saveTimerRef.current = window.setTimeout(() => {
       void saveRemote(year, data);
     }, 800);
@@ -345,10 +349,12 @@ export default function BillEvPage() {
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <span>{auth?.token ? "Logged in" : "Login to sync to backend"}</span>
-                  {loading ? <span>Loading…</span> : null}
-                  {saving ? <span>Saving…</span> : null}
-                  {message ? <span className="text-foreground">{message}</span> : null}
+                  {!auth?.token ? <span>Login to sync to backend</span> :
+                    loading ? <span>Loading…</span> :
+                    saving ? <span>Saving…</span> :
+                    dirty ? <span className="text-amber-600">Unsaved • auto-saving…</span> :
+                    message ? <span className="text-foreground">{message}</span> :
+                    <span className="text-emerald-600">Synced ✓</span>}
                 </div>
                 <div className="flex gap-2">
                   <Button
