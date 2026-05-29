@@ -273,6 +273,9 @@ export default function EvPage() {
               <Link href={`/${locale}/ev`}>EV</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
+              <Link href={`/${locale}/ev-calculator`}>EV Calc</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
               <Link href={`/${locale}/settings`}>Settings</Link>
             </Button>
           </div>

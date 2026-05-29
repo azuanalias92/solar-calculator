@@ -268,7 +268,7 @@ export default function Home() {
 
         <div className="flex justify-center mt-4">
           <div className="inline-flex gap-2 rounded-lg border border-input bg-background p-1">
-            <Button asChild size="sm" variant={pathname.includes("/bill-ev") || pathname.includes("/rates") || pathname.includes("/usage") || pathname.includes("/ev") || pathname.includes("/settings") ? "outline" : "secondary"}>
+            <Button asChild size="sm" variant={pathname.includes("/bill-ev") || pathname.includes("/rates") || pathname.includes("/usage") || pathname.includes("/ev") || pathname.includes("/ev-calculator") || pathname.includes("/settings") ? "outline" : "secondary"}>
               <Link href={`/${locale}`}>Calculator</Link>
             </Button>
             <Button asChild size="sm" variant={pathname.includes("/bill-ev") ? "secondary" : "outline"}>
@@ -282,6 +282,9 @@ export default function Home() {
             </Button>
             <Button asChild size="sm" variant={pathname.includes("/ev") ? "secondary" : "outline"}>
               <Link href={`/${locale}/ev`}>EV</Link>
+            </Button>
+            <Button asChild size="sm" variant={pathname.includes("/ev-calculator") ? "secondary" : "outline"}>
+              <Link href={`/${locale}/ev-calculator`}>EV Calc</Link>
             </Button>
             <Button asChild size="sm" variant={pathname.includes("/settings") ? "secondary" : "outline"}>
               <Link href={`/${locale}/settings`}>Settings</Link>
