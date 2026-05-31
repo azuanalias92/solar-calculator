@@ -1,0 +1,1 @@
+cd /tmp/solar-calculator && python3 validate_locales.py 2>&1

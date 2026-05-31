@@ -183,7 +183,7 @@ export default function SettingsPage() {
     return () => {
       canceled = true;
     };
-  }, [apiBaseUrl, ratesAsOf, t]);
+  }, [apiBaseUrl, ratesAsOf]);
   const [solarConfig, setSolarConfig] = useState<SolarConfig>(DEFAULT_SOLAR);
   const [solarLoading, setSolarLoading] = useState(false);
   const [solarSaving, setSolarSaving] = useState(false);
