@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +11,7 @@ import { getAuthState, clearAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
+import NavBar from "@/components/NavBar";
 import { Coffee, Github, LogOut, Sun, Zap, Info } from "lucide-react";
 
 interface SolarConfig {
@@ -136,7 +135,6 @@ function RateTable({ rate }: { rate: TariffRate }) {
 
 export default function SettingsPage() {
   const { t, locale } = useTranslation();
-  const pathname = usePathname();
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
 
   const [auth, setAuth] = useState<AuthState | null>(null);
@@ -301,20 +299,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="flex justify-center mt-4">
-          <div className="inline-flex gap-2 rounded-lg border border-input bg-background p-1">
-            <Button asChild size="sm" variant={pathname.includes("/dashboard") ? "secondary" : "outline"}>
-              <Link href={`/${locale}/dashboard`}>Dashboard</Link>
-            </Button>
-            <Button asChild size="sm" variant={pathname.includes("/dashboard") || pathname.includes("/ev-calculator") || pathname.includes("/settings") ? "outline" : "secondary"}>
-              <Link href={`/${locale}`}>Solar Calculator</Link>
-            </Button>
-            <Button asChild size="sm" variant={pathname.includes("/ev-calculator") ? "secondary" : "outline"}>
-              <Link href={`/${locale}/ev-calculator`}>EV Calculator</Link>
-            </Button>
-            <Button asChild size="sm" variant={pathname.includes("/settings") ? "secondary" : "outline"}>
-              <Link href={`/${locale}/settings`}>Settings</Link>
-            </Button>
-          </div>
+          <NavBar locale={locale} />
         </div>
 
         <p className="text-sm sm:text-base text-emerald-600 mt-2">{t("common.description")}</p>

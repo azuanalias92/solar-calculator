@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +9,7 @@ import { getAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
+import NavBar from "@/components/NavBar";
 import {
   Coffee, Github, BarChart3, CalendarDays, Upload, Loader2,
   Car, Zap, Sun, BatteryCharging, Fuel
@@ -73,7 +72,6 @@ function dedupeYears(years: number[]): number[] {
 export default function DashboardPage() {
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
   const { t, locale } = useTranslation();
-  const pathname = usePathname();
   const nowDate = useMemo(() => {
     const d = new Date();
     return { year: d.getFullYear(), month: d.getMonth() + 1 };
@@ -448,20 +446,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex justify-center mt-4 flex-wrap gap-2">
-          <div className="inline-flex gap-2 rounded-lg border border-input bg-background p-1 flex-wrap justify-center">
-            <Button asChild size="sm" variant={pathname.includes("/dashboard") ? "secondary" : "outline"}>
-              <Link href={`/${locale}/dashboard`}>Dashboard</Link>
-            </Button>
-            <Button asChild size="sm" variant={pathname.includes("/bill-ev") || pathname.includes("/usage") || pathname.includes("/ev") || pathname.includes("/dashboard") || pathname.includes("/ev-calculator") || pathname.includes("/settings") ? "outline" : "secondary"}>
-              <Link href={`/${locale}`}>Solar Calculator</Link>
-            </Button>
-            <Button asChild size="sm" variant={pathname.includes("/ev-calculator") ? "secondary" : "outline"}>
-              <Link href={`/${locale}/ev-calculator`}>EV Calculator</Link>
-            </Button>
-            <Button asChild size="sm" variant={pathname.includes("/settings") ? "secondary" : "outline"}>
-              <Link href={`/${locale}/settings`}>Settings</Link>
-            </Button>
-          </div>
+          <NavBar locale={locale} />
         </div>
 
         <p className="text-sm sm:text-base text-emerald-600 mt-2">{t("common.description")}</p>

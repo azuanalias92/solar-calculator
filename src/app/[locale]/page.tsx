@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -13,6 +12,7 @@ import ItemForm from "./items/form";
 import { useTranslation } from "@/lib/useTranslation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
+import NavBar from "@/components/NavBar";
 import { getAuthState, type AuthState } from "@/lib/auth";
 
 interface Item {
@@ -39,7 +39,6 @@ interface SolarConfig {
 
 export default function Home() {
   const { t, locale } = useTranslation();
-  const pathname = usePathname();
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [items, setItems] = useState<Item[]>([]);
@@ -267,20 +266,7 @@ export default function Home() {
         </div>
 
         <div className="flex justify-center mt-4">
-          <div className="inline-flex gap-2 rounded-lg border border-input bg-background p-1">
-            <Button asChild size="sm" variant={pathname.includes("/dashboard") ? "secondary" : "outline"}>
-              <Link href={`/${locale}/dashboard`}>Dashboard</Link>
-            </Button>
-            <Button asChild size="sm" variant={pathname.includes("/dashboard") || pathname.includes("/ev-calculator") || pathname.includes("/settings") ? "outline" : "secondary"}>
-              <Link href={`/${locale}`}>Solar Calculator</Link>
-            </Button>
-            <Button asChild size="sm" variant={pathname.includes("/ev-calculator") ? "secondary" : "outline"}>
-              <Link href={`/${locale}/ev-calculator`}>EV Calculator</Link>
-            </Button>
-            <Button asChild size="sm" variant={pathname.includes("/settings") ? "secondary" : "outline"}>
-              <Link href={`/${locale}/settings`}>Settings</Link>
-            </Button>
-          </div>
+          <NavBar locale={locale} />
         </div>
 
         <p className="text-sm sm:text-base text-emerald-600 mt-2">{t("common.description")}</p>
