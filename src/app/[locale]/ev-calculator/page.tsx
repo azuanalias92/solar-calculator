@@ -65,13 +65,13 @@ export default function EvCalculatorPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BatteryCharging className="w-5 h-5 text-emerald-600" />
-              EV Charging Cost Calculator
+              {t("evCalc.title")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="batteryKwh">Battery Capacity (kWh)</Label>
+                <Label htmlFor="batteryKwh">{t("evCalc.batteryCapacity")}</Label>
                 <Input
                   id="batteryKwh"
                   type="number"
@@ -79,11 +79,11 @@ export default function EvCalculatorPage() {
                   step="1"
                   value={batteryKwh}
                   onChange={(e) => setBatteryKwh(e.target.value)}
-                  placeholder="e.g. 60"
+                  placeholder={t("evCalc.batteryCapacityPlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="currentPct">Current Charge (%)</Label>
+                <Label htmlFor="currentPct">{t("evCalc.currentCharge")}</Label>
                 <Input
                   id="currentPct"
                   type="number"
@@ -92,11 +92,11 @@ export default function EvCalculatorPage() {
                   step="1"
                   value={currentPct}
                   onChange={(e) => setCurrentPct(e.target.value)}
-                  placeholder="e.g. 37"
+                  placeholder={t("evCalc.currentChargePlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="targetPct">Target Charge (%)</Label>
+                <Label htmlFor="targetPct">{t("evCalc.targetCharge")}</Label>
                 <Input
                   id="targetPct"
                   type="number"
@@ -105,11 +105,11 @@ export default function EvCalculatorPage() {
                   step="1"
                   value={targetPct}
                   onChange={(e) => setTargetPct(e.target.value)}
-                  placeholder="e.g. 80"
+                  placeholder={t("evCalc.targetChargePlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="price">Rate (RM/kWh)</Label>
+                <Label htmlFor="price">{t("evCalc.rate")}</Label>
                 <Input
                   id="price"
                   type="number"
@@ -117,19 +117,19 @@ export default function EvCalculatorPage() {
                   step="0.01"
                   value={pricePerKwh}
                   onChange={(e) => setPricePerKwh(e.target.value)}
-                  placeholder="e.g. 1.30"
+                  placeholder={t("evCalc.ratePlaceholder")}
                 />
               </div>
             </div>
 
             <div className="mt-4 flex items-center gap-2">
-              <Label htmlFor="rateName" className="text-sm whitespace-nowrap">Rate Name:</Label>
+              <Label htmlFor="rateName" className="text-sm whitespace-nowrap">{t("evCalc.rateName")}</Label>
               <Input
                 id="rateName"
                 value={rateName}
                 onChange={(e) => setRateName(e.target.value)}
                 className="max-w-[200px]"
-                placeholder="e.g. Easy Charging"
+                placeholder={t("evCalc.rateNamePlaceholder")}
               />
             </div>
           </CardContent>
@@ -138,15 +138,15 @@ export default function EvCalculatorPage() {
         {/* Quick Presets */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Quick Presets</CardTitle>
+            <CardTitle className="text-base">{t("evCalc.quickPresets")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: "20→80% (60kWh)", bat: "60", cur: "20", tgt: "80", price: "1.30" },
-                { label: "30→80% (60kWh)", bat: "60", cur: "30", tgt: "80", price: "1.30" },
-                { label: "10→90% (40kWh)", bat: "40", cur: "10", tgt: "90", price: "1.30" },
-                { label: "0→100% (60kWh)", bat: "60", cur: "0", tgt: "100", price: "1.30" },
+                { label: t("evCalc.presets.20to80"), bat: "60", cur: "20", tgt: "80", price: "1.30" },
+                { label: t("evCalc.presets.30to80"), bat: "60", cur: "30", tgt: "80", price: "1.30" },
+                { label: t("evCalc.presets.10to90"), bat: "40", cur: "10", tgt: "90", price: "1.30" },
+                { label: t("evCalc.presets.0to100"), bat: "60", cur: "0", tgt: "100", price: "1.30" },
               ].map((p) => (
                 <Button
                   key={p.label}
@@ -175,7 +175,7 @@ export default function EvCalculatorPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Zap className="w-4 h-4 text-emerald-600" />
-                  Battery Visual
+                  {t("evCalc.batteryVisual")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -188,14 +188,14 @@ export default function EvCalculatorPage() {
                     <div
                       className="absolute left-0 top-0 h-full bg-emerald-200 dark:bg-emerald-800 transition-all"
                       style={{ width: `${pctStart}%` }}
-                      title={`Current: ${cur}%`}
+                      title={`${t("evCalc.currentTitle")} ${cur}%`}
                     />
                     {/* Added charge */}
                     {barAdded > 0 && (
                       <div
                         className="absolute top-0 h-full bg-emerald-600 transition-all"
                         style={{ left: `${pctStart}%`, width: `${barAdded}%` }}
-                        title={`After charging: ${tgt}%`}
+                        title={`${t("evCalc.afterChargingTitle")} ${tgt}%`}
                       >
                         {/* Label inside the bar */}
                         {barAdded > 20 && (
@@ -215,16 +215,16 @@ export default function EvCalculatorPage() {
                   <div className="flex justify-center gap-4 mt-3 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <span className="inline-block w-3 h-3 rounded-sm bg-emerald-600" />
-                      Charge added ({barAdded.toFixed(0)}%)
+                      {t("evCalc.chargeAddedLegend")} ({barAdded.toFixed(0)}%)
                     </span>
                     <span className="flex items-center gap-1">
                       <span className="inline-block w-3 h-3 rounded-sm bg-emerald-200 dark:bg-emerald-800" />
-                      Existing ({cur.toFixed(0)}%)
+                      {t("evCalc.existingLegend")} ({cur.toFixed(0)}%)
                     </span>
                     {barRemaining > 0 && (
                       <span className="flex items-center gap-1">
                         <span className="inline-block w-3 h-3 rounded-sm bg-muted" />
-                        Available ({barRemaining.toFixed(0)}%)
+                        {t("evCalc.availableLegend")} ({barRemaining.toFixed(0)}%)
                       </span>
                     )}
                   </div>
@@ -237,30 +237,33 @@ export default function EvCalculatorPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Zap className="w-4 h-4 text-emerald-600" />
-                  Cost Breakdown
+                  {t("evCalc.costBreakdown")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="p-4 rounded-lg bg-muted/50">
-                    <div className="text-sm text-muted-foreground">Charge Added</div>
+                    <div className="text-sm text-muted-foreground">{t("evCalc.chargeAddedLabel")}</div>
                     <div className="text-2xl font-bold text-emerald-600">{pctAdded.toFixed(0)}%</div>
                   </div>
                   <div className="p-4 rounded-lg bg-muted/50">
-                    <div className="text-sm text-muted-foreground">Energy Needed</div>
+                    <div className="text-sm text-muted-foreground">{t("evCalc.energyNeeded")}</div>
                     <div className="text-2xl font-bold">{kwhNeeded.toFixed(2)} kWh</div>
                   </div>
                   <div className="p-4 rounded-lg bg-emerald-600/10 dark:bg-emerald-900/30 border border-emerald-600/20 dark:border-emerald-800/40">
-                    <div className="text-sm text-muted-foreground">Estimated Cost</div>
+                    <div className="text-sm text-muted-foreground">{t("evCalc.estimatedCost")}</div>
                     <div className="text-2xl font-bold text-emerald-600">{formatMoney(cost)}</div>
                   </div>
                 </div>
 
                 <div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30">
                   <p className="text-sm text-muted-foreground">
-                    Charging <strong>{bKwh} kWh</strong> battery from{" "}
-                    <strong>{cur}%</strong> to <strong>{tgt}%</strong> ({pctAdded.toFixed(0)}% charge) at{" "}
-                    <strong>{formatMoney(price)}/kWh</strong> ({rateName}) costs approx{" "}
+                    {t("evCalc.chargingSummaryPrefix")} <strong>{bKwh} kWh</strong>{" "}
+                    {t("evCalc.chargingSummaryBattery")} <strong>{cur}%</strong>{" "}
+                    {t("evCalc.chargingSummaryTo")} <strong>{tgt}%</strong>{" "}
+                    ({pctAdded.toFixed(0)}% {t("evCalc.chargingSummaryCharge")}){" "}
+                    {t("evCalc.chargingSummaryAt")} <strong>{formatMoney(price)}/kWh</strong>{" "}
+                    ({rateName}) {t("evCalc.chargingSummaryCostsApprox")}{" "}
                     <strong className="text-emerald-700 dark:text-emerald-400">{formatMoney(cost)}</strong>.
                   </p>
                 </div>

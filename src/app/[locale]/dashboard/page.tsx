@@ -169,7 +169,7 @@ export default function DashboardPage() {
     try {
       const text = await file.text();
       const lines = text.split("\n").filter((l) => l.trim());
-      if (lines.length < 2) { setUsageMsg("CSV is empty"); setUploading(false); return; }
+      if (lines.length < 2) { setUsageMsg(t("dashboard.csvEmpty")); setUploading(false); return; }
       const rows: DailyUsageItem[] = [];
       for (let i = 1; i < lines.length; i++) {
         const line = lines[i].trim();
@@ -183,14 +183,14 @@ export default function DashboardPage() {
         const offPeakKwh = Math.max(0, Number.parseFloat(cols[2]) || 0);
         rows.push({ date, peakKwh, offPeakKwh });
       }
-      if (rows.length === 0) { setUsageMsg("No valid rows found"); setUploading(false); return; }
+      if (rows.length === 0) { setUsageMsg(t("dashboard.noValidRows")); setUploading(false); return; }
       const res = await fetch(`${apiBaseUrl}/daily-usage`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         body: JSON.stringify({ data: rows }),
       });
-      if (!res.ok) { setUsageMsg("Upload failed"); setUploading(false); return; }
-      setUsageMsg(`Uploaded ${rows.length} days!`);
+      if (!res.ok) { setUsageMsg(t("dashboard.uploadFailed")); setUploading(false); return; }
+      setUsageMsg(`${t("dashboard.uploaded")} ${rows.length} ${t("dashboard.days")}!`);
       const [dailyRes, summaryRes] = await Promise.all([
         fetch(`${apiBaseUrl}/daily-usage?year=${usageYear}&month=${usageMonth}`, {
           headers: { Authorization: `Bearer ${auth.token}` },
@@ -207,7 +207,7 @@ export default function DashboardPage() {
         const p = (await summaryRes.json()) as { data: DailyUsageSummaryItem[] };
         setSummaryData(p.data ?? []);
       }
-    } catch { setUsageMsg("Failed to parse CSV"); }
+    } catch { setUsageMsg(t("dashboard.failedToParse")); }
     finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ""; }
   };
 
@@ -272,7 +272,7 @@ export default function DashboardPage() {
             headers: { Authorization: `Bearer ${auth.token}` },
           }),
         ]);
-        if (!usageRes.ok) { if (!canceled) setBillEvError("Failed to load usage data"); setLoadingBillEv(false); return; }
+        if (!usageRes.ok) { if (!canceled) setBillEvError(t("dashboard.failedToLoadUsage")); setLoadingBillEv(false); return; }
         const usagePayload = (await usageRes.json()) as {
           data: Array<{ month: number; totalKwh: number }>;
         };
@@ -286,7 +286,7 @@ export default function DashboardPage() {
           return { month: m.month, totalKwh: m.totalKwh, evKwh, nonEvKwh: Math.max(0, m.totalKwh - evKwh) };
         });
         if (!canceled) setBillEvData(merged);
-      } catch { if (!canceled) setBillEvError("Failed to load data"); }
+      } catch { if (!canceled) setBillEvError(t("dashboard.failedToLoadData")); }
       finally { if (!canceled) setLoadingBillEv(false); }
     };
     void run();
@@ -371,7 +371,7 @@ export default function DashboardPage() {
       parsed.push({ date: dates[0], startTime: times[0], endTime: times.length >= 3 ? times[2] : times[1], duration, kwh, cost });
     }
     setSessions(parsed);
-    setEvMsg(parsed.length === 0 ? "No sessions parsed" : `Parsed ${parsed.length} sessions!`);
+    setEvMsg(parsed.length === 0 ? t("dashboard.noSessions") : `${t("dashboard.parsed")} ${parsed.length} ${t("dashboard.sessionsLabel")}!`);
     setTimeout(() => setEvMsg(null), 5000);
   };
 
@@ -414,15 +414,15 @@ export default function DashboardPage() {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         body: JSON.stringify({ data: updatedData }),
       });
-      if (!res.ok) { setEvMsg("Failed to save"); return; }
+      if (!res.ok) { setEvMsg(t("dashboard.failedToSave")); return; }
       const result = (await res.json()) as { data: MonthUsage[] };
       setExistingEvData(result.data ?? emptyYearData());
       setSessions([]);
       setRawInput("");
       setEvAvailableYears((prev) => dedupeYears([evYear, ...prev]));
-      setEvMsg("Saved!");
+      setEvMsg(t("dashboard.saved"));
       setTimeout(() => setEvMsg(null), 3000);
-    } catch { setEvMsg("Failed to save"); }
+    } catch { setEvMsg(t("dashboard.failedToSave")); }
     finally { setSaving(false); }
   };
 
@@ -457,7 +457,7 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-emerald-600" />
-                Daily Energy Usage
+                {t("dashboard.dailyEnergyUsage")}
               </CardTitle>
               <div className="flex items-center gap-3">
                 <select
@@ -482,7 +482,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground">
               <span>
-                {!auth?.token ? "Login to view data" : ""}
+                {!auth?.token ? t("dashboard.loginToView") : ""}
                 {loadingDaily ? <Loader2 className="w-3 h-3 inline animate-spin ml-1" /> : null}
                 {usageMsg ? <span className="text-foreground ml-2">{usageMsg}</span> : null}
               </span>
@@ -490,7 +490,7 @@ export default function DashboardPage() {
                 <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleFileUpload} />
                 <Button variant="secondary" size="sm" disabled={!auth?.token || uploading} onClick={() => fileInputRef.current?.click()}>
                   {uploading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Upload className="w-4 h-4 mr-1" />}
-                  Upload CSV
+                  {t("dashboard.uploadCsv")}
                 </Button>
               </div>
             </div>
@@ -502,24 +502,24 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <CalendarDays className="w-4 h-4 text-emerald-600" />
-                {monthLabel(usageMonth)} {usageYear} — Daily Consumption
+                {monthLabel(usageMonth)} {usageYear} — {t("dashboard.dailyConsumption")}
               </CardTitle>
               <div className="flex flex-wrap gap-4 text-sm">
                 <div className="flex items-center gap-1">
                   <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" />
-                  Peak: <strong>{formatKwh(dailyTotals.peak)} kWh</strong>
+                  {t("dashboard.peak")}: <strong>{formatKwh(dailyTotals.peak)} {t("dashboard.kwh")}</strong>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />
-                  Off-Peak: <strong>{formatKwh(dailyTotals.offPeak)} kWh</strong>
+                  {t("dashboard.offPeak")}: <strong>{formatKwh(dailyTotals.offPeak)} {t("dashboard.kwh")}</strong>
                 </div>
-                <div>Total: <strong>{formatKwh(dailyTotals.total)} kWh</strong></div>
+                <div>{t("dashboard.total")}: <strong>{formatKwh(dailyTotals.total)} {t("dashboard.kwh")}</strong></div>
               </div>
             </CardHeader>
             <CardContent>
               {dailyData.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8 text-sm">
-                  {loadingDaily ? "Loading..." : "No data for this month. Upload a CSV!"}
+                  {loadingDaily ? t("dashboard.loading") : t("dashboard.noDataThisMonth")}
                 </p>
               ) : (
                 <div className="w-full overflow-x-auto">
@@ -532,8 +532,8 @@ export default function DashboardPage() {
                         return (
                           <div key={d.date} className="flex-1 flex flex-col items-center gap-1">
                             <div className="w-full h-40 flex flex-col justify-end">
-                              <div className="w-full bg-amber-500 rounded-t-sm transition-all" style={{ height: `${Math.max(peakPct, 0.5)}%` }} title={`Peak: ${formatKwh(d.peakKwh)} kWh`} />
-                              <div className="w-full bg-emerald-600 transition-all" style={{ height: `${Math.max(offPeakPct - peakPct, 0.5)}%` }} title={`Off-Peak: ${formatKwh(d.offPeakKwh)} kWh`} />
+                              <div className="w-full bg-amber-500 rounded-t-sm transition-all" style={{ height: `${Math.max(peakPct, 0.5)}%` }} title={`${t("dashboard.peak")}: ${formatKwh(d.peakKwh)} ${t("dashboard.kwh")}`} />
+                              <div className="w-full bg-emerald-600 transition-all" style={{ height: `${Math.max(offPeakPct - peakPct, 0.5)}%` }} title={`${t("dashboard.offPeak")}: ${formatKwh(d.offPeakKwh)} ${t("dashboard.kwh")}`} />
                             </div>
                             <div className="text-[10px] text-muted-foreground">{getDay(d.date)}</div>
                           </div>
@@ -549,16 +549,16 @@ export default function DashboardPage() {
 
         {auth?.token && dailyData.length > 0 && (
           <Card>
-            <CardHeader><CardTitle className="text-base">Daily Breakdown</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">{t("dashboard.dailyBreakdown")}</CardTitle></CardHeader>
             <CardContent className="p-3 sm:p-6">
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead className="text-right">Peak (kWh)</TableHead>
-                      <TableHead className="text-right">Off-Peak (kWh)</TableHead>
-                      <TableHead className="text-right">Total (kWh)</TableHead>
+                      <TableHead>{t("dashboard.date")}</TableHead>
+                      <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
+                      <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
+                      <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -582,24 +582,24 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <BarChart3 className="w-4 h-4 text-emerald-600" />
-                Monthly Bill Summary — {usageYear}
+                {t("dashboard.monthlyBillSummary")} — {usageYear}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {loadingSummary ? (
-                <p className="text-center text-muted-foreground py-4">Loading...</p>
+                <p className="text-center text-muted-foreground py-4">{t("dashboard.loading")}</p>
               ) : summaryData.length === 0 ? (
-                <p className="text-center text-muted-foreground py-4">No data yet</p>
+                <p className="text-center text-muted-foreground py-4">{t("dashboard.noDataYet")}</p>
               ) : (
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Month</TableHead>
-                        <TableHead className="text-right">Peak (kWh)</TableHead>
-                        <TableHead className="text-right">Off-Peak (kWh)</TableHead>
-                        <TableHead className="text-right">Total (kWh)</TableHead>
-                        <TableHead className="text-right">Est. Bill (MYR)</TableHead>
+                        <TableHead>{t("dashboard.month")}</TableHead>
+                        <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
+                        <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
+                        <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
+                        <TableHead className="text-right">{t("dashboard.estBill")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -626,7 +626,7 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <CardTitle className="flex items-center gap-2">
                 <Fuel className="w-5 h-5 text-emerald-600" />
-                EV vs Non-EV Monthly Usage
+                {t("dashboard.evVsNonEv")}
               </CardTitle>
               <select
                 value={String(billEvYear)}
@@ -640,30 +640,30 @@ export default function DashboardPage() {
             </div>
             <div className="text-sm text-muted-foreground">
               {!auth?.token ? (
-                <span>Login to view data</span>
+                <span>{t("dashboard.loginToView")}</span>
               ) : loadingBillEv ? (
-                <span><Loader2 className="w-3 h-3 inline animate-spin mr-1" />Loading…</span>
+                <span><Loader2 className="w-3 h-3 inline animate-spin mr-1" />{t("dashboard.loading")}</span>
               ) : billEvError ? (
                 <span className="text-red-600">{billEvError}</span>
               ) : monthsWithData > 0 ? (
-                <span className="text-emerald-600">Data loaded ✓</span>
+                <span className="text-emerald-600">{t("dashboard.dataLoaded")}</span>
               ) : (
-                <span>No data for {billEvYear}</span>
+                <span>{t("dashboard.noDataFor")} {billEvYear}</span>
               )}
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground">
-              <span>Total EV: <strong className="text-foreground">{formatKwh(billEvTotals.evTotal)} kWh</strong></span>
-              <span>Total Non-EV: <strong className="text-foreground">{formatKwh(billEvTotals.nonEvTotal)} kWh</strong></span>
-              <span>Total: <strong className="text-foreground">{formatKwh(billEvTotals.grandTotal)} kWh</strong></span>
+              <span>{t("dashboard.totalEv")}: <strong className="text-foreground">{formatKwh(billEvTotals.evTotal)} {t("dashboard.kwh")}</strong></span>
+              <span>{t("dashboard.totalNonEv")}: <strong className="text-foreground">{formatKwh(billEvTotals.nonEvTotal)} {t("dashboard.kwh")}</strong></span>
+              <span>{t("dashboard.total")}: <strong className="text-foreground">{formatKwh(billEvTotals.grandTotal)} {t("dashboard.kwh")}</strong></span>
             </div>
 
             {monthsWithData > 0 && (
               <>
                 <div className="flex items-center gap-4 text-sm">
-                  <span className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />Non-EV</span>
-                  <span className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm bg-sky-500" />EV Charging</span>
+                  <span className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />{t("dashboard.nonEv")}</span>
+                  <span className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm bg-sky-500" />{t("dashboard.evCharging")}</span>
                 </div>
                 <div className="w-full overflow-x-auto">
                   <div className="min-w-[760px]">
@@ -673,11 +673,11 @@ export default function DashboardPage() {
                         return (
                           <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
                             <div className="w-full h-56 flex flex-col justify-end">
-                              <div className="w-full bg-sky-500 rounded-t-sm" style={{ height: `${Math.round(evPct * 100)}%` }} aria-label={`${monthLabel(m.month)} EV ${formatKwh(m.evKwh)} kWh`} />
-                              <div className="w-full bg-emerald-600 rounded-b-sm" style={{ height: `${Math.round(nonEvPct * 100)}%` }} aria-label={`${monthLabel(m.month)} non-EV ${formatKwh(m.nonEvKwh)} kWh`} />
+                              <div className="w-full bg-sky-500 rounded-t-sm" style={{ height: `${Math.round(evPct * 100)}%` }} aria-label={`${monthLabel(m.month)} ${t("dashboard.evCharging")} ${formatKwh(m.evKwh)} ${t("dashboard.kwh")}`} />
+                              <div className="w-full bg-emerald-600 rounded-b-sm" style={{ height: `${Math.round(nonEvPct * 100)}%` }} aria-label={`${monthLabel(m.month)} ${t("dashboard.nonEv")} ${formatKwh(m.nonEvKwh)} ${t("dashboard.kwh")}`} />
                             </div>
                             <div className="text-xs text-muted-foreground">{monthLabel(m.month)}</div>
-                            <div className="text-xs font-medium">{formatKwh(m.totalKwh)} kWh</div>
+                            <div className="text-xs font-medium">{formatKwh(m.totalKwh)} {t("dashboard.kwh")}</div>
                           </div>
                         );
                       })}
@@ -690,24 +690,24 @@ export default function DashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>Monthly Breakdown (kWh)</CardTitle></CardHeader>
+          <CardHeader><CardTitle>{t("dashboard.monthlyBreakdownKwh")}</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Month</TableHead>
-                    <TableHead>Total Usage</TableHead>
-                    <TableHead>EV Charging</TableHead>
-                    <TableHead>Non-EV</TableHead>
-                    <TableHead className="text-right">EV %</TableHead>
+                    <TableHead>{t("dashboard.month")}</TableHead>
+                    <TableHead>{t("dashboard.totalUsage")}</TableHead>
+                    <TableHead>{t("dashboard.evCharging")}</TableHead>
+                    <TableHead>{t("dashboard.nonEv")}</TableHead>
+                    <TableHead className="text-right">{t("dashboard.evPercent")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {billEvData.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center text-muted-foreground py-6">
-                        {!auth?.token ? "Login to view data" : loadingBillEv ? "Loading…" : `No data for ${billEvYear}.`}
+                        {!auth?.token ? t("dashboard.loginToView") : loadingBillEv ? t("dashboard.loading") : `${t("dashboard.noDataFor")} ${billEvYear}.`}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -730,7 +730,7 @@ export default function DashboardPage() {
 
             {!auth?.token && (
               <div className="text-center py-4">
-                <p className="text-sm text-muted-foreground mb-2">Sign in to view data</p>
+                <p className="text-sm text-muted-foreground mb-2">{t("dashboard.signInToView")}</p>
                 <GoogleAuthButton locale={locale} />
               </div>
             )}
@@ -742,15 +742,15 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Car className="w-5 h-5 text-emerald-600" />
-              EV Charging Import
+              {t("dashboard.evChargingImport")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Paste Easy Charging PDF text below. The parser extracts dates, kWh, and costs.
+              {t("dashboard.pasteInstructions")}
             </p>
             <Textarea
-              placeholder={`Paste Easy Charging data here...\n\nExample:\n254902721  Azuan Alias  2026-05-24  00:06:39  2026-05-24  10:13:03  10H06M  61.0  17.57`}
+              placeholder={t("dashboard.pastePlaceholder")}
               value={rawInput}
               onChange={(e) => setRawInput(e.target.value)}
               rows={6}
@@ -759,12 +759,12 @@ export default function DashboardPage() {
             <div className="flex gap-2">
               <Button onClick={handleParse} disabled={!rawInput.trim()}>
                 <Upload className="w-4 h-4 mr-1" />
-                Parse Sessions
+                {t("dashboard.parseSessions")}
               </Button>
               {sessions.length > 0 && auth?.token && (
                 <Button onClick={handleSaveEv} variant="secondary" disabled={saving}>
                   {saving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Zap className="w-4 h-4 mr-1" />}
-                  {saving ? "Saving..." : `Save to ${evYear}`}
+                  {saving ? t("dashboard.saving") : `${t("dashboard.saveTo")} ${evYear}`}
                 </Button>
               )}
             </div>
@@ -777,11 +777,11 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <Car className="w-4 h-4 text-emerald-600" />
-                Charging Sessions ({sessions.length})
+                {t("dashboard.chargingSessions")} ({sessions.length})
               </CardTitle>
               <div className="flex gap-4 text-sm">
-                <span>Total: <strong>{formatKwh(sessionTotals.kwh)} kWh</strong></span>
-                <span>Cost: <strong>{formatMoney(sessionTotals.cost)}</strong></span>
+                <span>{t("dashboard.total")}: <strong>{formatKwh(sessionTotals.kwh)} {t("dashboard.kwh")}</strong></span>
+                <span>{t("dashboard.cost")}: <strong>{formatMoney(sessionTotals.cost)}</strong></span>
               </div>
             </CardHeader>
             <CardContent className="p-3 sm:p-6">
@@ -789,8 +789,8 @@ export default function DashboardPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Date</TableHead><TableHead>Start</TableHead><TableHead>End</TableHead>
-                      <TableHead>Duration</TableHead><TableHead className="text-right">kWh</TableHead><TableHead className="text-right">Cost (RM)</TableHead>
+                      <TableHead>{t("dashboard.date")}</TableHead><TableHead>{t("dashboard.start")}</TableHead><TableHead>{t("dashboard.end")}</TableHead>
+                      <TableHead>{t("dashboard.duration")}</TableHead><TableHead className="text-right">{t("dashboard.kwh")}</TableHead><TableHead className="text-right">{t("dashboard.costRm")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -816,7 +816,7 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <CardTitle className="flex items-center gap-2 text-base">
                 <Zap className="w-4 h-4 text-emerald-600" />
-                EV Monthly Breakdown
+                {t("dashboard.evMonthlyBreakdown")}
               </CardTitle>
               <select
                 value={String(evYear)}
@@ -829,25 +829,25 @@ export default function DashboardPage() {
               </select>
             </div>
             <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-              <span>Existing EV: <strong>{formatKwh(evTotals.evKwh)} kWh</strong></span>
-              <span>Non-EV: <strong>{formatKwh(evTotals.nonEvKwh)} kWh</strong></span>
-              {sessions.length > 0 && <span className="text-emerald-600">+ {formatKwh(sessionTotals.kwh)} kWh from import</span>}
+              <span>{t("dashboard.existingEv")}: <strong>{formatKwh(evTotals.evKwh)} {t("dashboard.kwh")}</strong></span>
+              <span>{t("dashboard.nonEv")}: <strong>{formatKwh(evTotals.nonEvKwh)} {t("dashboard.kwh")}</strong></span>
+              {sessions.length > 0 && <span className="text-emerald-600">+ {formatKwh(sessionTotals.kwh)} {t("dashboard.kwh")} {t("dashboard.fromImport")}</span>}
               {loadingEv && <Loader2 className="w-3 h-3 animate-spin" />}
             </div>
           </CardHeader>
           <CardContent>
             {!auth?.token ? (
-              <p className="text-center text-muted-foreground py-4">Sign in to view EV data</p>
+              <p className="text-center text-muted-foreground py-4">{t("dashboard.signInToViewEv")}</p>
             ) : (
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Month</TableHead>
-                      <TableHead className="text-right">EV (kWh)</TableHead>
-                      <TableHead className="text-right">Non-EV (kWh)</TableHead>
-                      <TableHead className="text-right">Total (kWh)</TableHead>
-                      {sessions.length > 0 && <TableHead className="text-right text-emerald-600">Import +</TableHead>}
+                      <TableHead>{t("dashboard.month")}</TableHead>
+                      <TableHead className="text-right">{t("dashboard.evCharging")} ({t("dashboard.kwh")})</TableHead>
+                      <TableHead className="text-right">{t("dashboard.nonEv")} ({t("dashboard.kwh")})</TableHead>
+                      <TableHead className="text-right">{t("dashboard.total")} ({t("dashboard.kwh")})</TableHead>
+                      {sessions.length > 0 && <TableHead className="text-right text-emerald-600">{t("dashboard.importPlus")}</TableHead>}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -866,7 +866,7 @@ export default function DashboardPage() {
                       );
                     })}
                     <TableRow className="font-bold">
-                      <TableCell>Total</TableCell>
+                      <TableCell>{t("dashboard.totalLabel")}</TableCell>
                       <TableCell className="text-right">{formatKwh(evTotals.evKwh + sessionTotals.kwh)}</TableCell>
                       <TableCell className="text-right">{formatKwh(evTotals.nonEvKwh)}</TableCell>
                       <TableCell className="text-right">{formatKwh(evTotals.evKwh + evTotals.nonEvKwh + sessionTotals.kwh)}</TableCell>
