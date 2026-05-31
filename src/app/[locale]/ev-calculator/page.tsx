@@ -187,12 +187,12 @@ export default function EvCalculatorPage() {
                     {/* Added charge */}
                     {barAdded > 0 && (
                       <div
-                        className="absolute left-0 top-0 h-full bg-emerald-600 transition-all"
-                        style={{ width: `${pctEnd}%` }}
+                        className="absolute top-0 h-full bg-emerald-600 transition-all"
+                        style={{ left: `${pctStart}%`, width: `${barAdded}%` }}
                         title={`After charging: ${tgt}%`}
                       >
                         {/* Label inside the bar */}
-                        {pctEnd > 20 && (
+                        {barAdded > 20 && (
                           <span className="absolute right-1 top-1/2 -translate-y-1/2 text-xs font-bold text-white drop-shadow-sm">
                             {tgt}%
                           </span>
