@@ -127,6 +127,17 @@ export default function RootLayout({
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="canonical" href="https://solar-calculator.vercel.app" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Kira Solar" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="Kira Solar" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js');});}",
+          }}
+        />
       </head>
       <body className={inter.className}>
         <ThemeProvider

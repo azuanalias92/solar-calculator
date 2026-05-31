@@ -1,21 +1,37 @@
 {
-  "name": "Kira Solar - Calculate Your Solar Energy Needs",
-  "short_name": "Solar Calculator",
-  "description": "Free solar panel calculator to estimate how many solar panels you need for your home. Calculate energy consumption, solar system requirements, and potential savings.",
+  "name": "Kira Solar",
+  "short_name": "Kira Solar",
+  "description": "Kira Solar — kalkulator solar dan pengurusan tenaga untuk Malaysia",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "display_override": ["window-controls-overlay", "standalone"],
+  "background_color": "#f8fafc",
   "theme_color": "#059669",
   "orientation": "portrait-primary",
   "icons": [
     {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
       "src": "/logo.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ],
+  "screenshots": [],
   "categories": ["utilities", "productivity", "lifestyle"],
   "lang": "en",
-  "scope": "/"
+  "scope": "/",
+  "id": "/",
+  "edge_side_panel": {}
 }
