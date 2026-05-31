@@ -1,1 +1,0 @@
-bash /tmp/solar-calculator/run_validate.sh
