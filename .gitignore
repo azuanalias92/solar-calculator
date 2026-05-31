@@ -36,3 +36,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# stray subagent files
+run.sh
+run_cmd.sh
+run_final.sh
+run_validate.sh
+run_validate_tmp.sh
+validate_locales.py
