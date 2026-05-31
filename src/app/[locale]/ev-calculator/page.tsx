@@ -61,14 +61,14 @@ export default function EvCalculatorPage() {
 
         <div className="flex justify-center mt-4">
           <div className="inline-flex gap-2 rounded-lg border border-input bg-background p-1">
-            <Button asChild size="sm" variant={pathname.includes("/dashboard") || pathname.includes("/ev-calculator") || pathname.includes("/settings") ? "outline" : "secondary"}>
-              <Link href={`/${locale}`}>Calculator</Link>
-            </Button>
             <Button asChild size="sm" variant={pathname.includes("/dashboard") ? "secondary" : "outline"}>
               <Link href={`/${locale}/dashboard`}>Dashboard</Link>
             </Button>
+            <Button asChild size="sm" variant={pathname.includes("/dashboard") || pathname.includes("/ev-calculator") || pathname.includes("/settings") ? "outline" : "secondary"}>
+              <Link href={`/${locale}`}>Solar Calculator</Link>
+            </Button>
             <Button asChild size="sm" variant={pathname.includes("/ev-calculator") ? "secondary" : "outline"}>
-              <Link href={`/${locale}/ev-calculator`}>EV Calc</Link>
+              <Link href={`/${locale}/ev-calculator`}>EV Calculator</Link>
             </Button>
             <Button asChild size="sm" variant={pathname.includes("/settings") ? "secondary" : "outline"}>
               <Link href={`/${locale}/settings`}>Settings</Link>
