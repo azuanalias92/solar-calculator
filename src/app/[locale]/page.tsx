@@ -277,7 +277,7 @@ export default function Home() {
             <Button asChild size="sm" variant={pathname.includes("/usage") ? "secondary" : "outline"}>
               <Link href={`/${locale}/usage`}>Usage</Link>
             </Button>
-            <Button asChild size="sm" variant={pathname.includes("/ev") ? "secondary" : "outline"}>
+            <Button asChild size="sm" variant={pathname.endsWith("/ev") ? "secondary" : "outline"}>
               <Link href={`/${locale}/ev`}>EV</Link>
             </Button>
             <Button asChild size="sm" variant={pathname.includes("/ev-calculator") ? "secondary" : "outline"}>
