@@ -10,8 +10,6 @@ import { exportToPDF } from "@/lib/pdfExport";
 import { Plus, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2, RotateCcw } from "lucide-react";
 import ItemForm from "./items/form";
 import { useTranslation } from "@/lib/useTranslation";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
-import GoogleAuthButton from "@/components/GoogleAuthButton";
 import NavBar from "@/components/NavBar";
 import { getAuthState, type AuthState } from "@/lib/auth";
 
@@ -251,18 +249,9 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
       <div className="w-full max-w-6xl mx-auto text-center mb-6 sm:mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-4">
-          <div className="hidden sm:block" />
-
-          <div className="flex items-center justify-center gap-2 sm:gap-3">
-            <img src="/logo.svg" alt={t("common.logoAlt")} className="w-8 h-8 sm:w-10 sm:h-10" />
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-800">{t("common.title")}</h1>
-          </div>
-
-          <div className="flex justify-center sm:justify-end items-center gap-3">
-            <GoogleAuthButton locale={locale} />
-            <LanguageSwitcher />
-          </div>
+        <div className="flex items-center justify-center gap-2 sm:gap-3">
+          <img src="/logo.svg" alt={t("common.logoAlt")} className="w-8 h-8 sm:w-10 sm:h-10" />
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-800">{t("common.title")}</h1>
         </div>
 
         <div className="flex justify-center mt-4">
