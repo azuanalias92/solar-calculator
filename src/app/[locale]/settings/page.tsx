@@ -341,11 +341,11 @@ export default function SettingsPage() {
                       alt={auth.user.name ?? "User"}
                       width={48}
                       height={48}
-                      className="h-12 w-12 rounded-full border-2 border-emerald-200"
+                      className="h-12 w-12 rounded-full border-2 border-emerald-200 dark:border-emerald-800"
                       unoptimized
                     />
                   ) : (
-                    <div className="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center text-lg font-medium text-emerald-700">
+                    <div className="h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center text-lg font-medium text-emerald-700 dark:text-emerald-300">
                       {(auth.user.name ?? "U")[0]}
                     </div>
                   )}
@@ -493,7 +493,7 @@ export default function SettingsPage() {
                   onClick={() => handleTariffChange(t.value)}
                   className={`text-left rounded-lg border p-4 transition-all cursor-pointer ${
                     tariff === t.value
-                      ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500"
+                      ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 ring-1 ring-emerald-500"
                       : "border-input hover:border-emerald-200 hover:bg-accent"
                   }`}
                 >

@@ -206,7 +206,7 @@ export default function EvCalculatorPage() {
                     <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-2 h-5 rounded-r border-2 border-foreground border-l-0 bg-background" />
                     {/* Current charge */}
                     <div
-                      className="absolute left-0 top-0 h-full bg-emerald-200 transition-all"
+                      className="absolute left-0 top-0 h-full bg-emerald-200 dark:bg-emerald-800 transition-all"
                       style={{ width: `${pctStart}%` }}
                       title={`Current: ${cur}%`}
                     />
@@ -238,7 +238,7 @@ export default function EvCalculatorPage() {
                       Charge added ({barAdded.toFixed(0)}%)
                     </span>
                     <span className="flex items-center gap-1">
-                      <span className="inline-block w-3 h-3 rounded-sm bg-emerald-200" />
+                      <span className="inline-block w-3 h-3 rounded-sm bg-emerald-200 dark:bg-emerald-800" />
                       Existing ({cur.toFixed(0)}%)
                     </span>
                     {barRemaining > 0 && (
@@ -270,7 +270,7 @@ export default function EvCalculatorPage() {
                     <div className="text-sm text-muted-foreground">Energy Needed</div>
                     <div className="text-2xl font-bold">{kwhNeeded.toFixed(2)} kWh</div>
                   </div>
-                  <div className="p-4 rounded-lg bg-emerald-600/10 border border-emerald-600/20">
+                  <div className="p-4 rounded-lg bg-emerald-600/10 dark:bg-emerald-900/30 border border-emerald-600/20 dark:border-emerald-800/40">
                     <div className="text-sm text-muted-foreground">Estimated Cost</div>
                     <div className="text-2xl font-bold text-emerald-600">{formatMoney(cost)}</div>
                   </div>
