@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -95,14 +95,6 @@ export default function Home() {
       window.removeEventListener("kirasolar:auth", refresh);
     };
   }, []);
-
-  // Redirect to dashboard if logged in
-  const router = useRouter();
-  useEffect(() => {
-    if (auth?.token) {
-      router.replace(`/${locale}/dashboard`);
-    }
-  }, [auth, locale, router]);
 
   useEffect(() => {
     let canceled = false;
