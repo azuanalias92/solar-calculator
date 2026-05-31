@@ -264,9 +264,6 @@ export default function EvPage() {
               <Link href={`/${locale}/bill-ev`}>Bill EV</Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link href={`/${locale}/rates`}>Rates</Link>
-            </Button>
-            <Button asChild size="sm" variant="outline">
               <Link href={`/${locale}/usage`}>Usage</Link>
             </Button>
             <Button asChild size="sm" variant="secondary">

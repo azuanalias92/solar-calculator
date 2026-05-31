@@ -285,9 +285,6 @@ export default function UsagePage() {
             <Button asChild size="sm" variant="outline">
               <Link href={`/${locale}/bill-ev`}>Bill EV</Link>
             </Button>
-            <Button asChild size="sm" variant="outline">
-              <Link href={`/${locale}/rates`}>Rates</Link>
-            </Button>
             <Button asChild size="sm" variant="secondary">
               <Link href={`/${locale}/usage`}>Usage</Link>
             </Button>

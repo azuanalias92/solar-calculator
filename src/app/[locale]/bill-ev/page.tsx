@@ -213,9 +213,6 @@ export default function BillEvPage() {
             <Button asChild size="sm" variant={pathname.includes("/bill-ev") ? "secondary" : "outline"}>
               <Link href={`/${locale}/bill-ev`}>Bill EV</Link>
             </Button>
-            <Button asChild size="sm" variant={pathname.includes("/rates") ? "secondary" : "outline"}>
-              <Link href={`/${locale}/rates`}>Rates</Link>
-            </Button>
             <Button asChild size="sm" variant={pathname.includes("/usage") ? "secondary" : "outline"}>
               <Link href={`/${locale}/usage`}>Usage</Link>
             </Button>

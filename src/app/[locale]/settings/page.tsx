@@ -8,11 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getAuthState, clearAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
-import { Coffee, Github, LogOut, Sun, Zap } from "lucide-react";
+import { Coffee, Github, LogOut, Sun, Zap, Info } from "lucide-react";
 
 interface SolarConfig {
   peakSunHours: number;
@@ -43,6 +44,96 @@ const DEFAULT_SOLAR: SolarConfig = {
   systemEfficiency: 85,
 };
 
+type TariffRate = {
+  id: string;
+  tariff_type: string;
+  effective_date: string;
+  peak_energy: number;
+  off_peak_energy: number;
+  capacity_rate: number;
+  network_rate: number;
+  retail_charge_rm: number;
+  afa_rate: number;
+  efficiency_incentive_rate: number;
+  service_tax_rate: number;
+  kwtbb_rate: number;
+};
+
+function todayIsoDate(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function formatNumber(value: number): string {
+  return new Intl.NumberFormat("en-US", { maximumFractionDigits: 6 }).format(value);
+}
+
+function formatMoney(value: number): string {
+  return new Intl.NumberFormat("en-MY", { style: "currency", currency: "MYR" }).format(value);
+}
+
+function RateTable({ rate }: { rate: TariffRate }) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Field</TableHead>
+          <TableHead className="text-right">Value</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>ID</TableCell>
+          <TableCell className="text-right">{rate.id}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Tariff Type</TableCell>
+          <TableCell className="text-right">{rate.tariff_type}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Effective Date</TableCell>
+          <TableCell className="text-right">{rate.effective_date}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Peak Energy (RM/kWh)</TableCell>
+          <TableCell className="text-right">{formatNumber(rate.peak_energy)}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Off-Peak Energy (RM/kWh)</TableCell>
+          <TableCell className="text-right">{formatNumber(rate.off_peak_energy)}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Capacity Charge (RM/kWh)</TableCell>
+          <TableCell className="text-right">{formatNumber(rate.capacity_rate)}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Network Charge (RM/kWh)</TableCell>
+          <TableCell className="text-right">{formatNumber(rate.network_rate)}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Retail Charge</TableCell>
+          <TableCell className="text-right">{formatMoney(rate.retail_charge_rm)}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>AFA Rate (RM/kWh)</TableCell>
+          <TableCell className="text-right">{formatNumber(rate.afa_rate)}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Energy Efficiency Incentive (RM/kWh)</TableCell>
+          <TableCell className="text-right">{formatNumber(rate.efficiency_incentive_rate)}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Service Tax Rate</TableCell>
+          <TableCell className="text-right">{formatNumber(rate.service_tax_rate)}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>KWTBB Rate</TableCell>
+          <TableCell className="text-right">{formatNumber(rate.kwtbb_rate)}</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  );
+}
+
 export default function SettingsPage() {
   const { t, locale } = useTranslation();
   const pathname = usePathname();
@@ -52,6 +143,48 @@ export default function SettingsPage() {
   const [tariff, setTariff] = useState(loadTariff);
 
   // Solar config state (form values as strings for controlled inputs)
+  const [touRate, setTouRate] = useState<TariffRate | null>(null);
+  const [amRate, setAmRate] = useState<TariffRate | null>(null);
+  const [ratesLoading, setRatesLoading] = useState(false);
+  const [ratesError, setRatesError] = useState<string | null>(null);
+  const [ratesAsOf, setRatesAsOf] = useState<string>(todayIsoDate());
+
+  // Fetch tariff rates
+  useEffect(() => {
+    let canceled = false;
+
+    const load = async () => {
+      setRatesLoading(true);
+      setRatesError(null);
+      try {
+        const [touRes, amRes] = await Promise.all([
+          fetch(`${apiBaseUrl}/tariff-rates?tariffType=TNB_DOMESTIC_TOU&asOf=${encodeURIComponent(ratesAsOf)}`),
+          fetch(`${apiBaseUrl}/tariff-rates?tariffType=TNB_DOMESTIC_AM&asOf=${encodeURIComponent(ratesAsOf)}`),
+        ]);
+
+        const touJson = touRes.ok ? ((await touRes.json()) as { data: TariffRate }) : null;
+        const amJson = amRes.ok ? ((await amRes.json()) as { data: TariffRate }) : null;
+
+        if (!canceled) {
+          setTouRate(touJson?.data ?? null);
+          setAmRate(amJson?.data ?? null);
+        }
+      } catch {
+        if (!canceled) {
+          setTouRate(null);
+          setAmRate(null);
+          setRatesError(`Unable to reach API at ${apiBaseUrl}.`);
+        }
+      } finally {
+        if (!canceled) setRatesLoading(false);
+      }
+    };
+
+    void load();
+    return () => {
+      canceled = true;
+    };
+  }, [apiBaseUrl, ratesAsOf]);
   const [solarConfig, setSolarConfig] = useState<SolarConfig>(DEFAULT_SOLAR);
   const [solarLoading, setSolarLoading] = useState(false);
   const [solarSaving, setSolarSaving] = useState(false);
@@ -169,14 +302,11 @@ export default function SettingsPage() {
 
         <div className="flex justify-center mt-4">
           <div className="inline-flex gap-2 rounded-lg border border-input bg-background p-1">
-            <Button asChild size="sm" variant={pathname.includes("/bill-ev") || pathname.includes("/rates") || pathname.includes("/usage") || pathname.includes("/ev") || pathname.includes("/ev-calculator") || pathname.includes("/settings") ? "outline" : "secondary"}>
+            <Button asChild size="sm" variant={pathname.includes("/bill-ev") || pathname.includes("/usage") || pathname.includes("/ev") || pathname.includes("/ev-calculator") || pathname.includes("/settings") ? "outline" : "secondary"}>
               <Link href={`/${locale}`}>Calculator</Link>
             </Button>
             <Button asChild size="sm" variant={pathname.includes("/bill-ev") ? "secondary" : "outline"}>
               <Link href={`/${locale}/bill-ev`}>Bill EV</Link>
-            </Button>
-            <Button asChild size="sm" variant={pathname.includes("/rates") ? "secondary" : "outline"}>
-              <Link href={`/${locale}/rates`}>Rates</Link>
             </Button>
             <Button asChild size="sm" variant={pathname.includes("/usage") ? "secondary" : "outline"}>
               <Link href={`/${locale}/usage`}>Usage</Link>
@@ -391,10 +521,41 @@ export default function SettingsPage() {
             {currentTariff && (
               <div className="rounded-lg bg-muted p-3 text-sm">
                 Active: <strong>{currentTariff.label}</strong> — {currentTariff.desc}.
-                Learn more on the{" "}
-                <Link href={`/${locale}/rates`} className="text-primary underline">Rates</Link> page.
+                View current tariff rates{" "}
+                <a href="#tariff-rate-details" className="text-primary underline">below</a>.
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Tariff Rate Details */}
+        <Card id="tariff-rate-details">
+          <CardHeader className="space-y-2">
+            <CardTitle className="flex items-center gap-2">
+              <Info className="w-5 h-5 text-emerald-600" />
+              Tariff Rate Details
+            </CardTitle>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div>As of</div>
+              <Input
+                type="date"
+                value={ratesAsOf}
+                onChange={(e) => setRatesAsOf(e.target.value)}
+                className="w-44"
+              />
+              {ratesLoading ? <div>Loading…</div> : null}
+              {ratesError ? <div className="text-destructive">{ratesError}</div> : null}
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div>
+              <h3 className="text-base font-semibold mb-3">TNB Domestic ToU</h3>
+              {touRate ? <RateTable rate={touRate} /> : <div className="text-sm text-muted-foreground">No rate found.</div>}
+            </div>
+            <div>
+              <h3 className="text-base font-semibold mb-3">TNB Domestik Am</h3>
+              {amRate ? <RateTable rate={amRate} /> : <div className="text-sm text-muted-foreground">No rate found.</div>}
+            </div>
           </CardContent>
         </Card>
       </div>
