@@ -161,6 +161,38 @@ export default function EvCalculatorPage() {
           </CardContent>
         </Card>
 
+        {/* Quick Presets */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Quick Presets</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: "20→80% (60kWh)", bat: "60", cur: "20", tgt: "80", price: "1.30" },
+                { label: "30→80% (60kWh)", bat: "60", cur: "30", tgt: "80", price: "1.30" },
+                { label: "10→90% (40kWh)", bat: "40", cur: "10", tgt: "90", price: "1.30" },
+                { label: "0→100% (60kWh)", bat: "60", cur: "0", tgt: "100", price: "1.30" },
+              ].map((p) => (
+                <Button
+                  key={p.label}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                  onClick={() => {
+                    setBatteryKwh(p.bat);
+                    setCurrentPct(p.cur);
+                    setTargetPct(p.tgt);
+                    setPricePerKwh(p.price);
+                  }}
+                >
+                  {p.label}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Results Card */}
         {kwhNeeded > 0 && (
           <>
@@ -262,38 +294,6 @@ export default function EvCalculatorPage() {
             </Card>
           </>
         )}
-
-        {/* Quick Presets */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Quick Presets</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: "20→80% (60kWh)", bat: "60", cur: "20", tgt: "80", price: "1.30" },
-                { label: "30→80% (60kWh)", bat: "60", cur: "30", tgt: "80", price: "1.30" },
-                { label: "10→90% (40kWh)", bat: "40", cur: "10", tgt: "90", price: "1.30" },
-                { label: "0→100% (60kWh)", bat: "60", cur: "0", tgt: "100", price: "1.30" },
-              ].map((p) => (
-                <Button
-                  key={p.label}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                  onClick={() => {
-                    setBatteryKwh(p.bat);
-                    setCurrentPct(p.cur);
-                    setTargetPct(p.tgt);
-                    setPricePerKwh(p.price);
-                  }}
-                >
-                  {p.label}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       <footer className="border-t bg-card/50 backdrop-blur-sm mt-4">
