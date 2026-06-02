@@ -345,7 +345,7 @@ export default function SettingsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => switchLanguage(locale === "en" ? "ms" : "en")}
-                    className="w-full justify-start gap-2"
+                    className="w-full justify-center gap-2"
                   >
                     <Globe className="w-4 h-4" />
                     {locale === "en" ? "BM" : "EN"}
@@ -358,7 +358,7 @@ export default function SettingsPage() {
                       window.google?.accounts?.id?.disableAutoSelect?.();
                       clearAuthState();
                     }}
-                    className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50"
+                    className="w-full justify-center text-red-600 border-red-200 hover:bg-red-50"
                   >
                     <LogOut className="w-3.5 h-3.5 mr-1.5" />
                     {t("settings.signOut")}
