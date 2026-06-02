@@ -206,7 +206,7 @@ export default function EvCalculatorPage() {
                   {/* kWh per percent indicator */}
                   <p className="text-center text-xs text-muted-foreground mt-2">
                     1% = {(bKwh / 100).toFixed(2)} kWh
-                    {kmPerPct > 0 && <> = {(kmPerPct).toFixed(0)} km</>}
+                    {kmPerPct > 0 && <> = {(kmPerPct).toFixed(2)} km</>}
                   </p>
                 </div>
               </CardContent>
