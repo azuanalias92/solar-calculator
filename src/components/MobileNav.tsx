@@ -10,15 +10,15 @@ export default function MobileNav({ locale }: { locale: string }) {
   const pathname = usePathname();
 
   const isDashboard =
-    pathname.includes("/dashboard") || pathname.includes("/bill-ev") || pathname.includes("/usage") || (pathname.includes("/ev") && !pathname.includes("/ev-calculator"));
+    pathname === `/${locale}` || pathname.includes("/bill-ev") || pathname.includes("/usage") || (pathname.includes("/ev") && !pathname.includes("/ev-calculator"));
+  const isCalculator = pathname.includes("/solar-calculator");
   const isEvCalculator = pathname.includes("/ev-calculator");
   const isSettings = pathname.includes("/settings");
-  const isCalculator = !isDashboard && !isEvCalculator && !isSettings;
 
   const items = [
-    { label: "Dashboard", href: `/${locale}/dashboard`, active: isDashboard },
+    { label: "Dashboard", href: `/${locale}`, active: isDashboard },
+    { label: "Solar Calculator", href: `/${locale}/solar-calculator`, active: isCalculator },
     { label: "EV Calculator", href: `/${locale}/ev-calculator`, active: isEvCalculator },
-    { label: "Solar Calculator", href: `/${locale}`, active: isCalculator },
     { label: "Settings", href: `/${locale}/settings`, active: isSettings },
   ];
 

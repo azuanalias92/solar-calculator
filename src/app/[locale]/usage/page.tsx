@@ -8,7 +8,7 @@ export default function UsageRedirect() {
   const locale = params.locale as string;
 
   useEffect(() => {
-    redirect(`/${locale}/dashboard`);
+    redirect(`/${locale}`);
   }, [locale]);
 
   return null;
