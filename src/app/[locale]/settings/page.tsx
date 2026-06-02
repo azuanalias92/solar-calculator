@@ -9,9 +9,9 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getAuthState, clearAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { ModeToggle } from "@/components/ModeToggle";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
-import { Coffee, Github, LogOut, Sun, Zap, Info } from "lucide-react";
+import { Coffee, Github, Globe, LogOut, Sun, Zap, Info } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 
 interface SolarConfig {
@@ -131,7 +131,7 @@ function RateTable({ rate, t }: { rate: TariffRate; t: (key: string) => string }
 }
 
 export default function SettingsPage() {
-  const { t, locale } = useTranslation();
+  const { t, locale, switchLanguage } = useTranslation();
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
 
   const [auth, setAuth] = useState<AuthState | null>(null);
@@ -317,7 +317,7 @@ export default function SettingsPage() {
                 <GoogleAuthButton locale={locale} />
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div className="flex items-center gap-4 rounded-lg border p-4">
                   {auth.user.picture ? (
                     <Image
@@ -338,6 +338,19 @@ export default function SettingsPage() {
                     <p className="text-sm text-muted-foreground truncate">{auth.user.email ?? ""}</p>
                     <p className="text-xs text-emerald-600 mt-0.5">{t("settings.syncingStatus")}</p>
                   </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => switchLanguage(locale === "en" ? "ms" : "en")}
+                    className="w-full justify-start gap-2"
+                  >
+                    <Globe className="w-4 h-4" />
+                    {locale === "en" ? "BM" : "EN"}
+                  </Button>
+                  <ModeToggle />
                   <Button
                     variant="outline"
                     size="sm"
@@ -345,7 +358,7 @@ export default function SettingsPage() {
                       window.google?.accounts?.id?.disableAutoSelect?.();
                       clearAuthState();
                     }}
-                    className="text-red-600 border-red-200 hover:bg-red-50"
+                    className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50"
                   >
                     <LogOut className="w-3.5 h-3.5 mr-1.5" />
                     {t("settings.signOut")}
@@ -353,10 +366,6 @@ export default function SettingsPage() {
                 </div>
               </div>
             )}
-            {/* Language & Theme */}
-            <div className="border-t pt-4">
-              <LanguageSwitcher />
-            </div>
           </CardContent>
         </Card>
 
