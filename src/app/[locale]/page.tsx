@@ -834,6 +834,24 @@ export default function Home() {
                   </DialogHeader>
                   <div className="space-y-4 pt-2">
                     <p className="text-sm text-muted-foreground">{t("dashboard.pasteInstructions")}</p>
+                    <details className="text-xs text-muted-foreground bg-muted/30 rounded-md p-3">
+                      <summary className="cursor-pointer font-medium text-foreground text-sm mb-1">How to extract text from PDF</summary>
+                      <ol className="list-decimal list-inside space-y-1 mt-2">
+                        <li>Open your Easy Charging PDF</li>
+                        <li>Copy all text from the PDF (<code className="bg-muted px-1 rounded">Ctrl+A</code> → <code className="bg-muted px-1 rounded">Ctrl+C</code>)</li>
+                        <li>Paste it in the text area below</li>
+                      </ol>
+                      <p className="mt-2">
+                        <strong>Tip:</strong> If copying doesn't work, use{" "}
+                        <a href="https://www.pdftotext.com" target="_blank" rel="noopener noreferrer" className="underline">pdftotext.com</a>{" "}
+                        or run <code className="bg-muted px-1 rounded">pdftotext -layout charging.pdf output.txt</code> on desktop.
+                      </p>
+                      <p className="mt-2">
+                        <strong>Expected format per line:</strong>
+                      </p>
+                      <pre className="bg-muted p-2 rounded mt-1 text-xs overflow-x-auto">
+254902721  Azuan Alias  2026-05-24  00:06:39  2026-05-24  10:13:03  10H06M  61.0  17.57</pre>
+                    </details>
                     <Textarea placeholder={t("dashboard.pastePlaceholder")} value={rawInput} onChange={(e) => setRawInput(e.target.value)} rows={6} className="font-mono text-sm" />
                     <div className="flex gap-2">
                       <Button onClick={handleParse} disabled={!rawInput.trim()}>
