@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { exportToPDF } from "@/lib/pdfExport";
 import { Plus, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2, RotateCcw } from "lucide-react";
-import ItemForm from "./items/form";
+import ItemForm from "../items/form";
 import { useTranslation } from "@/lib/useTranslation";
 import AppHeader from "@/components/AppHeader";
 import { getAuthState, type AuthState } from "@/lib/auth";
