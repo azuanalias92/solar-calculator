@@ -61,6 +61,11 @@ function parseCsvDate(dateStr: string): string {
   if (!mm) return "";
   return `${year}-${mm}-${day}`;
 }
+function formatDisplayDate(isoDate: string): string {
+  const [y, m, d] = isoDate.split("-");
+  return `${d}/${m}/${y}`;
+}
+
 function getDay(dateStr: string): number {
   return Number.parseInt(dateStr.slice(8, 10), 10);
 }
@@ -639,7 +644,7 @@ export default function Home() {
                   <TableBody>
                     {dailyData.map((d) => (
                       <TableRow key={d.date}>
-                        <TableCell className="font-medium">{d.date}</TableCell>
+                        <TableCell className="font-medium">{formatDisplayDate(d.date)}</TableCell>
                         <TableCell className="text-right">{formatKwh(d.peakKwh)}</TableCell>
                         <TableCell className="text-right">{formatKwh(d.offPeakKwh)}</TableCell>
                         <TableCell className="text-right font-medium">{formatKwh(d.peakKwh + d.offPeakKwh)}</TableCell>
