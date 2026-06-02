@@ -188,6 +188,10 @@ export default function EvCalculatorPage() {
                       </span>
                     )}
                   </div>
+                  {/* kWh per percent indicator */}
+                  <p className="text-center text-xs text-muted-foreground mt-2">
+                    1% = {(bKwh / 100).toFixed(2)} kWh
+                  </p>
                 </div>
               </CardContent>
             </Card>
