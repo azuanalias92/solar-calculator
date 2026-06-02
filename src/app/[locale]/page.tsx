@@ -8,8 +8,15 @@ import { Button } from "@/components/ui/button";
 import { getAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
-import { Coffee, Github, BarChart3, CalendarDays, Upload, Loader2, Car, Zap, Sun, BatteryCharging, Fuel } from "lucide-react";
+import { Coffee, Github, BarChart3, CalendarDays, Upload, Loader2, Car, Zap, Sun, BatteryCharging, Fuel, Plus } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 // ── Shared Types ──
 
@@ -809,7 +816,42 @@ export default function Home() {
 
         <Card>
           <CardHeader>
-            <CardTitle>{t("dashboard.monthlyBreakdownKwh")}</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle>{t("dashboard.monthlyBreakdownKwh")}</CardTitle>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Upload className="w-4 h-4 mr-1" />
+                    {t("dashboard.importPlus")}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Car className="w-5 h-5 text-emerald-600" />
+                      {t("dashboard.evChargingImport")}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-2">
+                    <p className="text-sm text-muted-foreground">{t("dashboard.pasteInstructions")}</p>
+                    <Textarea placeholder={t("dashboard.pastePlaceholder")} value={rawInput} onChange={(e) => setRawInput(e.target.value)} rows={6} className="font-mono text-sm" />
+                    <div className="flex gap-2">
+                      <Button onClick={handleParse} disabled={!rawInput.trim()}>
+                        <Upload className="w-4 h-4 mr-1" />
+                        {t("dashboard.parseSessions")}
+                      </Button>
+                      {sessions.length > 0 && auth?.token && (
+                        <Button onClick={handleSaveEv} variant="secondary" disabled={saving}>
+                          {saving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Zap className="w-4 h-4 mr-1" />}
+                          {saving ? t("dashboard.saving") : `${t("dashboard.saveTo")} ${evYear}`}
+                        </Button>
+                      )}
+                    </div>
+                    {evMsg && <p className="text-sm text-foreground">{evMsg}</p>}
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="overflow-x-auto">
@@ -861,32 +903,6 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        {/* ════════════════════════ SECTION 3: EV Charging Import ════════════════════════ */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Car className="w-5 h-5 text-emerald-600" />
-              {t("dashboard.evChargingImport")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">{t("dashboard.pasteInstructions")}</p>
-            <Textarea placeholder={t("dashboard.pastePlaceholder")} value={rawInput} onChange={(e) => setRawInput(e.target.value)} rows={6} className="font-mono text-sm" />
-            <div className="flex gap-2">
-              <Button onClick={handleParse} disabled={!rawInput.trim()}>
-                <Upload className="w-4 h-4 mr-1" />
-                {t("dashboard.parseSessions")}
-              </Button>
-              {sessions.length > 0 && auth?.token && (
-                <Button onClick={handleSaveEv} variant="secondary" disabled={saving}>
-                  {saving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Zap className="w-4 h-4 mr-1" />}
-                  {saving ? t("dashboard.saving") : `${t("dashboard.saveTo")} ${evYear}`}
-                </Button>
-              )}
-            </div>
-            {evMsg && <p className="text-sm text-foreground">{evMsg}</p>}
-          </CardContent>
-        </Card>
 
         {sessions.length > 0 && (
           <Card>
