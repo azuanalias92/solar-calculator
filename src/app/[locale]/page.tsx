@@ -504,7 +504,7 @@ export default function Home() {
   // ═══════════════════════════════════════════════
 
   return (
-    <div className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
+    <div className="flex flex-col min-h-screen p-2 sm:p-6 lg:p-8 bg-background">
       <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
 
       <div className="flex-1 w-full max-w-6xl mx-auto space-y-6">
@@ -630,7 +630,7 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="text-base">{t("dashboard.dailyBreakdown")}</CardTitle>
             </CardHeader>
-            <CardContent className="p-3 sm:p-6">
+            <CardContent className="p-2 sm:p-6">
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
@@ -907,7 +907,7 @@ export default function Home() {
                 </span>
               </div>
             </CardHeader>
-            <CardContent className="p-3 sm:p-6">
+            <CardContent className="p-2 sm:p-6">
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>

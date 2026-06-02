@@ -247,7 +247,7 @@ export default function SolarCalculatorPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
+    <div className="flex flex-col min-h-screen p-2 sm:p-6 lg:p-8 bg-background">
       <AppHeader
         locale={locale}
         title={t("common.title")}
@@ -392,11 +392,11 @@ export default function SolarCalculatorPage() {
           <CardHeader>
             <CardTitle className="text-lg sm:text-xl">{t("table.itemsList")}</CardTitle>
           </CardHeader>
-          <CardContent className="p-3 sm:p-6">
+          <CardContent className="p-2 sm:p-6">
             {items.length === 0 ? (
               <p className="text-gray-500 text-center py-8 text-sm sm:text-base">{t("table.noItems")}</p>
             ) : (
-              <div className="overflow-x-auto -mx-3 sm:mx-0">
+              <div className="overflow-x-auto -mx-2 sm:mx-0">
                 <div className="min-w-full inline-block align-middle">
                   <Table>
                     <TableHeader>
