@@ -10,8 +10,7 @@ import { exportToPDF } from "@/lib/pdfExport";
 import { Plus, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2, RotateCcw } from "lucide-react";
 import ItemForm from "./items/form";
 import { useTranslation } from "@/lib/useTranslation";
-import NavBar from "@/components/NavBar";
-import MobileNav from "@/components/MobileNav";
+import AppHeader from "@/components/AppHeader";
 import { getAuthState, type AuthState } from "@/lib/auth";
 
 interface Item {
@@ -71,7 +70,9 @@ export default function Home() {
     try {
       window.localStorage.setItem("kirasolar.tariff", value);
       window.dispatchEvent(new CustomEvent("kirasolar:tariff", { detail: value }));
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   // Listen for tariff changes from other tabs/pages
@@ -127,9 +128,7 @@ export default function Home() {
         };
         if (!canceled) {
           setItems(payload.data.items ?? []);
-          setSolarConfig(
-            payload.data.config ?? { peakSunHours: 5, panelWatts: 300, systemEfficiency: 85 },
-          );
+          setSolarConfig(payload.data.config ?? { peakSunHours: 5, panelWatts: 300, systemEfficiency: 85 });
           if (!canceled) setDirty(false);
           setIsLoaded(true);
         }
@@ -249,23 +248,12 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
-      <div className="w-full max-w-6xl mx-auto text-center mb-6 sm:mb-8">
-        <div className="flex items-center justify-between md:justify-center gap-2 sm:gap-3">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <img src="/logo.svg" alt={t("common.logoAlt")} className="w-8 h-8 sm:w-10 sm:h-10" />
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-800">{t("common.title")}</h1>
-          </div>
-          <div className="md:hidden">
-            <MobileNav locale={locale} />
-          </div>
-        </div>
-
-        <div className="hidden md:flex justify-center mt-4">
-          <NavBar locale={locale} />
-        </div>
-
-        <p className="text-sm sm:text-base text-emerald-600 mt-2">{t("common.description")}</p>
-      </div>
+      <AppHeader
+        locale={locale}
+        title={t("common.title")}
+        description={t("common.description")}
+        logoAlt={t("common.logoAlt")}
+      />
 
       <div className="flex-1 w-full max-w-6xl mx-auto">
         {/* Action Buttons */}
@@ -299,12 +287,19 @@ export default function Home() {
         </div>
 
         <div className="text-center text-sm text-muted-foreground mb-6">
-          {!auth?.token ? <span>Login to save to backend</span> :
-            loading ? <span>Loading…</span> :
-            saving ? <span>Saving…</span> :
-            dirty ? <span className="text-amber-600">Unsaved changes • auto-saving…</span> :
-            message ? <span className="text-foreground">{message}</span> :
-            <span className="text-emerald-600">Synced ✓</span>}
+          {!auth?.token ? (
+            <span>Login to save to backend</span>
+          ) : loading ? (
+            <span>Loading…</span>
+          ) : saving ? (
+            <span>Saving…</span>
+          ) : dirty ? (
+            <span className="text-amber-600">Unsaved changes • auto-saving…</span>
+          ) : message ? (
+            <span className="text-foreground">{message}</span>
+          ) : (
+            <span className="text-emerald-600">Synced ✓</span>
+          )}
         </div>
 
         {/* Statistics Cards */}
@@ -371,10 +366,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex items-center gap-4">
                 <p className="text-sm text-muted-foreground">
-                  Home tariff:{" "}
-                  <strong className="text-foreground">
-                    {currentTariffLabel}
-                  </strong>
+                  Home tariff: <strong className="text-foreground">{currentTariffLabel}</strong>
                 </p>
                 <select
                   value={tariff}
@@ -388,10 +380,7 @@ export default function Home() {
                   <option value="TNB_DOMESTIC_AM">TNB Domestic AM (Flat Rate)</option>
                 </select>
               </div>
-              <Link
-                href={`/${locale}/settings`}
-                className="text-xs text-muted-foreground hover:text-primary underline transition-colors"
-              >
+              <Link href={`/${locale}/settings`} className="text-xs text-muted-foreground hover:text-primary underline transition-colors">
                 Manage in Settings →
               </Link>
             </div>
@@ -429,12 +418,7 @@ export default function Home() {
                           <TableCell className="text-xs sm:text-sm">{item.quantity}</TableCell>
                           <TableCell className="text-xs sm:text-sm font-medium">{item.estimatekWh.toFixed(2)}</TableCell>
                           <TableCell>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => removeItem(item.id)} 
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
-                            >
+                            <Button variant="outline" size="sm" onClick={() => removeItem(item.id)} className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0">
                               <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                             </Button>
                           </TableCell>
@@ -453,14 +437,14 @@ export default function Home() {
       <footer className="border-t bg-card/50 backdrop-blur-sm mt-4">
         <div className="w-full max-w-6xl mx-auto flex flex-col gap-3 sm:gap-4 mt-3 sm:mt-4 md:flex-row md:justify-between md:items-center px-2 sm:px-0">
           <div className="text-base sm:text-lg font-semibold text-primary text-center md:text-left">{t("common.title")}</div>
-          
+
           <div className="text-xs sm:text-sm text-muted-foreground text-center md:text-left order-3 md:order-2">
             {t("footer.madeBy")}{" "}
             <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-primary hover:text-outline transition-colors">
               Azuan Alias
             </a>
           </div>
-          
+
           <div className="flex items-center justify-center gap-3 sm:gap-4 order-2 md:order-3">
             <a
               href="https://github.com/azuanalias92"

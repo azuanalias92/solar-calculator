@@ -8,19 +8,18 @@ import { Button } from "@/components/ui/button";
 import { getAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
-import NavBar from "@/components/NavBar";
-import MobileNav from "@/components/MobileNav";
-import {
-  Coffee, Github, BarChart3, CalendarDays, Upload, Loader2,
-  Car, Zap, Sun, BatteryCharging, Fuel
-} from "lucide-react";
+import { Coffee, Github, BarChart3, CalendarDays, Upload, Loader2, Car, Zap, Sun, BatteryCharging, Fuel } from "lucide-react";
+import AppHeader from "@/components/AppHeader";
 
 // ── Shared Types ──
 
 type DailyUsageItem = { date: string; peakKwh: number; offPeakKwh: number };
 type DailyUsageSummaryItem = {
-  month: number; peakKwh: number; offPeakKwh: number;
-  totalKwh: number; billAmount: number | null;
+  month: number;
+  peakKwh: number;
+  offPeakKwh: number;
+  totalKwh: number;
+  billAmount: number | null;
 };
 type MonthSummary = { month: number; totalKwh: number; evKwh: number; nonEvKwh: number };
 type ChargingSession = { date: string; startTime: string; endTime: string; duration: string; kwh: number; cost: number };
@@ -29,7 +28,7 @@ type MonthUsage = { month: number; evKwh: number; nonEvKwh: number };
 // ── Helpers ──
 
 function monthLabel(month: number): string {
-  return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][month - 1] ?? String(month);
+  return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][month - 1] ?? String(month);
 }
 function formatKwh(value: number): string {
   return new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(value);
@@ -39,8 +38,18 @@ function formatMoney(value: number): string {
 }
 function parseCsvDate(dateStr: string): string {
   const months: Record<string, string> = {
-    jan: "01", feb: "02", mar: "03", apr: "04", may: "05", jun: "06",
-    jul: "07", aug: "08", sep: "09", oct: "10", nov: "11", dec: "12",
+    jan: "01",
+    feb: "02",
+    mar: "03",
+    apr: "04",
+    may: "05",
+    jun: "06",
+    jul: "07",
+    aug: "08",
+    sep: "09",
+    oct: "10",
+    nov: "11",
+    dec: "12",
   };
   const cleaned = dateStr.trim().replace(/\s+/g, " ");
   const parts = cleaned.split(" ");
@@ -116,14 +125,22 @@ export default function DashboardPage() {
         const res = await fetch(`${apiBaseUrl}/daily-usage?year=${usageYear}&month=${usageMonth}`, {
           headers: { Authorization: `Bearer ${auth.token}` },
         });
-        if (!res.ok) { if (!canceled) setDailyData([]); return; }
+        if (!res.ok) {
+          if (!canceled) setDailyData([]);
+          return;
+        }
         const payload = (await res.json()) as { data: DailyUsageItem[] };
         if (!canceled) setDailyData(payload.data ?? []);
-      } catch { if (!canceled) setDailyData([]); }
-      finally { if (!canceled) setLoadingDaily(false); }
+      } catch {
+        if (!canceled) setDailyData([]);
+      } finally {
+        if (!canceled) setLoadingDaily(false);
+      }
     };
     void run();
-    return () => { canceled = true; };
+    return () => {
+      canceled = true;
+    };
   }, [apiBaseUrl, auth?.token, usageYear, usageMonth]);
 
   useEffect(() => {
@@ -135,14 +152,22 @@ export default function DashboardPage() {
         const res = await fetch(`${apiBaseUrl}/daily-usage/summary?year=${usageYear}`, {
           headers: { Authorization: `Bearer ${auth.token}` },
         });
-        if (!res.ok) { if (!canceled) setSummaryData([]); return; }
+        if (!res.ok) {
+          if (!canceled) setSummaryData([]);
+          return;
+        }
         const payload = (await res.json()) as { data: DailyUsageSummaryItem[] };
         if (!canceled) setSummaryData(payload.data ?? []);
-      } catch { if (!canceled) setSummaryData([]); }
-      finally { if (!canceled) setLoadingSummary(false); }
+      } catch {
+        if (!canceled) setSummaryData([]);
+      } finally {
+        if (!canceled) setLoadingSummary(false);
+      }
     };
     void run();
-    return () => { canceled = true; };
+    return () => {
+      canceled = true;
+    };
   }, [apiBaseUrl, auth?.token, usageYear]);
 
   const dailyTotals = useMemo(() => {
@@ -151,10 +176,7 @@ export default function DashboardPage() {
     return { peak, offPeak, total: peak + offPeak };
   }, [dailyData]);
 
-  const maxDailyTotal = useMemo(
-    () => dailyData.reduce((max, d) => Math.max(max, d.peakKwh + d.offPeakKwh), 0),
-    [dailyData],
-  );
+  const maxDailyTotal = useMemo(() => dailyData.reduce((max, d) => Math.max(max, d.peakKwh + d.offPeakKwh), 0), [dailyData]);
 
   const barHeightPct = (value: number): number => {
     if (maxDailyTotal <= 0) return 0;
@@ -169,7 +191,11 @@ export default function DashboardPage() {
     try {
       const text = await file.text();
       const lines = text.split("\n").filter((l) => l.trim());
-      if (lines.length < 2) { setUsageMsg(t("dashboard.csvEmpty")); setUploading(false); return; }
+      if (lines.length < 2) {
+        setUsageMsg(t("dashboard.csvEmpty"));
+        setUploading(false);
+        return;
+      }
       const rows: DailyUsageItem[] = [];
       for (let i = 1; i < lines.length; i++) {
         const line = lines[i].trim();
@@ -183,13 +209,21 @@ export default function DashboardPage() {
         const offPeakKwh = Math.max(0, Number.parseFloat(cols[2]) || 0);
         rows.push({ date, peakKwh, offPeakKwh });
       }
-      if (rows.length === 0) { setUsageMsg(t("dashboard.noValidRows")); setUploading(false); return; }
+      if (rows.length === 0) {
+        setUsageMsg(t("dashboard.noValidRows"));
+        setUploading(false);
+        return;
+      }
       const res = await fetch(`${apiBaseUrl}/daily-usage`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         body: JSON.stringify({ data: rows }),
       });
-      if (!res.ok) { setUsageMsg(t("dashboard.uploadFailed")); setUploading(false); return; }
+      if (!res.ok) {
+        setUsageMsg(t("dashboard.uploadFailed"));
+        setUploading(false);
+        return;
+      }
       setUsageMsg(`${t("dashboard.uploaded")} ${rows.length} ${t("dashboard.days")}!`);
       const [dailyRes, summaryRes] = await Promise.all([
         fetch(`${apiBaseUrl}/daily-usage?year=${usageYear}&month=${usageMonth}`, {
@@ -207,8 +241,12 @@ export default function DashboardPage() {
         const p = (await summaryRes.json()) as { data: DailyUsageSummaryItem[] };
         setSummaryData(p.data ?? []);
       }
-    } catch { setUsageMsg(t("dashboard.failedToParse")); }
-    finally { setUploading(false); if (fileInputRef.current) fileInputRef.current.value = ""; }
+    } catch {
+      setUsageMsg(t("dashboard.failedToParse"));
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   // ═══════════════════════════════════════════════
@@ -224,7 +262,10 @@ export default function DashboardPage() {
   useEffect(() => {
     let canceled = false;
     const run = async () => {
-      if (!auth?.token) { if (!canceled) setAvailableYears([currentYear]); return; }
+      if (!auth?.token) {
+        if (!canceled) setAvailableYears([currentYear]);
+        return;
+      }
       const yearsSet = new Set<number>([currentYear]);
       try {
         const usageRes = await fetch(`${apiBaseUrl}/daily-usage/years`, {
@@ -234,7 +275,9 @@ export default function DashboardPage() {
           const p = (await usageRes.json()) as { years: number[] };
           for (const y of p.years ?? []) yearsSet.add(y);
         }
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
       try {
         const evRes = await fetch(`${apiBaseUrl}/ev-usage/years`, {
           headers: { Authorization: `Bearer ${auth.token}` },
@@ -243,12 +286,18 @@ export default function DashboardPage() {
           const p = (await evRes.json()) as { years: number[] };
           for (const y of p.years ?? []) yearsSet.add(y);
         }
-      } catch { /* ignore */ }
-      const sorted = Array.from(yearsSet).filter((y) => Number.isFinite(y)).sort((a, b) => b - a);
+      } catch {
+        /* ignore */
+      }
+      const sorted = Array.from(yearsSet)
+        .filter((y) => Number.isFinite(y))
+        .sort((a, b) => b - a);
       if (!canceled) setAvailableYears(sorted.length ? sorted : [currentYear]);
     };
     void run();
-    return () => { canceled = true; };
+    return () => {
+      canceled = true;
+    };
   }, [apiBaseUrl, auth?.token, currentYear]);
 
   useEffect(() => {
@@ -262,7 +311,11 @@ export default function DashboardPage() {
     const run = async () => {
       setBillEvError(null);
       setLoadingBillEv(true);
-      if (!auth?.token) { if (!canceled) setBillEvData([]); setLoadingBillEv(false); return; }
+      if (!auth?.token) {
+        if (!canceled) setBillEvData([]);
+        setLoadingBillEv(false);
+        return;
+      }
       try {
         const [usageRes, evRes] = await Promise.all([
           fetch(`${apiBaseUrl}/daily-usage/summary?year=${encodeURIComponent(String(billEvYear))}`, {
@@ -272,7 +325,11 @@ export default function DashboardPage() {
             headers: { Authorization: `Bearer ${auth.token}` },
           }),
         ]);
-        if (!usageRes.ok) { if (!canceled) setBillEvError(t("dashboard.failedToLoadUsage")); setLoadingBillEv(false); return; }
+        if (!usageRes.ok) {
+          if (!canceled) setBillEvError(t("dashboard.failedToLoadUsage"));
+          setLoadingBillEv(false);
+          return;
+        }
         const usagePayload = (await usageRes.json()) as {
           data: Array<{ month: number; totalKwh: number }>;
         };
@@ -286,18 +343,24 @@ export default function DashboardPage() {
           return { month: m.month, totalKwh: m.totalKwh, evKwh, nonEvKwh: Math.max(0, m.totalKwh - evKwh) };
         });
         if (!canceled) setBillEvData(merged);
-      } catch { if (!canceled) setBillEvError(t("dashboard.failedToLoadData")); }
-      finally { if (!canceled) setLoadingBillEv(false); }
+      } catch {
+        if (!canceled) setBillEvError(t("dashboard.failedToLoadData"));
+      } finally {
+        if (!canceled) setLoadingBillEv(false);
+      }
     };
     void run();
-    return () => { canceled = true; };
+    return () => {
+      canceled = true;
+    };
   }, [apiBaseUrl, auth?.token, billEvYear]);
 
   const billEvTotals = useMemo(() => {
-    return billEvData.reduce(
-      (acc, m) => ({ evTotal: acc.evTotal + m.evKwh, nonEvTotal: acc.nonEvTotal + m.nonEvKwh, grandTotal: acc.grandTotal + m.totalKwh }),
-      { evTotal: 0, nonEvTotal: 0, grandTotal: 0 },
-    );
+    return billEvData.reduce((acc, m) => ({ evTotal: acc.evTotal + m.evKwh, nonEvTotal: acc.nonEvTotal + m.nonEvKwh, grandTotal: acc.grandTotal + m.totalKwh }), {
+      evTotal: 0,
+      nonEvTotal: 0,
+      grandTotal: 0,
+    });
   }, [billEvData]);
 
   const maxTotal = useMemo(() => billEvData.reduce((max, m) => Math.max(max, m.totalKwh), 0), [billEvData]);
@@ -330,7 +393,9 @@ export default function DashboardPage() {
       } catch {}
     };
     void run();
-    return () => { canceled = true; };
+    return () => {
+      canceled = true;
+    };
   }, [apiBaseUrl, auth?.token, currentYear]);
 
   useEffect(() => {
@@ -344,12 +409,18 @@ export default function DashboardPage() {
         });
         if (!res.ok) return;
         const p = (await res.json()) as { data: MonthUsage[] };
-        if (!canceled) { setExistingEvData(p.data ?? emptyYearData()); }
-      } catch {}
-      finally { if (!canceled) setLoadingEv(false); }
+        if (!canceled) {
+          setExistingEvData(p.data ?? emptyYearData());
+        }
+      } catch {
+      } finally {
+        if (!canceled) setLoadingEv(false);
+      }
     };
     void run();
-    return () => { canceled = true; };
+    return () => {
+      canceled = true;
+    };
   }, [apiBaseUrl, auth?.token, evYear]);
 
   const handleParse = () => {
@@ -384,20 +455,11 @@ export default function DashboardPage() {
     return byMonth;
   }, [sessions]);
 
-  const mergedEvData = useMemo(
-    () => existingEvData.map((m) => ({ ...m, evKwh: m.evKwh + (monthlyEv.get(m.month) ?? 0) })),
-    [existingEvData, monthlyEv],
-  );
+  const mergedEvData = useMemo(() => existingEvData.map((m) => ({ ...m, evKwh: m.evKwh + (monthlyEv.get(m.month) ?? 0) })), [existingEvData, monthlyEv]);
 
-  const evTotals = useMemo(
-    () => existingEvData.reduce((s, m) => ({ evKwh: s.evKwh + m.evKwh, nonEvKwh: s.nonEvKwh + m.nonEvKwh }), { evKwh: 0, nonEvKwh: 0 }),
-    [existingEvData],
-  );
+  const evTotals = useMemo(() => existingEvData.reduce((s, m) => ({ evKwh: s.evKwh + m.evKwh, nonEvKwh: s.nonEvKwh + m.nonEvKwh }), { evKwh: 0, nonEvKwh: 0 }), [existingEvData]);
 
-  const sessionTotals = useMemo(
-    () => sessions.reduce((s, c) => ({ kwh: s.kwh + c.kwh, cost: s.cost + c.cost }), { kwh: 0, cost: 0 }),
-    [sessions],
-  );
+  const sessionTotals = useMemo(() => sessions.reduce((s, c) => ({ kwh: s.kwh + c.kwh, cost: s.cost + c.cost }), { kwh: 0, cost: 0 }), [sessions]);
 
   const handleSaveEv = async () => {
     if (!auth?.token) return;
@@ -414,7 +476,10 @@ export default function DashboardPage() {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         body: JSON.stringify({ data: updatedData }),
       });
-      if (!res.ok) { setEvMsg(t("dashboard.failedToSave")); return; }
+      if (!res.ok) {
+        setEvMsg(t("dashboard.failedToSave"));
+        return;
+      }
       const result = (await res.json()) as { data: MonthUsage[] };
       setExistingEvData(result.data ?? emptyYearData());
       setSessions([]);
@@ -422,8 +487,11 @@ export default function DashboardPage() {
       setEvAvailableYears((prev) => dedupeYears([evYear, ...prev]));
       setEvMsg(t("dashboard.saved"));
       setTimeout(() => setEvMsg(null), 3000);
-    } catch { setEvMsg(t("dashboard.failedToSave")); }
-    finally { setSaving(false); }
+    } catch {
+      setEvMsg(t("dashboard.failedToSave"));
+    } finally {
+      setSaving(false);
+    }
   };
 
   // ═══════════════════════════════════════════════
@@ -432,23 +500,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
-      <div className="w-full max-w-6xl mx-auto text-center mb-6 sm:mb-8">
-        <div className="flex items-center justify-between md:justify-center gap-2 sm:gap-3">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <img src="/logo.svg" alt={t("common.logoAlt")} className="w-8 h-8 sm:w-10 sm:h-10" />
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-800">{t("common.title")}</h1>
-          </div>
-          <div className="md:hidden">
-            <MobileNav locale={locale} />
-          </div>
-        </div>
-
-        <div className="hidden md:flex justify-center mt-4 flex-wrap gap-2">
-          <NavBar locale={locale} />
-        </div>
-
-        <p className="text-sm sm:text-base text-emerald-600 mt-2">{t("common.description")}</p>
-      </div>
+      <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
 
       <div className="flex-1 w-full max-w-6xl mx-auto space-y-6">
         {/* ════════════════════════ SECTION 1: Daily Energy Usage ════════════════════════ */}
@@ -466,7 +518,9 @@ export default function DashboardPage() {
                   className="flex h-9 w-24 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm"
                 >
                   {Array.from({ length: 5 }, (_, i) => nowDate.year - 2 + i).map((y) => (
-                    <option key={y} value={String(y)}>{y}</option>
+                    <option key={y} value={String(y)}>
+                      {y}
+                    </option>
                   ))}
                 </select>
                 <select
@@ -475,7 +529,9 @@ export default function DashboardPage() {
                   className="flex h-9 w-28 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm"
                 >
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                    <option key={m} value={String(m)}>{monthLabel(m)}</option>
+                    <option key={m} value={String(m)}>
+                      {monthLabel(m)}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -507,20 +563,29 @@ export default function DashboardPage() {
               <div className="flex flex-wrap gap-4 text-sm">
                 <div className="flex items-center gap-1">
                   <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" />
-                  {t("dashboard.peak")}: <strong>{formatKwh(dailyTotals.peak)} {t("dashboard.kwh")}</strong>
+                  {t("dashboard.peak")}:{" "}
+                  <strong>
+                    {formatKwh(dailyTotals.peak)} {t("dashboard.kwh")}
+                  </strong>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />
-                  {t("dashboard.offPeak")}: <strong>{formatKwh(dailyTotals.offPeak)} {t("dashboard.kwh")}</strong>
+                  {t("dashboard.offPeak")}:{" "}
+                  <strong>
+                    {formatKwh(dailyTotals.offPeak)} {t("dashboard.kwh")}
+                  </strong>
                 </div>
-                <div>{t("dashboard.total")}: <strong>{formatKwh(dailyTotals.total)} {t("dashboard.kwh")}</strong></div>
+                <div>
+                  {t("dashboard.total")}:{" "}
+                  <strong>
+                    {formatKwh(dailyTotals.total)} {t("dashboard.kwh")}
+                  </strong>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
               {dailyData.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8 text-sm">
-                  {loadingDaily ? t("dashboard.loading") : t("dashboard.noDataThisMonth")}
-                </p>
+                <p className="text-center text-muted-foreground py-8 text-sm">{loadingDaily ? t("dashboard.loading") : t("dashboard.noDataThisMonth")}</p>
               ) : (
                 <div className="w-full overflow-x-auto">
                   <div className="min-w-[600px]">
@@ -532,8 +597,16 @@ export default function DashboardPage() {
                         return (
                           <div key={d.date} className="flex-1 flex flex-col items-center gap-1">
                             <div className="w-full h-40 flex flex-col justify-end">
-                              <div className="w-full bg-amber-500 rounded-t-sm transition-all" style={{ height: `${Math.max(peakPct, 0.5)}%` }} title={`${t("dashboard.peak")}: ${formatKwh(d.peakKwh)} ${t("dashboard.kwh")}`} />
-                              <div className="w-full bg-emerald-600 transition-all" style={{ height: `${Math.max(offPeakPct - peakPct, 0.5)}%` }} title={`${t("dashboard.offPeak")}: ${formatKwh(d.offPeakKwh)} ${t("dashboard.kwh")}`} />
+                              <div
+                                className="w-full bg-amber-500 rounded-t-sm transition-all"
+                                style={{ height: `${Math.max(peakPct, 0.5)}%` }}
+                                title={`${t("dashboard.peak")}: ${formatKwh(d.peakKwh)} ${t("dashboard.kwh")}`}
+                              />
+                              <div
+                                className="w-full bg-emerald-600 transition-all"
+                                style={{ height: `${Math.max(offPeakPct - peakPct, 0.5)}%` }}
+                                title={`${t("dashboard.offPeak")}: ${formatKwh(d.offPeakKwh)} ${t("dashboard.kwh")}`}
+                              />
                             </div>
                             <div className="text-[10px] text-muted-foreground">{getDay(d.date)}</div>
                           </div>
@@ -549,7 +622,9 @@ export default function DashboardPage() {
 
         {auth?.token && dailyData.length > 0 && (
           <Card>
-            <CardHeader><CardTitle className="text-base">{t("dashboard.dailyBreakdown")}</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-base">{t("dashboard.dailyBreakdown")}</CardTitle>
+            </CardHeader>
             <CardContent className="p-3 sm:p-6">
               <div className="overflow-x-auto">
                 <Table>
@@ -634,7 +709,9 @@ export default function DashboardPage() {
                 className="flex h-9 w-28 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm"
               >
                 {availableYears.map((y) => (
-                  <option key={y} value={String(y)}>{y}</option>
+                  <option key={y} value={String(y)}>
+                    {y}
+                  </option>
                 ))}
               </select>
             </div>
@@ -642,28 +719,54 @@ export default function DashboardPage() {
               {!auth?.token ? (
                 <span>{t("dashboard.loginToView")}</span>
               ) : loadingBillEv ? (
-                <span><Loader2 className="w-3 h-3 inline animate-spin mr-1" />{t("dashboard.loading")}</span>
+                <span>
+                  <Loader2 className="w-3 h-3 inline animate-spin mr-1" />
+                  {t("dashboard.loading")}
+                </span>
               ) : billEvError ? (
                 <span className="text-red-600">{billEvError}</span>
               ) : monthsWithData > 0 ? (
                 <span className="text-emerald-600">{t("dashboard.dataLoaded")}</span>
               ) : (
-                <span>{t("dashboard.noDataFor")} {billEvYear}</span>
+                <span>
+                  {t("dashboard.noDataFor")} {billEvYear}
+                </span>
               )}
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground">
-              <span>{t("dashboard.totalEv")}: <strong className="text-foreground">{formatKwh(billEvTotals.evTotal)} {t("dashboard.kwh")}</strong></span>
-              <span>{t("dashboard.totalNonEv")}: <strong className="text-foreground">{formatKwh(billEvTotals.nonEvTotal)} {t("dashboard.kwh")}</strong></span>
-              <span>{t("dashboard.total")}: <strong className="text-foreground">{formatKwh(billEvTotals.grandTotal)} {t("dashboard.kwh")}</strong></span>
+              <span>
+                {t("dashboard.totalEv")}:{" "}
+                <strong className="text-foreground">
+                  {formatKwh(billEvTotals.evTotal)} {t("dashboard.kwh")}
+                </strong>
+              </span>
+              <span>
+                {t("dashboard.totalNonEv")}:{" "}
+                <strong className="text-foreground">
+                  {formatKwh(billEvTotals.nonEvTotal)} {t("dashboard.kwh")}
+                </strong>
+              </span>
+              <span>
+                {t("dashboard.total")}:{" "}
+                <strong className="text-foreground">
+                  {formatKwh(billEvTotals.grandTotal)} {t("dashboard.kwh")}
+                </strong>
+              </span>
             </div>
 
             {monthsWithData > 0 && (
               <>
                 <div className="flex items-center gap-4 text-sm">
-                  <span className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />{t("dashboard.nonEv")}</span>
-                  <span className="flex items-center gap-2"><span className="inline-block h-3 w-3 rounded-sm bg-sky-500" />{t("dashboard.evCharging")}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />
+                    {t("dashboard.nonEv")}
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <span className="inline-block h-3 w-3 rounded-sm bg-sky-500" />
+                    {t("dashboard.evCharging")}
+                  </span>
                 </div>
                 <div className="w-full overflow-x-auto">
                   <div className="min-w-[760px]">
@@ -673,11 +776,21 @@ export default function DashboardPage() {
                         return (
                           <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
                             <div className="w-full h-56 flex flex-col justify-end">
-                              <div className="w-full bg-sky-500 rounded-t-sm" style={{ height: `${Math.round(evPct * 100)}%` }} aria-label={`${monthLabel(m.month)} ${t("dashboard.evCharging")} ${formatKwh(m.evKwh)} ${t("dashboard.kwh")}`} />
-                              <div className="w-full bg-emerald-600 rounded-b-sm" style={{ height: `${Math.round(nonEvPct * 100)}%` }} aria-label={`${monthLabel(m.month)} ${t("dashboard.nonEv")} ${formatKwh(m.nonEvKwh)} ${t("dashboard.kwh")}`} />
+                              <div
+                                className="w-full bg-sky-500 rounded-t-sm"
+                                style={{ height: `${Math.round(evPct * 100)}%` }}
+                                aria-label={`${monthLabel(m.month)} ${t("dashboard.evCharging")} ${formatKwh(m.evKwh)} ${t("dashboard.kwh")}`}
+                              />
+                              <div
+                                className="w-full bg-emerald-600 rounded-b-sm"
+                                style={{ height: `${Math.round(nonEvPct * 100)}%` }}
+                                aria-label={`${monthLabel(m.month)} ${t("dashboard.nonEv")} ${formatKwh(m.nonEvKwh)} ${t("dashboard.kwh")}`}
+                              />
                             </div>
                             <div className="text-xs text-muted-foreground">{monthLabel(m.month)}</div>
-                            <div className="text-xs font-medium">{formatKwh(m.totalKwh)} {t("dashboard.kwh")}</div>
+                            <div className="text-xs font-medium">
+                              {formatKwh(m.totalKwh)} {t("dashboard.kwh")}
+                            </div>
                           </div>
                         );
                       })}
@@ -690,7 +803,9 @@ export default function DashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle>{t("dashboard.monthlyBreakdownKwh")}</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>{t("dashboard.monthlyBreakdownKwh")}</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-4">
             <div className="overflow-x-auto">
               <Table>
@@ -712,13 +827,17 @@ export default function DashboardPage() {
                     </TableRow>
                   ) : (
                     billEvData.map((m) => {
-                      const evPct = m.totalKwh > 0 ? ((m.evKwh / m.totalKwh) * 100) : 0;
+                      const evPct = m.totalKwh > 0 ? (m.evKwh / m.totalKwh) * 100 : 0;
                       return (
                         <TableRow key={m.month}>
                           <TableCell className="font-medium">{monthLabel(m.month)}</TableCell>
                           <TableCell>{formatKwh(m.totalKwh)}</TableCell>
-                          <TableCell><span className="text-sky-600">{formatKwh(m.evKwh)}</span></TableCell>
-                          <TableCell><span className="text-emerald-600">{formatKwh(m.nonEvKwh)}</span></TableCell>
+                          <TableCell>
+                            <span className="text-sky-600">{formatKwh(m.evKwh)}</span>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-emerald-600">{formatKwh(m.nonEvKwh)}</span>
+                          </TableCell>
                           <TableCell className="text-right">{evPct.toFixed(1)}%</TableCell>
                         </TableRow>
                       );
@@ -746,16 +865,8 @@ export default function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {t("dashboard.pasteInstructions")}
-            </p>
-            <Textarea
-              placeholder={t("dashboard.pastePlaceholder")}
-              value={rawInput}
-              onChange={(e) => setRawInput(e.target.value)}
-              rows={6}
-              className="font-mono text-sm"
-            />
+            <p className="text-sm text-muted-foreground">{t("dashboard.pasteInstructions")}</p>
+            <Textarea placeholder={t("dashboard.pastePlaceholder")} value={rawInput} onChange={(e) => setRawInput(e.target.value)} rows={6} className="font-mono text-sm" />
             <div className="flex gap-2">
               <Button onClick={handleParse} disabled={!rawInput.trim()}>
                 <Upload className="w-4 h-4 mr-1" />
@@ -780,8 +891,15 @@ export default function DashboardPage() {
                 {t("dashboard.chargingSessions")} ({sessions.length})
               </CardTitle>
               <div className="flex gap-4 text-sm">
-                <span>{t("dashboard.total")}: <strong>{formatKwh(sessionTotals.kwh)} {t("dashboard.kwh")}</strong></span>
-                <span>{t("dashboard.cost")}: <strong>{formatMoney(sessionTotals.cost)}</strong></span>
+                <span>
+                  {t("dashboard.total")}:{" "}
+                  <strong>
+                    {formatKwh(sessionTotals.kwh)} {t("dashboard.kwh")}
+                  </strong>
+                </span>
+                <span>
+                  {t("dashboard.cost")}: <strong>{formatMoney(sessionTotals.cost)}</strong>
+                </span>
               </div>
             </CardHeader>
             <CardContent className="p-3 sm:p-6">
@@ -789,8 +907,12 @@ export default function DashboardPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>{t("dashboard.date")}</TableHead><TableHead>{t("dashboard.start")}</TableHead><TableHead>{t("dashboard.end")}</TableHead>
-                      <TableHead>{t("dashboard.duration")}</TableHead><TableHead className="text-right">{t("dashboard.kwh")}</TableHead><TableHead className="text-right">{t("dashboard.costRm")}</TableHead>
+                      <TableHead>{t("dashboard.date")}</TableHead>
+                      <TableHead>{t("dashboard.start")}</TableHead>
+                      <TableHead>{t("dashboard.end")}</TableHead>
+                      <TableHead>{t("dashboard.duration")}</TableHead>
+                      <TableHead className="text-right">{t("dashboard.kwh")}</TableHead>
+                      <TableHead className="text-right">{t("dashboard.costRm")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -824,14 +946,30 @@ export default function DashboardPage() {
                 className="flex h-9 w-28 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm"
               >
                 {evAvailableYears.map((y) => (
-                  <option key={y} value={String(y)}>{y}</option>
+                  <option key={y} value={String(y)}>
+                    {y}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-              <span>{t("dashboard.existingEv")}: <strong>{formatKwh(evTotals.evKwh)} {t("dashboard.kwh")}</strong></span>
-              <span>{t("dashboard.nonEv")}: <strong>{formatKwh(evTotals.nonEvKwh)} {t("dashboard.kwh")}</strong></span>
-              {sessions.length > 0 && <span className="text-emerald-600">+ {formatKwh(sessionTotals.kwh)} {t("dashboard.kwh")} {t("dashboard.fromImport")}</span>}
+              <span>
+                {t("dashboard.existingEv")}:{" "}
+                <strong>
+                  {formatKwh(evTotals.evKwh)} {t("dashboard.kwh")}
+                </strong>
+              </span>
+              <span>
+                {t("dashboard.nonEv")}:{" "}
+                <strong>
+                  {formatKwh(evTotals.nonEvKwh)} {t("dashboard.kwh")}
+                </strong>
+              </span>
+              {sessions.length > 0 && (
+                <span className="text-emerald-600">
+                  + {formatKwh(sessionTotals.kwh)} {t("dashboard.kwh")} {t("dashboard.fromImport")}
+                </span>
+              )}
               {loadingEv && <Loader2 className="w-3 h-3 animate-spin" />}
             </div>
           </CardHeader>
@@ -844,9 +982,15 @@ export default function DashboardPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>{t("dashboard.month")}</TableHead>
-                      <TableHead className="text-right">{t("dashboard.evCharging")} ({t("dashboard.kwh")})</TableHead>
-                      <TableHead className="text-right">{t("dashboard.nonEv")} ({t("dashboard.kwh")})</TableHead>
-                      <TableHead className="text-right">{t("dashboard.total")} ({t("dashboard.kwh")})</TableHead>
+                      <TableHead className="text-right">
+                        {t("dashboard.evCharging")} ({t("dashboard.kwh")})
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {t("dashboard.nonEv")} ({t("dashboard.kwh")})
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {t("dashboard.total")} ({t("dashboard.kwh")})
+                      </TableHead>
                       {sessions.length > 0 && <TableHead className="text-right text-emerald-600">{t("dashboard.importPlus")}</TableHead>}
                     </TableRow>
                   </TableHeader>
@@ -859,9 +1003,7 @@ export default function DashboardPage() {
                           <TableCell className="text-right">{formatKwh(m.evKwh)}</TableCell>
                           <TableCell className="text-right">{formatKwh(m.nonEvKwh)}</TableCell>
                           <TableCell className="text-right font-medium">{formatKwh(m.evKwh + m.nonEvKwh)}</TableCell>
-                          {sessions.length > 0 && (
-                            <TableCell className="text-right text-emerald-600">{importKwh > 0 ? `+${formatKwh(importKwh)}` : "—"}</TableCell>
-                          )}
+                          {sessions.length > 0 && <TableCell className="text-right text-emerald-600">{importKwh > 0 ? `+${formatKwh(importKwh)}` : "—"}</TableCell>}
                         </TableRow>
                       );
                     })}
@@ -885,14 +1027,26 @@ export default function DashboardPage() {
           <div className="text-base sm:text-lg font-semibold text-primary text-center md:text-left">{t("common.title")}</div>
           <div className="text-xs sm:text-sm text-muted-foreground text-center md:text-left order-3 md:order-2">
             {t("footer.madeBy")}{" "}
-            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-outline transition-colors">Azuan Alias</a>
+            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-outline transition-colors">
+              Azuan Alias
+            </a>
           </div>
           <div className="flex items-center justify-center gap-3 sm:gap-4 order-2 md:order-3">
-            <a href="https://github.com/azuanalias92" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors">
+            <a
+              href="https://github.com/azuanalias92"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
               <Github className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">{t("footer.github")}</span>
             </a>
-            <a href="https://ko-fi.com/azuanalias" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors">
+            <a
+              href="https://ko-fi.com/azuanalias"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
               <Coffee className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">{t("footer.buyMeCoffee")}</span>
             </a>

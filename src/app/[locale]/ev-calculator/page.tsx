@@ -6,9 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/lib/useTranslation";
-import NavBar from "@/components/NavBar";
-import MobileNav from "@/components/MobileNav";
 import { Coffee, Github, BatteryCharging, Zap } from "lucide-react";
+import AppHeader from "@/components/AppHeader";
 
 function formatMoney(value: number): string {
   return new Intl.NumberFormat("en-MY", { style: "currency", currency: "MYR" }).format(value);
@@ -18,11 +17,10 @@ export default function EvCalculatorPage() {
   const { t, locale } = useTranslation();
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
 
-  const [batteryKwh, setBatteryKwh] = useState("60");
-  const [currentPct, setCurrentPct] = useState("37");
+  const [batteryKwh, setBatteryKwh] = useState("60.22");
+  const [currentPct, setCurrentPct] = useState("20");
   const [targetPct, setTargetPct] = useState("80");
-  const [pricePerKwh, setPricePerKwh] = useState("1.30");
-  const [rateName, setRateName] = useState("Easy Charging");
+  const [pricePerKwh, setPricePerKwh] = useState("1.20");
 
   const bKwh = Number.parseFloat(batteryKwh) || 0;
   const cur = Number.parseFloat(currentPct) || 0;
@@ -41,23 +39,7 @@ export default function EvCalculatorPage() {
 
   return (
     <div className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
-      <div className="w-full max-w-6xl mx-auto text-center mb-6 sm:mb-8">
-        <div className="flex items-center justify-between md:justify-center gap-2 sm:gap-3">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <img src="/logo.svg" alt={t("common.logoAlt")} className="w-8 h-8 sm:w-10 sm:h-10" />
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-800">{t("common.title")}</h1>
-          </div>
-          <div className="md:hidden">
-            <MobileNav locale={locale} />
-          </div>
-        </div>
-
-        <div className="hidden md:flex justify-center mt-4">
-          <NavBar locale={locale} />
-        </div>
-
-        <p className="text-sm sm:text-base text-emerald-600 mt-2">{t("common.description")}</p>
-      </div>
+      <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
 
       <div className="flex-1 w-full max-w-6xl mx-auto space-y-6">
         {/* Input Card */}
@@ -69,6 +51,34 @@ export default function EvCalculatorPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div className="space-y-2">
+                <Label htmlFor="batteryKwh">{t("evCalc.quickPresets")}</Label>
+                <div className="flex flex-row gap-2">
+                  {[
+                    { label: t("evCalc.presets.20to80"), bat: "60.22", cur: "20", tgt: "80", price: "1.20" },
+                    { label: t("evCalc.presets.30to80"), bat: "60.22", cur: "30", tgt: "80", price: "1.20" },
+                    { label: t("evCalc.presets.10to90"), bat: "60.22", cur: "10", tgt: "100", price: "1.20" },
+                    { label: t("evCalc.presets.0to100"), bat: "60.22", cur: "0", tgt: "100", price: "1.20" },
+                  ].map((p) => (
+                    <Button
+                      key={p.label}
+                      variant="default"
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => {
+                        setBatteryKwh(p.bat);
+                        setCurrentPct(p.cur);
+                        setTargetPct(p.tgt);
+                        setPricePerKwh(p.price);
+                      }}
+                    >
+                      {p.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="batteryKwh">{t("evCalc.batteryCapacity")}</Label>
@@ -121,49 +131,6 @@ export default function EvCalculatorPage() {
                 />
               </div>
             </div>
-
-            <div className="mt-4 flex items-center gap-2">
-              <Label htmlFor="rateName" className="text-sm whitespace-nowrap">{t("evCalc.rateName")}</Label>
-              <Input
-                id="rateName"
-                value={rateName}
-                onChange={(e) => setRateName(e.target.value)}
-                className="max-w-[200px]"
-                placeholder={t("evCalc.rateNamePlaceholder")}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Quick Presets */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">{t("evCalc.quickPresets")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: t("evCalc.presets.20to80"), bat: "60", cur: "20", tgt: "80", price: "1.30" },
-                { label: t("evCalc.presets.30to80"), bat: "60", cur: "30", tgt: "80", price: "1.30" },
-                { label: t("evCalc.presets.10to90"), bat: "40", cur: "10", tgt: "90", price: "1.30" },
-                { label: t("evCalc.presets.0to100"), bat: "60", cur: "0", tgt: "100", price: "1.30" },
-              ].map((p) => (
-                <Button
-                  key={p.label}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs"
-                  onClick={() => {
-                    setBatteryKwh(p.bat);
-                    setCurrentPct(p.cur);
-                    setTargetPct(p.tgt);
-                    setPricePerKwh(p.price);
-                  }}
-                >
-                  {p.label}
-                </Button>
-              ))}
-            </div>
           </CardContent>
         </Card>
 
@@ -198,18 +165,11 @@ export default function EvCalculatorPage() {
                         title={`${t("evCalc.afterChargingTitle")} ${tgt}%`}
                       >
                         {/* Label inside the bar */}
-                        {barAdded > 20 && (
-                          <span className="absolute right-1 top-1/2 -translate-y-1/2 text-xs font-bold text-white drop-shadow-sm">
-                            {tgt}%
-                          </span>
-                        )}
+                        {barAdded > 20 && <span className="absolute right-1 top-1/2 -translate-y-1/2 text-xs font-bold text-white drop-shadow-sm">{tgt}%</span>}
                       </div>
                     )}
                     {/* Current charge level marker */}
-                    <div
-                      className="absolute top-0 h-full w-0.5 bg-amber-500 z-10"
-                      style={{ left: `${pctStart}%` }}
-                    />
+                    <div className="absolute top-0 h-full w-0.5 bg-amber-500 z-10" style={{ left: `${pctStart}%` }} />
                   </div>
                   {/* Legend */}
                   <div className="flex justify-center gap-4 mt-3 text-xs text-muted-foreground">
@@ -258,13 +218,9 @@ export default function EvCalculatorPage() {
 
                 <div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30">
                   <p className="text-sm text-muted-foreground">
-                    {t("evCalc.chargingSummaryPrefix")} <strong>{bKwh} kWh</strong>{" "}
-                    {t("evCalc.chargingSummaryBattery")} <strong>{cur}%</strong>{" "}
-                    {t("evCalc.chargingSummaryTo")} <strong>{tgt}%</strong>{" "}
-                    ({pctAdded.toFixed(0)}% {t("evCalc.chargingSummaryCharge")}){" "}
-                    {t("evCalc.chargingSummaryAt")} <strong>{formatMoney(price)}/kWh</strong>{" "}
-                    ({rateName}) {t("evCalc.chargingSummaryCostsApprox")}{" "}
-                    <strong className="text-emerald-700 dark:text-emerald-400">{formatMoney(cost)}</strong>.
+                    {t("evCalc.chargingSummaryPrefix")} <strong>{bKwh} kWh</strong> {t("evCalc.chargingSummaryBattery")} <strong>{cur}%</strong> {t("evCalc.chargingSummaryTo")}{" "}
+                    <strong>{tgt}%</strong> ({pctAdded.toFixed(0)}% {t("evCalc.chargingSummaryCharge")}) {t("evCalc.chargingSummaryAt")} <strong>{formatMoney(price)}/kWh</strong>{" "}
+                    {t("evCalc.chargingSummaryCostsApprox")} <strong className="text-emerald-700 dark:text-emerald-400">{formatMoney(cost)}</strong>.
                   </p>
                 </div>
               </CardContent>
@@ -285,11 +241,21 @@ export default function EvCalculatorPage() {
           </div>
 
           <div className="flex items-center justify-center gap-3 sm:gap-4 order-2 md:order-3">
-            <a href="https://github.com/azuanalias92" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors">
+            <a
+              href="https://github.com/azuanalias92"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
               <Github className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">{t("footer.github")}</span>
             </a>
-            <a href="https://ko-fi.com/azuanalias" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors">
+            <a
+              href="https://ko-fi.com/azuanalias"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
+            >
               <Coffee className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">{t("footer.buyMeCoffee")}</span>
             </a>

@@ -1,7 +1,7 @@
 {
   "common": {
     "title": "Kira Solar",
-    "description": "Kira berapa banyak panel solar yang anda perlukan",
+    "description": "Semua tentang pengiraan tenaga solar dan pengiraan elektrik",
     "addItem": "Tambah Barang",
     "configureSolar": "Konfigurasi Sistem Solar",
     "exportPDF": "Eksport ke PDF",
@@ -252,8 +252,6 @@
     "targetChargePlaceholder": "cth. 80",
     "rate": "Kadar (RM/kWh)",
     "ratePlaceholder": "cth. 1.30",
-    "rateName": "Nama Kadar:",
-    "rateNamePlaceholder": "cth. Easy Charging",
     "quickPresets": "Praset Pantas",
     "presets": {
       "20to80": "20→80% (60kWh)",

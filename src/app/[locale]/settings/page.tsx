@@ -11,9 +11,8 @@ import { getAuthState, clearAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
-import NavBar from "@/components/NavBar";
-import MobileNav from "@/components/MobileNav";
 import { Coffee, Github, LogOut, Sun, Zap, Info } from "lucide-react";
+import AppHeader from "@/components/AppHeader";
 
 interface SolarConfig {
   peakSunHours: number;
@@ -26,16 +25,13 @@ const TARIFF_TYPES = [
   { value: "TNB_DOMESTIC_AM", labelKey: "settings.tariffTnbDomesticAm", descKey: "settings.tariffTnbDomesticAmDesc" },
 ] as const;
 
-function loadTariff(): string {
-  if (typeof window === "undefined") return "TNB_DOMESTIC_TOU";
-  return window.localStorage.getItem("kirasolar.tariff") ?? "TNB_DOMESTIC_TOU";
-}
-
 function saveTariff(value: string) {
   try {
     window.localStorage.setItem("kirasolar.tariff", value);
     window.dispatchEvent(new CustomEvent("kirasolar:tariff", { detail: value }));
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 }
 
 const DEFAULT_SOLAR: SolarConfig = {
@@ -139,17 +135,30 @@ export default function SettingsPage() {
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
 
   const [auth, setAuth] = useState<AuthState | null>(null);
-  const [tariff, setTariff] = useState(loadTariff);
+  const [tariff, setTariff] = useState<string>("TNB_DOMESTIC_TOU");
 
   // Solar config state (form values as strings for controlled inputs)
   const [touRate, setTouRate] = useState<TariffRate | null>(null);
   const [amRate, setAmRate] = useState<TariffRate | null>(null);
   const [ratesLoading, setRatesLoading] = useState(false);
   const [ratesError, setRatesError] = useState<string | null>(null);
-  const [ratesAsOf, setRatesAsOf] = useState<string>(todayIsoDate());
+  const [ratesAsOf, setRatesAsOf] = useState<string>("");
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem("kirasolar.tariff");
+      if (stored === "TNB_DOMESTIC_TOU" || stored === "TNB_DOMESTIC_AM") {
+        setTariff(stored);
+      }
+    } catch {
+      /* ignore */
+    }
+    setRatesAsOf(todayIsoDate());
+  }, []);
 
   // Fetch tariff rates
   useEffect(() => {
+    if (!ratesAsOf) return;
     let canceled = false;
 
     const load = async () => {
@@ -207,7 +216,10 @@ export default function SettingsPage() {
 
     const run = async () => {
       if (!auth?.token) {
-        if (!canceled) { setSolarConfig(DEFAULT_SOLAR); setSolarLoaded(true); }
+        if (!canceled) {
+          setSolarConfig(DEFAULT_SOLAR);
+          setSolarLoaded(true);
+        }
         return;
       }
 
@@ -228,13 +240,20 @@ export default function SettingsPage() {
             });
           }
         }
-      } catch { /* ignore */ } finally {
-        if (!canceled) { setSolarLoaded(true); setSolarLoading(false); }
+      } catch {
+        /* ignore */
+      } finally {
+        if (!canceled) {
+          setSolarLoaded(true);
+          setSolarLoading(false);
+        }
       }
     };
 
     void run();
-    return () => { canceled = true; };
+    return () => {
+      canceled = true;
+    };
   }, [apiBaseUrl, auth?.token]);
 
   const saveSolarConfig = async () => {
@@ -248,9 +267,7 @@ export default function SettingsPage() {
       const getRes = await fetch(`${apiBaseUrl}/calculator/state`, {
         headers: { Authorization: `Bearer ${auth.token}` },
       });
-      const existing = getRes.ok
-        ? (await getRes.json()) as { data: { items: unknown[]; config: SolarConfig } }
-        : { data: { items: [], config: DEFAULT_SOLAR } };
+      const existing = getRes.ok ? ((await getRes.json()) as { data: { items: unknown[]; config: SolarConfig } }) : { data: { items: [], config: DEFAULT_SOLAR } };
 
       // PUT with existing items + updated config
       const res = await fetch(`${apiBaseUrl}/calculator/state`, {
@@ -285,23 +302,7 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col min-h-screen p-4 sm:p-6 lg:p-8 bg-background">
-      <div className="w-full max-w-6xl mx-auto text-center mb-6 sm:mb-8">
-        <div className="flex items-center justify-between md:justify-center gap-2 sm:gap-3">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <img src="/logo.svg" alt={t("common.logoAlt")} className="w-8 h-8 sm:w-10 sm:h-10" />
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-800">{t("common.title")}</h1>
-          </div>
-          <div className="md:hidden">
-            <MobileNav locale={locale} />
-          </div>
-        </div>
-
-        <div className="hidden md:flex justify-center mt-4">
-          <NavBar locale={locale} />
-        </div>
-
-        <p className="text-sm sm:text-base text-emerald-600 mt-2">{t("common.description")}</p>
-      </div>
+      <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
 
       <div className="flex-1 w-full max-w-6xl mx-auto space-y-6">
         {/* Account Section */}
@@ -335,9 +336,7 @@ export default function SettingsPage() {
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{auth.user.name ?? t("settings.defaultUsername")}</p>
                     <p className="text-sm text-muted-foreground truncate">{auth.user.email ?? ""}</p>
-                    <p className="text-xs text-emerald-600 mt-0.5">
-                      {t("settings.syncingStatus")}
-                    </p>
+                    <p className="text-xs text-emerald-600 mt-0.5">{t("settings.syncingStatus")}</p>
                   </div>
                   <Button
                     variant="outline"
@@ -371,9 +370,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {!auth?.token ? (
-              <div className="text-sm text-muted-foreground py-2">
-                {t("settings.signInToConfigure")}
-              </div>
+              <div className="text-sm text-muted-foreground py-2">{t("settings.signInToConfigure")}</div>
             ) : solarLoading ? (
               <div className="text-sm text-muted-foreground py-2">{t("settings.loading")}</div>
             ) : (
@@ -393,9 +390,7 @@ export default function SettingsPage() {
                         if (!isNaN(val)) setSolarConfig((prev) => ({ ...prev, peakSunHours: val }));
                       }}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      {t("settings.peakSunHoursDesc")}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{t("settings.peakSunHoursDesc")}</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="panelWatts">{t("settings.panelWatts")}</Label>
@@ -411,9 +406,7 @@ export default function SettingsPage() {
                         if (!isNaN(val)) setSolarConfig((prev) => ({ ...prev, panelWatts: val }));
                       }}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      {t("settings.panelWattsDesc")}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{t("settings.panelWattsDesc")}</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="systemEfficiency">{t("settings.systemEfficiency")}</Label>
@@ -429,9 +422,7 @@ export default function SettingsPage() {
                         if (!isNaN(val)) setSolarConfig((prev) => ({ ...prev, systemEfficiency: Math.min(100, Math.max(1, val)) }));
                       }}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      {t("settings.systemEfficiencyDesc")}
-                    </p>
+                    <p className="text-xs text-muted-foreground">{t("settings.systemEfficiencyDesc")}</p>
                   </div>
                 </div>
 
@@ -439,11 +430,7 @@ export default function SettingsPage() {
                   <Button onClick={() => void saveSolarConfig()} disabled={solarSaving}>
                     {solarSaving ? t("settings.saving") : t("settings.saveConfig")}
                   </Button>
-                  {solarMessage && (
-                    <span className={`text-sm ${solarMessage.includes("✓") ? "text-emerald-600" : "text-red-600"}`}>
-                      {solarMessage}
-                    </span>
-                  )}
+                  {solarMessage && <span className={`text-sm ${solarMessage.includes("✓") ? "text-emerald-600" : "text-red-600"}`}>{solarMessage}</span>}
                 </div>
 
                 {solarLoaded && (
@@ -470,9 +457,7 @@ export default function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              {t("settings.tariffDescription")}
-            </p>
+            <p className="text-sm text-muted-foreground">{t("settings.tariffDescription")}</p>
 
             <div className="grid gap-3 sm:grid-cols-2">
               {TARIFF_TYPES.map((tt) => (
@@ -503,9 +488,11 @@ export default function SettingsPage() {
 
             {currentTariff && (
               <div className="rounded-lg bg-muted p-3 text-sm">
-                {t("settings.tariffActive")} <strong>{t(currentTariff.labelKey)}</strong> — {t(currentTariff.descKey)}.
-                {" "}{t("settings.tariffViewRates")}{" "}
-                <a href="#tariff-rate-details" className="text-primary underline">{t("settings.below")}</a>.
+                {t("settings.tariffActive")} <strong>{t(currentTariff.labelKey)}</strong> — {t(currentTariff.descKey)}. {t("settings.tariffViewRates")}{" "}
+                <a href="#tariff-rate-details" className="text-primary underline">
+                  {t("settings.below")}
+                </a>
+                .
               </div>
             )}
           </CardContent>
@@ -520,12 +507,7 @@ export default function SettingsPage() {
             </CardTitle>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <div>{t("settings.asOf")}</div>
-              <Input
-                type="date"
-                value={ratesAsOf}
-                onChange={(e) => setRatesAsOf(e.target.value)}
-                className="w-44"
-              />
+              <Input type="date" value={ratesAsOf} onChange={(e) => setRatesAsOf(e.target.value)} className="w-44" />
               {ratesLoading ? <div>{t("settings.loading")}</div> : null}
               {ratesError ? <div className="text-destructive">{ratesError}</div> : null}
             </div>
