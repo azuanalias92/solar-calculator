@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -37,7 +36,6 @@ interface SolarConfig {
 }
 
 export default function Home() {
-  const router = useRouter();
   const { t, locale } = useTranslation();
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
   const [auth, setAuth] = useState<AuthState | null>(null);
@@ -96,13 +94,6 @@ export default function Home() {
       window.removeEventListener("kirasolar:auth", refresh);
     };
   }, []);
-
-  // Redirect logged-in users to dashboard
-  useEffect(() => {
-    if (auth?.token) {
-      router.replace(`/${locale}/dashboard`);
-    }
-  }, [auth, locale, router]);
 
   useEffect(() => {
     let canceled = false;
