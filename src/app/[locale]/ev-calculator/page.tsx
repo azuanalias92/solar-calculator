@@ -21,16 +21,19 @@ export default function EvCalculatorPage() {
   const [currentPct, setCurrentPct] = useState("20");
   const [targetPct, setTargetPct] = useState("80");
   const [pricePerKwh, setPricePerKwh] = useState("1.20");
+  const [drivingRange, setDrivingRange] = useState("");
 
   const bKwh = Number.parseFloat(batteryKwh) || 0;
   const cur = Number.parseFloat(currentPct) || 0;
   const tgt = Number.parseFloat(targetPct) || 0;
   const price = Number.parseFloat(pricePerKwh) || 0;
+  const rangeKm = Number.parseFloat(drivingRange) || 0;
 
   const pctAdded = tgt - cur;
   const kwhNeeded = bKwh > 0 && pctAdded > 0 ? (bKwh * pctAdded) / 100 : 0;
   const cost = kwhNeeded > 0 && price > 0 ? kwhNeeded * price : 0;
   const costPerPct = pctAdded > 0 && cost > 0 ? cost / pctAdded : 0;
+  const kmPerPct = rangeKm > 0 ? rangeKm / 100 : 0;
 
   const pctStart = Math.max(0, Math.min(100, cur));
   const pctEnd = Math.max(0, Math.min(100, tgt));
@@ -79,7 +82,7 @@ export default function EvCalculatorPage() {
                 </div>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="batteryKwh">{t("evCalc.batteryCapacity")}</Label>
                 <Input
@@ -128,6 +131,18 @@ export default function EvCalculatorPage() {
                   value={pricePerKwh}
                   onChange={(e) => setPricePerKwh(e.target.value)}
                   placeholder={t("evCalc.ratePlaceholder")}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="drivingRange">{t("evCalc.drivingRange")}</Label>
+                <Input
+                  id="drivingRange"
+                  type="number"
+                  min="0"
+                  step="1"
+                  value={drivingRange}
+                  onChange={(e) => setDrivingRange(e.target.value)}
+                  placeholder={t("evCalc.drivingRangePlaceholder")}
                 />
               </div>
             </div>
@@ -191,6 +206,7 @@ export default function EvCalculatorPage() {
                   {/* kWh per percent indicator */}
                   <p className="text-center text-xs text-muted-foreground mt-2">
                     1% = {(bKwh / 100).toFixed(2)} kWh
+                    {kmPerPct > 0 && <> = {(kmPerPct).toFixed(0)} km</>}
                   </p>
                 </div>
               </CardContent>

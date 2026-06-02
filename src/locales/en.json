@@ -199,12 +199,12 @@
     "configSaveFailed": "Failed to save",
     "configSaved": "Solar configuration saved ✓",
     "defaultUsername": "User",
-    "loading": "Loading\u2026",
+    "loading": "Loading…",
     "noRateFound": "No rate found.",
     "panelWatts": "Panel Wattage (W)",
-    "panelWattsDesc": "Wattage per solar panel (typical: 300\u2013600W)",
+    "panelWattsDesc": "Wattage per solar panel (typical: 300–600W)",
     "peakSunHours": "Peak Sun Hours",
-    "peakSunHoursDesc": "Avg daily peak sun hours at your location (e.g. Malaysia ~4.5\u20135.5)",
+    "peakSunHoursDesc": "Avg daily peak sun hours at your location (e.g. Malaysia ~4.5–5.5)",
     "rateAfaRate": "AFA Rate (RM/kWh)",
     "rateCapacityCharge": "Capacity Charge (RM/kWh)",
     "rateEffectiveDate": "Effective Date",
@@ -220,7 +220,7 @@
     "rateTariffType": "Tariff Type",
     "rateValue": "Value",
     "saveConfig": "Save Solar Configuration",
-    "saving": "Saving\u2026",
+    "saving": "Saving…",
     "signInPrompt": "Sign in with Google to sync your data to the cloud",
     "signInToConfigure": "Sign in to configure your solar system settings and sync them to the cloud.",
     "signOut": "Sign Out",
@@ -228,7 +228,7 @@
     "summary": "Summary:",
     "syncingStatus": "Syncing data to cloud ✓",
     "systemEfficiency": "System Efficiency (%)",
-    "systemEfficiencyDesc": "Overall system efficiency including inverter losses (typical: 80\u201390%)",
+    "systemEfficiencyDesc": "Overall system efficiency including inverter losses (typical: 80–90%)",
     "tariffActive": "Active:",
     "tariffDescription": "Select your home's TNB electricity tariff to use in bill calculations and the solar calculator.",
     "tariffRateDetails": "Tariff Rate Details",
@@ -274,6 +274,8 @@
     "chargingSummaryTo": "to",
     "chargingSummaryCharge": "charge",
     "chargingSummaryAt": "at",
-    "chargingSummaryCostsApprox": "costs approx"
+    "chargingSummaryCostsApprox": "costs approx",
+    "drivingRange": "Driving Range (km)",
+    "drivingRangePlaceholder": "e.g. 400"
   }
 }

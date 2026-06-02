@@ -199,12 +199,12 @@
     "configSaveFailed": "Gagal menyimpan",
     "configSaved": "Konfigurasi solar disimpan ✓",
     "defaultUsername": "Pengguna",
-    "loading": "Memuatkan\u2026",
+    "loading": "Memuatkan…",
     "noRateFound": "Tiada kadar ditemui.",
     "panelWatts": "Watt Panel (W)",
-    "panelWattsDesc": "Watt setiap panel solar (biasa: 300\u2013600W)",
+    "panelWattsDesc": "Watt setiap panel solar (biasa: 300–600W)",
     "peakSunHours": "Jam Puncak Matahari",
-    "peakSunHoursDesc": "Purata jam puncak matahari harian (cth. Malaysia ~4.5\u20135.5)",
+    "peakSunHoursDesc": "Purata jam puncak matahari harian (cth. Malaysia ~4.5–5.5)",
     "rateAfaRate": "Kadar AFA (RM/kWh)",
     "rateCapacityCharge": "Caj Kapasiti (RM/kWh)",
     "rateEffectiveDate": "Tarikh Berkuat Kuasa",
@@ -220,7 +220,7 @@
     "rateTariffType": "Jenis Tarif",
     "rateValue": "Nilai",
     "saveConfig": "Simpan Konfigurasi Solar",
-    "saving": "Menyimpan\u2026",
+    "saving": "Menyimpan…",
     "signInPrompt": "Log masuk dengan Google untuk menyegerakkan data ke awan",
     "signInToConfigure": "Log masuk untuk mengkonfigurasi sistem solar anda.",
     "signOut": "Log Keluar",
@@ -228,7 +228,7 @@
     "summary": "Ringkasan:",
     "syncingStatus": "Menyegerakkan data ke awan ✓",
     "systemEfficiency": "Kecekapan Sistem (%)",
-    "systemEfficiencyDesc": "Kecekapan keseluruhan sistem termasuk kehilangan inverter (biasa: 80\u201390%)",
+    "systemEfficiencyDesc": "Kecekapan keseluruhan sistem termasuk kehilangan inverter (biasa: 80–90%)",
     "tariffActive": "Aktif:",
     "tariffDescription": "Pilih tarif elektrik TNB rumah anda untuk pengiraan bil dan kalkulator solar.",
     "tariffRateDetails": "Butiran Kadar Tarif",
@@ -274,6 +274,8 @@
     "chargingSummaryTo": "ke",
     "chargingSummaryCharge": "caj",
     "chargingSummaryAt": "pada",
-    "chargingSummaryCostsApprox": "berjumlah lebih kurang"
+    "chargingSummaryCostsApprox": "berjumlah lebih kurang",
+    "drivingRange": "Jarak Pemanduan (km)",
+    "drivingRangePlaceholder": "cth. 400"
   }
 }
