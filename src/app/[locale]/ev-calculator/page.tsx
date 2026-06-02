@@ -54,7 +54,7 @@ export default function EvCalculatorPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               <div className="space-y-2">
                 <Label htmlFor="batteryKwh">{t("evCalc.quickPresets")}</Label>
-                <div className="flex flex-row gap-2">
+                <div className="flex flex-wrap gap-2">
                   {[
                     { label: t("evCalc.presets.20to80"), bat: "60.22", cur: "20", tgt: "80", price: "1.20" },
                     { label: t("evCalc.presets.30to80"), bat: "60.22", cur: "30", tgt: "80", price: "1.20" },
