@@ -13,6 +13,13 @@ function getLocale(request: NextRequest): string {
     return pathname.split("/")[1];
   }
 
+  // 1. Check saved cookie preference first
+  const cookieLocale = request.cookies.get("preferred_lang")?.value;
+  if (cookieLocale && locales.includes(cookieLocale)) {
+    return cookieLocale;
+  }
+
+  // 2. Fall back to browser Accept-Language
   const acceptLanguage = request.headers.get("accept-language");
   if (acceptLanguage) {
     const preferredLocale = acceptLanguage
