@@ -573,20 +573,20 @@ export default function Home() {
                   <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" />
                   {t("dashboard.peak")}:{" "}
                   <strong>
-                    ${formatKwh(dailyTotals.peak)} {t("dashboard.kwh")}
+                  {formatKwh(dailyTotals.peak)} {t("dashboard.kwh")}
                   </strong>
                 </div>
                 <div className="flex items-center gap-1">
                   <span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />
                   {t("dashboard.offPeak")}:{" "}
                   <strong>
-                    ${formatKwh(dailyTotals.offPeak)} {t("dashboard.kwh")}
+                  {formatKwh(dailyTotals.offPeak)} {t("dashboard.kwh")}
                   </strong>
                 </div>
                 <div>
                   {t("dashboard.total")}:{" "}
                   <strong>
-                    ${formatKwh(dailyTotals.total)} {t("dashboard.kwh")}
+                    {formatKwh(dailyTotals.total)} {t("dashboard.kwh")}
                   </strong>
                 </div>
               </div>
@@ -651,9 +651,9 @@ export default function Home() {
                       {dailyData.map((d) => (
                         <TableRow key={d.date}>
                           <TableCell className="font-medium">{formatDisplayDate(d.date)}</TableCell>
-                          <TableCell className="text-right">${formatKwh(d.peakKwh)}</TableCell>
-                          <TableCell className="text-right">${formatKwh(d.offPeakKwh)}</TableCell>
-                          <TableCell className="text-right font-medium">${formatKwh(d.peakKwh + d.offPeakKwh)}</TableCell>
+                          <TableCell className="text-right">{formatKwh(d.peakKwh)}</TableCell>
+                          <TableCell className="text-right">{formatKwh(d.offPeakKwh)}</TableCell>
+                          <TableCell className="text-right font-medium">{formatKwh(d.peakKwh + d.offPeakKwh)}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
@@ -676,7 +676,7 @@ export default function Home() {
                   <span>
                     {t("dashboard.total")}:{" "}
                     <strong>
-                      ${formatKwh(summaryData.reduce((s, m) => s + m.totalKwh, 0))} {t("dashboard.kwh")}
+                      {formatKwh(summaryData.reduce((s, m) => s + m.totalKwh, 0))} {t("dashboard.kwh")}
                     </strong>
                   </span>
                   <span>
@@ -762,9 +762,9 @@ export default function Home() {
                         {summaryData.map((s) => (
                           <TableRow key={s.month} className={s.month === selectedMonth ? "bg-emerald-100/80 dark:bg-emerald-900/30" : ""}>
                             <TableCell className="font-medium">{monthLabel(s.month)}</TableCell>
-                            <TableCell className="text-right">${formatKwh(s.peakKwh)}</TableCell>
-                            <TableCell className="text-right">${formatKwh(s.offPeakKwh)}</TableCell>
-                            <TableCell className="text-right font-medium">${formatKwh(s.totalKwh)}</TableCell>
+                            <TableCell className="text-right">{formatKwh(s.peakKwh)}</TableCell>
+                            <TableCell className="text-right">{formatKwh(s.offPeakKwh)}</TableCell>
+                            <TableCell className="text-right font-medium">{formatKwh(s.totalKwh)}</TableCell>
                             <TableCell className="text-right">{s.billAmount != null ? formatMoney(s.billAmount) : "—"}</TableCell>
                           </TableRow>
                         ))}
@@ -888,7 +888,7 @@ export default function Home() {
                     )}
                     {/* Center total */}
                     <text x="75" y="70" textAnchor="middle" className="fill-foreground" fontSize="22" fontWeight="bold">
-                      ${formatKwh(total)}
+                      {formatKwh(total)}
                     </text>
                     <text x="75" y="92" textAnchor="middle" className="fill-muted-foreground" fontSize="12">
                       kWh
@@ -897,11 +897,11 @@ export default function Home() {
                   <div className="flex gap-6 mt-2">
                     <span className="flex items-center gap-1.5 text-sm">
                       <span className="inline-block w-3 h-3 rounded-sm bg-sky-500" />
-                      <strong>${formatKwh(evTotal)}</strong> kWh ({evPct}%)
+                      <strong>{formatKwh(evTotal)}</strong> kWh ({evPct}%)
                     </span>
                     <span className="flex items-center gap-1.5 text-sm">
                       <span className="inline-block w-3 h-3 rounded-sm bg-emerald-600" />
-                      <strong>${formatKwh(nonEvTotal)}</strong> kWh ({nonEvPct}%)
+                      <strong>{formatKwh(nonEvTotal)}</strong> kWh ({nonEvPct}%)
                     </span>
                   </div>
                 </div>
@@ -947,7 +947,7 @@ export default function Home() {
                             </div>
                             <div className="text-xs text-muted-foreground">{monthLabel(m.month)}</div>
                             <div className="text-xs font-medium">
-                              ${formatKwh(m.totalKwh)} {t("dashboard.kwh")}
+                              {formatKwh(m.totalKwh)} {t("dashboard.kwh")}
                             </div>
                           </div>
                         );
@@ -983,12 +983,12 @@ export default function Home() {
                       return (
                         <TableRow key={m.month} className={m.month === selectedMonth ? "bg-emerald-100/80 dark:bg-emerald-900/30" : ""}>
                           <TableCell className="font-medium">{monthLabel(m.month)}</TableCell>
-                          <TableCell>${formatKwh(m.totalKwh)}</TableCell>
+                          <TableCell>{formatKwh(m.totalKwh)}</TableCell>
                           <TableCell>
-                            <span className="text-sky-600">${formatKwh(m.evKwh)}</span>
+                            <span className="text-sky-600">{formatKwh(m.evKwh)}</span>
                           </TableCell>
                           <TableCell>
-                            <span className="text-emerald-600">${formatKwh(m.nonEvKwh)}</span>
+                            <span className="text-emerald-600">{formatKwh(m.nonEvKwh)}</span>
                           </TableCell>
                           <TableCell className="text-right">{evPct.toFixed(1)}%</TableCell>
                         </TableRow>
@@ -1020,7 +1020,7 @@ export default function Home() {
                 <span>
                   {t("dashboard.total")}:{" "}
                   <strong>
-                    ${formatKwh(sessionTotals.kwh)} {t("dashboard.kwh")}
+                    {formatKwh(sessionTotals.kwh)} {t("dashboard.kwh")}
                   </strong>
                 </span>
                 <span>
