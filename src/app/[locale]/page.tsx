@@ -113,12 +113,64 @@ export default function Home() {
     };
   }, []);
 
+  // ── Global Filters ──
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedMonth, setSelectedMonth] = useState(nowDate.month);
+  const [availableYears, setAvailableYears] = useState<number[]>([currentYear]);
+
+  // Collect available years from both daily-usage and ev-usage endpoints
+  useEffect(() => {
+    let canceled = false;
+    const run = async () => {
+      if (!auth?.token) {
+        if (!canceled) setAvailableYears([currentYear]);
+        return;
+      }
+      const yearsSet = new Set<number>([currentYear]);
+      try {
+        const usageRes = await fetch(`${apiBaseUrl}/daily-usage/years`, {
+          headers: { Authorization: `Bearer ${auth.token}` },
+        });
+        if (usageRes.ok) {
+          const p = (await usageRes.json()) as { years: number[] };
+          for (const y of p.years ?? []) yearsSet.add(y);
+        }
+      } catch {
+        /* ignore */
+      }
+      try {
+        const evRes = await fetch(`${apiBaseUrl}/ev-usage/years`, {
+          headers: { Authorization: `Bearer ${auth.token}` },
+        });
+        if (evRes.ok) {
+          const p = (await evRes.json()) as { years: number[] };
+          for (const y of p.years ?? []) yearsSet.add(y);
+        }
+      } catch {
+        /* ignore */
+      }
+      const sorted = Array.from(yearsSet)
+        .filter((y) => Number.isFinite(y))
+        .sort((a, b) => b - a);
+      if (!canceled) setAvailableYears(sorted.length ? sorted : [currentYear]);
+    };
+    void run();
+    return () => {
+      canceled = true;
+    };
+  }, [apiBaseUrl, auth?.token, currentYear]);
+
+  // Sync selectedYear to available years
+  useEffect(() => {
+    if (!availableYears.includes(selectedYear) && availableYears.length > 0) {
+      setSelectedYear(availableYears[0]);
+    }
+  }, [availableYears, selectedYear]);
+
   // ═══════════════════════════════════════════════
   // SECTION 1: Daily Energy Usage
   // ═══════════════════════════════════════════════
 
-  const [usageYear, setUsageYear] = useState(nowDate.year);
-  const [usageMonth, setUsageMonth] = useState(nowDate.month);
   const [dailyData, setDailyData] = useState<DailyUsageItem[]>([]);
   const [summaryData, setSummaryData] = useState<DailyUsageSummaryItem[]>([]);
   const [loadingDaily, setLoadingDaily] = useState(false);
@@ -134,7 +186,7 @@ export default function Home() {
       setLoadingDaily(true);
       setUsageMsg(null);
       try {
-        const res = await fetch(`${apiBaseUrl}/daily-usage?year=${usageYear}&month=${usageMonth}`, {
+        const res = await fetch(`${apiBaseUrl}/daily-usage?year=${selectedYear}&month=${selectedMonth}`, {
           headers: { Authorization: `Bearer ${auth.token}` },
         });
         if (!res.ok) {
@@ -153,7 +205,7 @@ export default function Home() {
     return () => {
       canceled = true;
     };
-  }, [apiBaseUrl, auth?.token, usageYear, usageMonth]);
+  }, [apiBaseUrl, auth?.token, selectedYear, selectedMonth]);
 
   useEffect(() => {
     if (!auth?.token) return;
@@ -161,7 +213,7 @@ export default function Home() {
     const run = async () => {
       setLoadingSummary(true);
       try {
-        const res = await fetch(`${apiBaseUrl}/daily-usage/summary?year=${usageYear}`, {
+        const res = await fetch(`${apiBaseUrl}/daily-usage/summary?year=${selectedYear}`, {
           headers: { Authorization: `Bearer ${auth.token}` },
         });
         if (!res.ok) {
@@ -180,7 +232,7 @@ export default function Home() {
     return () => {
       canceled = true;
     };
-  }, [apiBaseUrl, auth?.token, usageYear]);
+  }, [apiBaseUrl, auth?.token, selectedYear]);
 
   const dailyTotals = useMemo(() => {
     const peak = dailyData.reduce((s, d) => s + d.peakKwh, 0);
@@ -238,10 +290,10 @@ export default function Home() {
       }
       setUsageMsg(`${t("dashboard.uploaded")} ${rows.length} ${t("dashboard.days")}!`);
       const [dailyRes, summaryRes] = await Promise.all([
-        fetch(`${apiBaseUrl}/daily-usage?year=${usageYear}&month=${usageMonth}`, {
+        fetch(`${apiBaseUrl}/daily-usage?year=${selectedYear}&month=${selectedMonth}`, {
           headers: { Authorization: `Bearer ${auth.token}` },
         }),
-        fetch(`${apiBaseUrl}/daily-usage/summary?year=${usageYear}`, {
+        fetch(`${apiBaseUrl}/daily-usage/summary?year=${selectedYear}`, {
           headers: { Authorization: `Bearer ${auth.token}` },
         }),
       ]);
@@ -265,58 +317,9 @@ export default function Home() {
   // SECTION 2: EV vs Non-EV (Bill EV)
   // ═══════════════════════════════════════════════
 
-  const [billEvYear, setBillEvYear] = useState(currentYear);
-  const [availableYears, setAvailableYears] = useState<number[]>([currentYear]);
   const [billEvData, setBillEvData] = useState<MonthSummary[]>([]);
   const [loadingBillEv, setLoadingBillEv] = useState(false);
   const [billEvError, setBillEvError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let canceled = false;
-    const run = async () => {
-      if (!auth?.token) {
-        if (!canceled) setAvailableYears([currentYear]);
-        return;
-      }
-      const yearsSet = new Set<number>([currentYear]);
-      try {
-        const usageRes = await fetch(`${apiBaseUrl}/daily-usage/years`, {
-          headers: { Authorization: `Bearer ${auth.token}` },
-        });
-        if (usageRes.ok) {
-          const p = (await usageRes.json()) as { years: number[] };
-          for (const y of p.years ?? []) yearsSet.add(y);
-        }
-      } catch {
-        /* ignore */
-      }
-      try {
-        const evRes = await fetch(`${apiBaseUrl}/ev-usage/years`, {
-          headers: { Authorization: `Bearer ${auth.token}` },
-        });
-        if (evRes.ok) {
-          const p = (await evRes.json()) as { years: number[] };
-          for (const y of p.years ?? []) yearsSet.add(y);
-        }
-      } catch {
-        /* ignore */
-      }
-      const sorted = Array.from(yearsSet)
-        .filter((y) => Number.isFinite(y))
-        .sort((a, b) => b - a);
-      if (!canceled) setAvailableYears(sorted.length ? sorted : [currentYear]);
-    };
-    void run();
-    return () => {
-      canceled = true;
-    };
-  }, [apiBaseUrl, auth?.token, currentYear]);
-
-  useEffect(() => {
-    if (availableYears.includes(billEvYear)) return;
-    if (availableYears.length === 0) return;
-    setBillEvYear(availableYears[0]);
-  }, [availableYears, billEvYear]);
 
   useEffect(() => {
     let canceled = false;
@@ -330,10 +333,10 @@ export default function Home() {
       }
       try {
         const [usageRes, evRes] = await Promise.all([
-          fetch(`${apiBaseUrl}/daily-usage/summary?year=${encodeURIComponent(String(billEvYear))}`, {
+          fetch(`${apiBaseUrl}/daily-usage/summary?year=${encodeURIComponent(String(selectedYear))}`, {
             headers: { Authorization: `Bearer ${auth.token}` },
           }),
-          fetch(`${apiBaseUrl}/ev-usage?year=${encodeURIComponent(String(billEvYear))}`, {
+          fetch(`${apiBaseUrl}/ev-usage?year=${encodeURIComponent(String(selectedYear))}`, {
             headers: { Authorization: `Bearer ${auth.token}` },
           }),
         ]);
@@ -365,7 +368,7 @@ export default function Home() {
     return () => {
       canceled = true;
     };
-  }, [apiBaseUrl, auth?.token, billEvYear]);
+  }, [apiBaseUrl, auth?.token, selectedYear]);
 
   const billEvTotals = useMemo(() => {
     return billEvData.reduce((acc, m) => ({ evTotal: acc.evTotal + m.evKwh, nonEvTotal: acc.nonEvTotal + m.nonEvKwh, grandTotal: acc.grandTotal + m.totalKwh }), {
@@ -382,8 +385,6 @@ export default function Home() {
   // SECTION 3: EV Charging Import
   // ═══════════════════════════════════════════════
 
-  const [evYear, setEvYear] = useState(currentYear);
-  const [evAvailableYears, setEvAvailableYears] = useState<number[]>([currentYear]);
   const [existingEvData, setExistingEvData] = useState<MonthUsage[]>(() => emptyYearData());
   const [loadingEv, setLoadingEv] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -395,28 +396,9 @@ export default function Home() {
     if (!auth?.token) return;
     let canceled = false;
     const run = async () => {
-      try {
-        const res = await fetch(`${apiBaseUrl}/ev-usage/years`, {
-          headers: { Authorization: `Bearer ${auth.token}` },
-        });
-        if (!res.ok) return;
-        const p = (await res.json()) as { years: number[] };
-        if (!canceled) setEvAvailableYears(dedupeYears([currentYear, ...(p.years ?? [])]));
-      } catch {}
-    };
-    void run();
-    return () => {
-      canceled = true;
-    };
-  }, [apiBaseUrl, auth?.token, currentYear]);
-
-  useEffect(() => {
-    if (!auth?.token) return;
-    let canceled = false;
-    const run = async () => {
       setLoadingEv(true);
       try {
-        const res = await fetch(`${apiBaseUrl}/ev-usage?year=${evYear}`, {
+        const res = await fetch(`${apiBaseUrl}/ev-usage?year=${selectedYear}`, {
           headers: { Authorization: `Bearer ${auth.token}` },
         });
         if (!res.ok) return;
@@ -433,7 +415,7 @@ export default function Home() {
     return () => {
       canceled = true;
     };
-  }, [apiBaseUrl, auth?.token, evYear]);
+  }, [apiBaseUrl, auth?.token, selectedYear]);
 
   const handleParse = () => {
     const lines = rawInput.split("\n").filter((l) => l.trim());
@@ -483,7 +465,7 @@ export default function Home() {
       nonEvKwh: m.nonEvKwh,
     }));
     try {
-      const res = await fetch(`${apiBaseUrl}/ev-usage?year=${evYear}`, {
+      const res = await fetch(`${apiBaseUrl}/ev-usage?year=${selectedYear}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         body: JSON.stringify({ data: updatedData }),
@@ -496,7 +478,6 @@ export default function Home() {
       setExistingEvData(result.data ?? emptyYearData());
       setSessions([]);
       setRawInput("");
-      setEvAvailableYears((prev) => dedupeYears([evYear, ...prev]));
       setEvMsg(t("dashboard.saved"));
       setTimeout(() => setEvMsg(null), 3000);
     } catch {
@@ -514,6 +495,32 @@ export default function Home() {
     <div className="flex flex-col min-h-screen p-2 sm:p-6 lg:p-8 bg-background">
       <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
 
+      {/* ── Global Year/Month Filter ── */}
+      <div className="w-full max-w-6xl mx-auto py-4 flex items-center justify-end gap-3">
+        <select
+          value={String(selectedYear)}
+          onChange={(e) => setSelectedYear(Number.parseInt(e.target.value, 10))}
+          className="flex h-9 w-28 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm"
+        >
+          {availableYears.map((y) => (
+            <option key={y} value={String(y)}>
+              {y}
+            </option>
+          ))}
+        </select>
+        <select
+          value={String(selectedMonth)}
+          onChange={(e) => setSelectedMonth(Number.parseInt(e.target.value, 10))}
+          className="flex h-9 w-28 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm"
+        >
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+            <option key={m} value={String(m)}>
+              {monthLabel(m)}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="flex-1 w-full max-w-6xl mx-auto space-y-6">
         {/* ════════════════════════ SECTION 1: Daily Energy Usage ════════════════════════ */}
         <Card>
@@ -523,30 +530,6 @@ export default function Home() {
                 <BarChart3 className="w-5 h-5 text-emerald-600" />
                 {t("dashboard.dailyEnergyUsage")}
               </CardTitle>
-              <div className="flex items-center gap-3">
-                <select
-                  value={String(usageYear)}
-                  onChange={(e) => setUsageYear(Number.parseInt(e.target.value, 10))}
-                  className="flex h-9 w-24 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm"
-                >
-                  {Array.from({ length: 5 }, (_, i) => nowDate.year - 2 + i).map((y) => (
-                    <option key={y} value={String(y)}>
-                      {y}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={String(usageMonth)}
-                  onChange={(e) => setUsageMonth(Number.parseInt(e.target.value, 10))}
-                  className="flex h-9 w-28 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm"
-                >
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                    <option key={m} value={String(m)}>
-                      {monthLabel(m)}
-                    </option>
-                  ))}
-                </select>
-              </div>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground">
               <span>
@@ -570,7 +553,7 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <CalendarDays className="w-4 h-4 text-emerald-600" />
-                {monthLabel(usageMonth)} {usageYear} — {t("dashboard.dailyConsumption")}
+                {monthLabel(selectedMonth)} {selectedYear} — {t("dashboard.dailyConsumption")}
               </CardTitle>
               <div className="flex flex-wrap gap-4 text-sm">
                 <div className="flex items-center gap-1">
@@ -669,7 +652,7 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <BarChart3 className="w-4 h-4 text-emerald-600" />
-                {t("dashboard.monthlyBillSummary")} — {usageYear}
+                {t("dashboard.monthlyBillSummary")} — {selectedYear}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -691,7 +674,7 @@ export default function Home() {
                     </TableHeader>
                     <TableBody>
                       {summaryData.map((s) => (
-                        <TableRow key={s.month} className={s.month === usageMonth ? "bg-emerald-50/50 dark:bg-emerald-950/20" : ""}>
+                        <TableRow key={s.month} className={s.month === selectedMonth ? "bg-emerald-50/50 dark:bg-emerald-950/20" : ""}>
                           <TableCell className="font-medium">{monthLabel(s.month)}</TableCell>
                           <TableCell className="text-right">{formatKwh(s.peakKwh)}</TableCell>
                           <TableCell className="text-right">{formatKwh(s.offPeakKwh)}</TableCell>
@@ -713,19 +696,8 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <CardTitle className="flex items-center gap-2">
                 <Fuel className="w-5 h-5 text-emerald-600" />
-                {t("dashboard.evVsNonEv")}
+                {t("dashboard.evVsNonEv")} — {selectedYear}
               </CardTitle>
-              <select
-                value={String(billEvYear)}
-                onChange={(e) => setBillEvYear(Number.parseInt(e.target.value, 10))}
-                className="flex h-9 w-28 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm"
-              >
-                {availableYears.map((y) => (
-                  <option key={y} value={String(y)}>
-                    {y}
-                  </option>
-                ))}
-              </select>
             </div>
             <div className="text-sm text-muted-foreground">
               {!auth?.token ? (
@@ -741,7 +713,7 @@ export default function Home() {
                 <span className="text-emerald-600">{t("dashboard.dataLoaded")}</span>
               ) : (
                 <span>
-                  {t("dashboard.noDataFor")} {billEvYear}
+                  {t("dashboard.noDataFor")} {selectedYear}
                 </span>
               )}
             </div>
@@ -850,7 +822,7 @@ export default function Home() {
                         <strong>Expected format per line:</strong>
                       </p>
                       <pre className="bg-muted p-2 rounded mt-1 text-[10px] sm:text-xs overflow-x-auto whitespace-nowrap">
-254902721  Azuan Alias  2026-05-24  00:06:39  2026-05-24  10:13:03  10H06M  61.0  17.57</pre>
+254902721  Azuan Alias  2026-06-05  00:06:39  2026-06-05  10:13:03  10H06M  61.0  17.57</pre>
                     </details>
                     <Textarea placeholder={t("dashboard.pastePlaceholder")} value={rawInput} onChange={(e) => setRawInput(e.target.value)} rows={6} className="font-mono text-sm" />
                     <div className="flex gap-2">
@@ -861,7 +833,7 @@ export default function Home() {
                       {sessions.length > 0 && auth?.token && (
                         <Button onClick={handleSaveEv} variant="secondary" disabled={saving}>
                           {saving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Zap className="w-4 h-4 mr-1" />}
-                          {saving ? t("dashboard.saving") : `${t("dashboard.saveTo")} ${evYear}`}
+                          {saving ? t("dashboard.saving") : `${t("dashboard.saveTo")} ${selectedYear}`}
                         </Button>
                       )}
                     </div>
@@ -887,7 +859,7 @@ export default function Home() {
                   {billEvData.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} className="text-center text-muted-foreground py-6">
-                        {!auth?.token ? t("dashboard.loginToView") : loadingBillEv ? t("dashboard.loading") : `${t("dashboard.noDataFor")} ${billEvYear}.`}
+                        {!auth?.token ? t("dashboard.loginToView") : loadingBillEv ? t("dashboard.loading") : `${t("dashboard.noDataFor")} ${selectedYear}.`}
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -979,17 +951,6 @@ export default function Home() {
                 <Zap className="w-4 h-4 text-emerald-600" />
                 {t("dashboard.evMonthlyBreakdown")}
               </CardTitle>
-              <select
-                value={String(evYear)}
-                onChange={(e) => setEvYear(Number.parseInt(e.target.value, 10))}
-                className="flex h-9 w-28 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm"
-              >
-                {evAvailableYears.map((y) => (
-                  <option key={y} value={String(y)}>
-                    {y}
-                  </option>
-                ))}
-              </select>
             </div>
             <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
               <span>
