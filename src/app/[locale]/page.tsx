@@ -618,8 +618,8 @@ export default function Home() {
                           value === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak")
                         }
                       />
-                      <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} />
-                      <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" radius={[0, 0, 4, 4]} maxBarSize={32} />
+                      <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" maxBarSize={32} />
+                      <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" maxBarSize={32} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -707,8 +707,8 @@ export default function Home() {
                           ]}
                         />
                         <Legend formatter={(value: unknown) => value === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak")} />
-                        <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} />
-                        <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" radius={[0, 0, 4, 4]} maxBarSize={32} />
+                        <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" maxBarSize={32} />
+                        <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" maxBarSize={32} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -897,8 +897,8 @@ export default function Home() {
                         ]}
                       />
                       <Legend formatter={(value: unknown) => value === "evKwh" || value === "evCharging" ? t("dashboard.evCharging") : t("dashboard.nonEv")} />
-                      <Bar dataKey="evKwh" name="evCharging" stackId="a" fill="#0ea5e9" radius={[4, 4, 0, 0]} maxBarSize={32} />
-                      <Bar dataKey="nonEvKwh" name="nonEv" stackId="a" fill="#059669" radius={[0, 0, 4, 4]} maxBarSize={32} />
+                      <Bar dataKey="evKwh" name="evCharging" stackId="a" fill="#0ea5e9" maxBarSize={32} />
+                      <Bar dataKey="nonEvKwh" name="nonEv" stackId="a" fill="#059669" maxBarSize={32} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
