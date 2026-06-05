@@ -119,12 +119,21 @@ export default function Home() {
   const [availableYears, setAvailableYears] = useState<number[]>([currentYear]);
   const [barTooltip, setBarTooltip] = useState<string | null>(null);
 
-  // Dismiss bar tooltip on outside click
+  // Dismiss bar tooltip on outside pointer
+  const tooltipDismissed = useRef(false);
   useEffect(() => {
     if (!barTooltip) return;
-    const handler = () => setBarTooltip(null);
-    document.addEventListener("click", handler);
-    return () => document.removeEventListener("click", handler);
+    tooltipDismissed.current = false;
+    const handler = () => {
+      if (!tooltipDismissed.current) setBarTooltip(null);
+      tooltipDismissed.current = true;
+    };
+    // Delay adding listener so current pointer event doesn't trigger it
+    const id = setTimeout(() => document.addEventListener("pointerdown", handler), 50);
+    return () => {
+      clearTimeout(id);
+      document.removeEventListener("pointerdown", handler);
+    };
   }, [barTooltip]);
 
   // Collect available years from both daily-usage and ev-usage endpoints
@@ -594,15 +603,15 @@ export default function Home() {
                           <div key={d.date} className="flex-1 flex flex-col items-center gap-1">
                             <div className="w-full h-40 flex flex-col justify-end">
                                   <div
-                                    className="w-full bg-amber-500 rounded-t-sm transition-all"
+                                    className="w-full bg-amber-500 rounded-t-sm transition-all cursor-pointer"
                                     style={{ height: `${Math.max(peakPct, 0.5)}%` }}
                                     title={`Peak: ${formatKwh(d.peakKwh)} kWh`}
-                                    onClick={(e) => { e.stopPropagation(); setBarTooltip(`Peak: ${formatKwh(d.peakKwh)} kWh`); }} />
+                                    onPointerDown={(e) => { e.stopPropagation(); setBarTooltip(`Peak: ${formatKwh(d.peakKwh)} kWh`); }} />
                                   <div
-                                    className="w-full bg-emerald-600 transition-all"
+                                    className="w-full bg-emerald-600 transition-all cursor-pointer"
                                     style={{ height: `${Math.max(offPeakPct - peakPct, 0.5)}%` }}
                                     title={`Off-Peak: ${formatKwh(d.offPeakKwh)} kWh`}
-                                    onClick={(e) => { e.stopPropagation(); setBarTooltip(`Off-Peak: ${formatKwh(d.offPeakKwh)} kWh`); }} />
+                                    onPointerDown={(e) => { e.stopPropagation(); setBarTooltip(`Off-Peak: ${formatKwh(d.offPeakKwh)} kWh`); }} />
                             </div>
                             <div className="text-[10px] text-muted-foreground">{getDay(d.date)}</div>
                           </div>
@@ -686,15 +695,15 @@ export default function Home() {
                               <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
                                 <div className="w-full h-56 flex flex-col justify-end">
                                   <div
-                                    className="w-full bg-amber-500 rounded-t-sm"
+                                    className="w-full bg-amber-500 rounded-t-sm cursor-pointer"
                                     style={{ height: `${Math.max(peakPct, 0.5)}%` }}
                                     title={`Peak: ${formatKwh(m.peakKwh)} kWh`}
-                                    onClick={(e) => { e.stopPropagation(); setBarTooltip(`Peak: ${formatKwh(m.peakKwh)} kWh`); }} />
+                                    onPointerDown={(e) => { e.stopPropagation(); setBarTooltip(`Peak: ${formatKwh(m.peakKwh)} kWh`); }} />
                                   <div
-                                    className="w-full bg-emerald-600 rounded-b-sm"
+                                    className="w-full bg-emerald-600 rounded-b-sm cursor-pointer"
                                     style={{ height: `${Math.max(totalPct - peakPct, 0.5)}%` }}
                                     title={`Off-Peak: ${formatKwh(m.offPeakKwh)} kWh`}
-                                    onClick={(e) => { e.stopPropagation(); setBarTooltip(`Off-Peak: ${formatKwh(m.offPeakKwh)} kWh`); }} />
+                                    onPointerDown={(e) => { e.stopPropagation(); setBarTooltip(`Off-Peak: ${formatKwh(m.offPeakKwh)} kWh`); }} />
                                 </div>
                                 <div className="text-xs text-muted-foreground">{monthLabel(m.month)}</div>
                               </div>
@@ -897,15 +906,15 @@ export default function Home() {
                           <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
                             <div className="w-full h-56 flex flex-col justify-end">
                                   <div
-                                    className="w-full bg-sky-500 rounded-t-sm"
+                                    className="w-full bg-sky-500 rounded-t-sm cursor-pointer"
                                     style={{ height: `${Math.round(evPct * 100)}%` }}
                                     title={`EV: ${formatKwh(m.evKwh)} kWh`}
-                                    onClick={(e) => { e.stopPropagation(); setBarTooltip(`EV: ${formatKwh(m.evKwh)} kWh`); }} />
+                                    onPointerDown={(e) => { e.stopPropagation(); setBarTooltip(`EV: ${formatKwh(m.evKwh)} kWh`); }} />
                                   <div
-                                    className="w-full bg-emerald-600 rounded-b-sm"
+                                    className="w-full bg-emerald-600 rounded-b-sm cursor-pointer"
                                     style={{ height: `${Math.round(nonEvPct * 100)}%` }}
                                     title={`Non-EV: ${formatKwh(m.nonEvKwh)} kWh`}
-                                    onClick={(e) => { e.stopPropagation(); setBarTooltip(`Non-EV: ${formatKwh(m.nonEvKwh)} kWh`); }} />
+                                    onPointerDown={(e) => { e.stopPropagation(); setBarTooltip(`Non-EV: ${formatKwh(m.nonEvKwh)} kWh`); }} />
                             </div>
                             <div className="text-xs text-muted-foreground">{monthLabel(m.month)}</div>
                             <div className="text-xs font-medium">
