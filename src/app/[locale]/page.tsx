@@ -890,12 +890,12 @@ export default function Home() {
                               <div
                                 className="w-full bg-sky-500 rounded-t-sm"
                                 style={{ height: `${Math.round(evPct * 100)}%` }}
-                                aria-label={`${monthLabel(m.month)} ${t("dashboard.evCharging")} ${formatKwh(m.evKwh)} ${t("dashboard.kwh")}`}
+                                title={`${monthLabel(m.month)} EV: ${formatKwh(m.evKwh)} ${t("dashboard.kwh")}`}
                               />
                               <div
                                 className="w-full bg-emerald-600 rounded-b-sm"
                                 style={{ height: `${Math.round(nonEvPct * 100)}%` }}
-                                aria-label={`${monthLabel(m.month)} ${t("dashboard.nonEv")} ${formatKwh(m.nonEvKwh)} ${t("dashboard.kwh")}`}
+                                title={`${monthLabel(m.month)} Non-EV: ${formatKwh(m.nonEvKwh)} ${t("dashboard.kwh")}`}
                               />
                             </div>
                             <div className="text-xs text-muted-foreground">{monthLabel(m.month)}</div>
