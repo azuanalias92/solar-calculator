@@ -9,7 +9,7 @@ import { getAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
 import { Coffee, Github, BarChart3, CalendarDays, Upload, Loader2, Car, Zap, Sun, BatteryCharging, Fuel, Plus } from "lucide-react";
-import * as Tooltip from "@radix-ui/react-tooltip";
+import * as Popover from "@radix-ui/react-popover";
 import AppHeader from "@/components/AppHeader";
 import {
   Dialog,
@@ -493,7 +493,6 @@ export default function Home() {
   // ═══════════════════════════════════════════════
 
   return (
-    <Tooltip.Provider>
     <div className="flex flex-col min-h-screen p-2 sm:p-6 lg:p-8 bg-background">
       <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
 
@@ -586,32 +585,32 @@ export default function Home() {
                         return (
                           <div key={d.date} className="flex-1 flex flex-col items-center gap-1">
                             <div className="w-full h-40 flex flex-col justify-end">
-                              <Tooltip.Root>
-                                <Tooltip.Trigger asChild>
+                              <Popover.Root>
+                                <Popover.Trigger asChild>
                                   <div
                                     className="w-full bg-amber-500 rounded-t-sm transition-all"
                                     style={{ height: `${Math.max(peakPct, 0.5)}%` }}
                                   />
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="top" className="z-50 rounded-md border bg-popover px-3 py-1.5 text-sm shadow-md">
+                                </Popover.Trigger>
+                                <Popover.Portal>
+                                  <Popover.Content side="top" className="z-50 rounded-md border bg-popover px-3 py-1.5 text-sm shadow-md">
                                     {t("dashboard.peak")}: {formatKwh(d.peakKwh)} {t("dashboard.kwh")}
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
-                              <Tooltip.Root>
-                                <Tooltip.Trigger asChild>
+                                  </Popover.Content>
+                                </Popover.Portal>
+                              </Popover.Root>
+                              <Popover.Root>
+                                <Popover.Trigger asChild>
                                   <div
                                     className="w-full bg-emerald-600 transition-all"
                                     style={{ height: `${Math.max(offPeakPct - peakPct, 0.5)}%` }}
                                   />
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="top" className="z-50 rounded-md border bg-popover px-3 py-1.5 text-sm shadow-md">
+                                </Popover.Trigger>
+                                <Popover.Portal>
+                                  <Popover.Content side="top" className="z-50 rounded-md border bg-popover px-3 py-1.5 text-sm shadow-md">
                                     {t("dashboard.offPeak")}: {formatKwh(d.offPeakKwh)} {t("dashboard.kwh")}
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
+                                  </Popover.Content>
+                                </Popover.Portal>
+                              </Popover.Root>
                             </div>
                             <div className="text-[10px] text-muted-foreground">{getDay(d.date)}</div>
                           </div>
@@ -694,32 +693,32 @@ export default function Home() {
                             return (
                               <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
                                 <div className="w-full h-56 flex flex-col justify-end">
-                                  <Tooltip.Root>
-                                <Tooltip.Trigger asChild>
+                                  <Popover.Root>
+                                <Popover.Trigger asChild>
                                   <div
                                     className="w-full bg-amber-500 rounded-t-sm"
                                     style={{ height: `${Math.max(peakPct, 0.5)}%` }}
                                   />
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="top" className="z-50 rounded-md border bg-popover px-3 py-1.5 text-sm shadow-md">
+                                </Popover.Trigger>
+                                <Popover.Portal>
+                                  <Popover.Content side="top" className="z-50 rounded-md border bg-popover px-3 py-1.5 text-sm shadow-md">
                                     {t("dashboard.peak")}: {formatKwh(m.peakKwh)} {t("dashboard.kwh")}
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
-                              <Tooltip.Root>
-                                <Tooltip.Trigger asChild>
+                                  </Popover.Content>
+                                </Popover.Portal>
+                              </Popover.Root>
+                              <Popover.Root>
+                                <Popover.Trigger asChild>
                                   <div
                                     className="w-full bg-emerald-600 rounded-b-sm"
                                     style={{ height: `${Math.max(totalPct - peakPct, 0.5)}%` }}
                                   />
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="top" className="z-50 rounded-md border bg-popover px-3 py-1.5 text-sm shadow-md">
+                                </Popover.Trigger>
+                                <Popover.Portal>
+                                  <Popover.Content side="top" className="z-50 rounded-md border bg-popover px-3 py-1.5 text-sm shadow-md">
                                     {t("dashboard.offPeak")}: {formatKwh(m.offPeakKwh)} {t("dashboard.kwh")}
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
+                                  </Popover.Content>
+                                </Popover.Portal>
+                              </Popover.Root>
                                 </div>
                                 <div className="text-xs text-muted-foreground">{monthLabel(m.month)}</div>
                               </div>
@@ -921,32 +920,32 @@ export default function Home() {
                         return (
                           <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
                             <div className="w-full h-56 flex flex-col justify-end">
-                              <Tooltip.Root>
-                                <Tooltip.Trigger asChild>
+                              <Popover.Root>
+                                <Popover.Trigger asChild>
                                   <div
                                     className="w-full bg-sky-500 rounded-t-sm"
                                     style={{ height: `${Math.round(evPct * 100)}%` }}
                                   />
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="top" className="z-50 rounded-md border bg-popover px-3 py-1.5 text-sm shadow-md">
+                                </Popover.Trigger>
+                                <Popover.Portal>
+                                  <Popover.Content side="top" className="z-50 rounded-md border bg-popover px-3 py-1.5 text-sm shadow-md">
                                     EV: {formatKwh(m.evKwh)} {t("dashboard.kwh")}
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
-                              <Tooltip.Root>
-                                <Tooltip.Trigger asChild>
+                                  </Popover.Content>
+                                </Popover.Portal>
+                              </Popover.Root>
+                              <Popover.Root>
+                                <Popover.Trigger asChild>
                                   <div
                                     className="w-full bg-emerald-600 rounded-b-sm"
                                     style={{ height: `${Math.round(nonEvPct * 100)}%` }}
                                   />
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="top" className="z-50 rounded-md border bg-popover px-3 py-1.5 text-sm shadow-md">
+                                </Popover.Trigger>
+                                <Popover.Portal>
+                                  <Popover.Content side="top" className="z-50 rounded-md border bg-popover px-3 py-1.5 text-sm shadow-md">
                                     Non-EV: {formatKwh(m.nonEvKwh)} {t("dashboard.kwh")}
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
+                                  </Popover.Content>
+                                </Popover.Portal>
+                              </Popover.Root>
                             </div>
                             <div className="text-xs text-muted-foreground">{monthLabel(m.month)}</div>
                             <div className="text-xs font-medium">
@@ -1094,6 +1093,5 @@ export default function Home() {
         </div>
       </footer>
     </div>
-    </Tooltip.Provider>
   );
 }
