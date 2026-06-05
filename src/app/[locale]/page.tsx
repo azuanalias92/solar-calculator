@@ -638,39 +638,99 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <BarChart3 className="w-4 h-4 text-emerald-600" />
-                {t("dashboard.monthlyBillSummary")} — {selectedYear}
+                {t("dashboard.monthlyBillSummary")} For {selectedYear}
               </CardTitle>
+              {summaryData.length > 0 && (
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <span>
+                    {t("dashboard.total")}:{" "}
+                    <strong>
+                      {formatKwh(summaryData.reduce((s, m) => s + m.totalKwh, 0))} {t("dashboard.kwh")}
+                    </strong>
+                  </span>
+                  <span>
+                    {t("dashboard.estBill")}:{" "}
+                    <strong>
+                      {formatMoney(summaryData.reduce((s, m) => s + (m.billAmount ?? 0), 0))}
+                    </strong>
+                  </span>
+                </div>
+              )}
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
               {loadingSummary ? (
                 <p className="text-center text-muted-foreground py-4">{t("dashboard.loading")}</p>
               ) : summaryData.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">{t("dashboard.noDataYet")}</p>
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t("dashboard.month")}</TableHead>
-                        <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
-                        <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
-                        <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
-                        <TableHead className="text-right">{t("dashboard.estBill")}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {summaryData.map((s) => (
-                        <TableRow key={s.month} className={s.month === selectedMonth ? "bg-emerald-50/50 dark:bg-emerald-950/20" : ""}>
-                          <TableCell className="font-medium">{monthLabel(s.month)}</TableCell>
-                          <TableCell className="text-right">{formatKwh(s.peakKwh)}</TableCell>
-                          <TableCell className="text-right">{formatKwh(s.offPeakKwh)}</TableCell>
-                          <TableCell className="text-right font-medium">{formatKwh(s.totalKwh)}</TableCell>
-                          <TableCell className="text-right">{s.billAmount != null ? formatMoney(s.billAmount) : "—"}</TableCell>
+                <>
+                  {/* ── Monthly bar chart ── */}
+                  <div className="w-full overflow-x-auto">
+                    <div className="min-w-[760px]">
+                      <div className="flex items-end gap-2 h-64">
+                        {(() => {
+                          const maxTotal = Math.max(...summaryData.map((m) => m.totalKwh), 1);
+                          return summaryData.map((m) => {
+                            const totalPct = (m.totalKwh / maxTotal) * 100;
+                            const peakPct = (m.peakKwh / maxTotal) * 100;
+                            return (
+                              <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
+                                <div className="w-full h-56 flex flex-col justify-end">
+                                  <div
+                                    className="w-full bg-amber-500 rounded-t-sm"
+                                    style={{ height: `${Math.max(peakPct, 0.5)}%` }}
+                                    title={`${t("dashboard.peak")}: ${formatKwh(m.peakKwh)} ${t("dashboard.kwh")}`}
+                                  />
+                                  <div
+                                    className="w-full bg-emerald-600 rounded-b-sm"
+                                    style={{ height: `${Math.max(totalPct - peakPct, 0.5)}%` }}
+                                    title={`${t("dashboard.offPeak")}: ${formatKwh(m.offPeakKwh)} ${t("dashboard.kwh")}`}
+                                  />
+                                </div>
+                                <div className="text-xs text-muted-foreground">{monthLabel(m.month)}</div>
+                              </div>
+                            );
+                          });
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm">
+                    <span className="flex items-center gap-2">
+                      <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" />
+                      {t("dashboard.peak")}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />
+                      {t("dashboard.offPeak")}
+                    </span>
+                  </div>
+                  {/* ── Monthly bill table ── */}
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>{t("dashboard.month")}</TableHead>
+                          <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
+                          <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
+                          <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
+                          <TableHead className="text-right">{t("dashboard.estBill")}</TableHead>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                      </TableHeader>
+                      <TableBody>
+                        {summaryData.map((s) => (
+                          <TableRow key={s.month} className={s.month === selectedMonth ? "bg-emerald-50/50 dark:bg-emerald-950/20" : ""}>
+                            <TableCell className="font-medium">{monthLabel(s.month)}</TableCell>
+                            <TableCell className="text-right">{formatKwh(s.peakKwh)}</TableCell>
+                            <TableCell className="text-right">{formatKwh(s.offPeakKwh)}</TableCell>
+                            <TableCell className="text-right font-medium">{formatKwh(s.totalKwh)}</TableCell>
+                            <TableCell className="text-right">{s.billAmount != null ? formatMoney(s.billAmount) : "—"}</TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </>
               )}
             </CardContent>
           </Card>
