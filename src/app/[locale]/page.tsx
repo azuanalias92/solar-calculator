@@ -610,16 +610,16 @@ export default function Home() {
                         contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
                         formatter={(value: unknown, name: unknown) => [
                           `${formatKwh(Number(value))} kWh`,
-                          name === "peak" ? t("dashboard.peak") : t("dashboard.offPeak"),
+                          name === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak"),
                         ]}
                       />
                       <Legend
                         formatter={(value: unknown) =>
-                          value === "peak" ? t("dashboard.peak") : t("dashboard.offPeak")
+                          value === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak")
                         }
                       />
-                      <Bar dataKey="peak" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} />
-                      <Bar dataKey="offPeak" stackId="a" fill="#059669" radius={[0, 0, 4, 4]} maxBarSize={32} />
+                      <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                      <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" radius={[0, 0, 4, 4]} maxBarSize={32} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -703,12 +703,12 @@ export default function Home() {
                           contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
                           formatter={(value: unknown, name: unknown) => [
                             `${formatKwh(Number(value))} kWh`,
-                            name === "peak" ? t("dashboard.peak") : t("dashboard.offPeak"),
+                            name === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak"),
                           ]}
                         />
-                        <Legend formatter={(value: unknown) => value === "peak" ? t("dashboard.peak") : t("dashboard.offPeak")} />
-                        <Bar dataKey="peak" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} />
-                        <Bar dataKey="offPeak" stackId="a" fill="#059669" radius={[0, 0, 4, 4]} maxBarSize={32} />
+                        <Legend formatter={(value: unknown) => value === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak")} />
+                        <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                        <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" radius={[0, 0, 4, 4]} maxBarSize={32} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
