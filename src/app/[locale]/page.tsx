@@ -679,11 +679,62 @@ export default function Home() {
         {/* ════════════════════════ SECTION 2: EV vs Non-EV ════════════════════════ */}
         <Card>
           <CardHeader className="space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <CardTitle className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 <Fuel className="w-5 h-5 text-emerald-600" />
-                {t("dashboard.evVsNonEv")} — {selectedYear}
+                {t("dashboard.evVsNonEv")} {selectedYear}
               </CardTitle>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Upload className="w-4 h-4 mr-1" />
+                    {t("dashboard.importPlus")}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Car className="w-5 h-5 text-emerald-600" />
+                      {t("dashboard.evChargingImport")}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-2">
+                    <p className="text-sm text-muted-foreground">{t("dashboard.pasteInstructions")}</p>
+                    <details className="text-xs text-muted-foreground bg-muted/30 rounded-md p-3">
+                      <summary className="cursor-pointer font-medium text-foreground text-sm mb-1">How to extract text from PDF</summary>
+                      <ol className="list-decimal list-inside space-y-1 mt-2 text-xs sm:text-sm">
+                        <li>Open your Easy Charging PDF</li>
+                        <li>Copy all text from the PDF (<code className="bg-muted px-1 rounded">Ctrl+A</code> → <code className="bg-muted px-1 rounded">Ctrl+C</code>)</li>
+                        <li>Paste it in the text area below</li>
+                      </ol>
+                      <p className="mt-2 text-xs sm:text-sm">
+                        <strong>Tip:</strong> If copying doesn't work, use{" "}
+                        <a href="https://www.pdftotext.com" target="_blank" rel="noopener noreferrer" className="underline">pdftotext.com</a>{" "}
+                        or run <code className="bg-muted px-1 rounded break-all">pdftotext -layout charging.pdf output.txt</code> on desktop.
+                      </p>
+                      <p className="mt-2 text-xs sm:text-sm">
+                        <strong>Expected format per line:</strong>
+                      </p>
+                      <pre className="bg-muted p-2 rounded mt-1 text-[10px] sm:text-xs overflow-x-auto whitespace-nowrap">
+254902721  Azuan Alias  2026-06-05  00:06:39  2026-06-05  10:13:03  10H06M  61.0  17.57</pre>
+                    </details>
+                    <Textarea placeholder={t("dashboard.pastePlaceholder")} value={rawInput} onChange={(e) => setRawInput(e.target.value)} rows={6} className="font-mono text-sm" />
+                    <div className="flex gap-2">
+                      <Button onClick={handleParse} disabled={!rawInput.trim()}>
+                        <Upload className="w-4 h-4 mr-1" />
+                        {t("dashboard.parseSessions")}
+                      </Button>
+                      {sessions.length > 0 && auth?.token && (
+                        <Button onClick={handleSaveEv} variant="secondary" disabled={saving}>
+                          {saving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Zap className="w-4 h-4 mr-1" />}
+                          {saving ? t("dashboard.saving") : `${t("dashboard.saveTo")} ${selectedYear}`}
+                        </Button>
+                      )}
+                    </div>
+                    {evMsg && <p className="text-sm text-foreground">{evMsg}</p>}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             <div className="text-sm text-muted-foreground">
               {!auth?.token ? (
@@ -704,7 +755,7 @@ export default function Home() {
               )}
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground">
               <span>
                 {t("dashboard.totalEv")}:{" "}
@@ -769,67 +820,7 @@ export default function Home() {
                 </div>
               </>
             )}
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>{t("dashboard.monthlyBreakdownKwh")}</CardTitle>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Upload className="w-4 h-4 mr-1" />
-                    {t("dashboard.importPlus")}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <Car className="w-5 h-5 text-emerald-600" />
-                      {t("dashboard.evChargingImport")}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 pt-2">
-                    <p className="text-sm text-muted-foreground">{t("dashboard.pasteInstructions")}</p>
-                    <details className="text-xs text-muted-foreground bg-muted/30 rounded-md p-3">
-                      <summary className="cursor-pointer font-medium text-foreground text-sm mb-1">How to extract text from PDF</summary>
-                      <ol className="list-decimal list-inside space-y-1 mt-2 text-xs sm:text-sm">
-                        <li>Open your Easy Charging PDF</li>
-                        <li>Copy all text from the PDF (<code className="bg-muted px-1 rounded">Ctrl+A</code> → <code className="bg-muted px-1 rounded">Ctrl+C</code>)</li>
-                        <li>Paste it in the text area below</li>
-                      </ol>
-                      <p className="mt-2 text-xs sm:text-sm">
-                        <strong>Tip:</strong> If copying doesn't work, use{" "}
-                        <a href="https://www.pdftotext.com" target="_blank" rel="noopener noreferrer" className="underline">pdftotext.com</a>{" "}
-                        or run <code className="bg-muted px-1 rounded break-all">pdftotext -layout charging.pdf output.txt</code> on desktop.
-                      </p>
-                      <p className="mt-2 text-xs sm:text-sm">
-                        <strong>Expected format per line:</strong>
-                      </p>
-                      <pre className="bg-muted p-2 rounded mt-1 text-[10px] sm:text-xs overflow-x-auto whitespace-nowrap">
-254902721  Azuan Alias  2026-06-05  00:06:39  2026-06-05  10:13:03  10H06M  61.0  17.57</pre>
-                    </details>
-                    <Textarea placeholder={t("dashboard.pastePlaceholder")} value={rawInput} onChange={(e) => setRawInput(e.target.value)} rows={6} className="font-mono text-sm" />
-                    <div className="flex gap-2">
-                      <Button onClick={handleParse} disabled={!rawInput.trim()}>
-                        <Upload className="w-4 h-4 mr-1" />
-                        {t("dashboard.parseSessions")}
-                      </Button>
-                      {sessions.length > 0 && auth?.token && (
-                        <Button onClick={handleSaveEv} variant="secondary" disabled={saving}>
-                          {saving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Zap className="w-4 h-4 mr-1" />}
-                          {saving ? t("dashboard.saving") : `${t("dashboard.saveTo")} ${selectedYear}`}
-                        </Button>
-                      )}
-                    </div>
-                    {evMsg && <p className="text-sm text-foreground">{evMsg}</p>}
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
