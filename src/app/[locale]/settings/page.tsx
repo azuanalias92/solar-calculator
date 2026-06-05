@@ -64,7 +64,8 @@ function formatNumber(value: number): string {
 }
 
 function formatMoney(value: number): string {
-  return new Intl.NumberFormat("en-MY", { style: "currency", currency: "MYR" }).format(value);
+  const n = value.toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return `RM ${n}`;
 }
 
 function RateTable({ rate, t }: { rate: TariffRate; t: (key: string) => string }) {

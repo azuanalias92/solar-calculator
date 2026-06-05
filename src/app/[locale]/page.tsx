@@ -41,7 +41,8 @@ function formatKwh(value: number): string {
   return new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 }).format(value);
 }
 function formatMoney(value: number): string {
-  return new Intl.NumberFormat("en-MY", { style: "currency", currency: "MYR" }).format(value);
+  const n = value.toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return `RM ${n}`;
 }
 function parseCsvDate(dateStr: string): string {
   const months: Record<string, string> = {

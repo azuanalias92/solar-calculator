@@ -10,7 +10,8 @@ import { Coffee, Github, BatteryCharging, Zap } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 
 function formatMoney(value: number): string {
-  return new Intl.NumberFormat("en-MY", { style: "currency", currency: "MYR" }).format(value);
+  const n = value.toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return `RM ${n}`;
 }
 
 export default function EvCalculatorPage() {
