@@ -600,31 +600,26 @@ export default function Home() {
               {dailyData.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8 text-sm">{loadingDaily ? t("dashboard.loading") : t("dashboard.noDataThisMonth")}</p>
               ) : (
-                <div className="w-full" style={{ height: 280 }}>
+                <div className="w-full" style={{ height: 300 }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={dailyData.map((d) => ({ ...d, day: getDay(d.date) }))} barGap={0} barCategoryGap={2}>
+                    <BarChart data={dailyData.map((d) => ({ ...d, day: getDay(d.date) }))} barGap={0} barCategoryGap={4}>
                       <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
                       <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} />
                       <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
                       <Tooltip
-                        contentStyle={{
-                          background: "hsl(var(--background))",
-                          border: "1px solid hsl(var(--border))",
-                          borderRadius: "8px",
-                          fontSize: "12px",
-                        }}
+                        contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
                         formatter={(value: unknown, name: unknown) => [
                           `${formatKwh(Number(value))} kWh`,
                           name === "peak" ? t("dashboard.peak") : t("dashboard.offPeak"),
                         ]}
                       />
                       <Legend
-                        formatter={(value: string) =>
+                        formatter={(value: unknown) =>
                           value === "peak" ? t("dashboard.peak") : t("dashboard.offPeak")
                         }
                       />
-                      <Bar dataKey="peak" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={24} />
-                      <Bar dataKey="offPeak" stackId="a" fill="#059669" radius={[0, 0, 4, 4]} maxBarSize={24} />
+                      <Bar dataKey="peak" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                      <Bar dataKey="offPeak" stackId="a" fill="#059669" radius={[0, 0, 4, 4]} maxBarSize={32} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
