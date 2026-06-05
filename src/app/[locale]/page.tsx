@@ -525,19 +525,17 @@ export default function Home() {
         {/* ════════════════════════ SECTION 1: Daily Energy Usage ════════════════════════ */}
         <Card>
           <CardHeader className="space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <CardTitle className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 <BarChart3 className="w-5 h-5 text-emerald-600" />
-                {t("dashboard.dailyEnergyUsage")}
+                {t("dashboard.dailyEnergyUsage")} {t("dashboard.for")} {monthLabel(selectedMonth)} {selectedYear}
               </CardTitle>
-            </div>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground">
-              <span>
-                {!auth?.token ? t("dashboard.loginToView") : ""}
-                {loadingDaily ? <Loader2 className="w-3 h-3 inline animate-spin ml-1" /> : null}
-                {usageMsg ? <span className="text-foreground ml-2">{usageMsg}</span> : null}
-              </span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-sm text-muted-foreground">
+                  {!auth?.token ? t("dashboard.loginToView") : ""}
+                  {loadingDaily ? <Loader2 className="w-3 h-3 inline animate-spin ml-1" /> : null}
+                  {usageMsg ? <span className="text-foreground ml-2">{usageMsg}</span> : null}
+                </span>
                 <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleFileUpload} />
                 <Button variant="secondary" size="sm" disabled={!auth?.token || uploading} onClick={() => fileInputRef.current?.click()}>
                   {uploading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Upload className="w-4 h-4 mr-1" />}
@@ -545,17 +543,8 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-          </CardHeader>
-        </Card>
-
-        {auth?.token && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <CalendarDays className="w-4 h-4 text-emerald-600" />
-                {monthLabel(selectedMonth)} {selectedYear} — {t("dashboard.dailyConsumption")}
-              </CardTitle>
-              <div className="flex flex-wrap gap-4 text-sm">
+            {auth?.token && (
+              <div className="flex flex-wrap gap-4 text-sm pt-1">
                 <div className="flex items-center gap-1">
                   <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" />
                   {t("dashboard.peak")}:{" "}
@@ -577,8 +566,11 @@ export default function Home() {
                   </strong>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
+            )}
+          </CardHeader>
+          {auth?.token && (
+            <CardContent className="space-y-6">
+              {/* ── Bar chart ── */}
               {dailyData.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8 text-sm">{loadingDaily ? t("dashboard.loading") : t("dashboard.noDataThisMonth")}</p>
               ) : (
@@ -611,41 +603,35 @@ export default function Home() {
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
-        )}
 
-        {auth?.token && dailyData.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">{t("dashboard.dailyBreakdown")}</CardTitle>
-            </CardHeader>
-            <CardContent className="p-2 sm:p-6">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t("dashboard.date")}</TableHead>
-                      <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
-                      <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
-                      <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {dailyData.map((d) => (
-                      <TableRow key={d.date}>
-                        <TableCell className="font-medium">{formatDisplayDate(d.date)}</TableCell>
-                        <TableCell className="text-right">{formatKwh(d.peakKwh)}</TableCell>
-                        <TableCell className="text-right">{formatKwh(d.offPeakKwh)}</TableCell>
-                        <TableCell className="text-right font-medium">{formatKwh(d.peakKwh + d.offPeakKwh)}</TableCell>
+              {/* ── Daily breakdown table ── */}
+              {dailyData.length > 0 && (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>{t("dashboard.date")}</TableHead>
+                        <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
+                        <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
+                        <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHeader>
+                    <TableBody>
+                      {dailyData.map((d) => (
+                        <TableRow key={d.date}>
+                          <TableCell className="font-medium">{formatDisplayDate(d.date)}</TableCell>
+                          <TableCell className="text-right">{formatKwh(d.peakKwh)}</TableCell>
+                          <TableCell className="text-right">{formatKwh(d.offPeakKwh)}</TableCell>
+                          <TableCell className="text-right font-medium">{formatKwh(d.peakKwh + d.offPeakKwh)}</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
             </CardContent>
-          </Card>
-        )}
+          )}
+        </Card>
 
         {auth?.token && (
           <Card>
