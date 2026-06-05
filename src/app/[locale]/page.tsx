@@ -814,26 +814,58 @@ export default function Home() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm text-muted-foreground">
-              <span>
-                {t("dashboard.totalEv")}:{" "}
-                <strong className="text-foreground">
-                  {formatKwh(billEvTotals.evTotal)} {t("dashboard.kwh")}
-                </strong>
-              </span>
-              <span>
-                {t("dashboard.totalNonEv")}:{" "}
-                <strong className="text-foreground">
-                  {formatKwh(billEvTotals.nonEvTotal)} {t("dashboard.kwh")}
-                </strong>
-              </span>
-              <span>
-                {t("dashboard.total")}:{" "}
-                <strong className="text-foreground">
-                  {formatKwh(billEvTotals.grandTotal)} {t("dashboard.kwh")}
-                </strong>
-              </span>
-            </div>
+            {(() => {
+              const total = billEvTotals.grandTotal;
+              const evTotal = billEvTotals.evTotal;
+              const nonEvTotal = billEvTotals.nonEvTotal;
+              if (total <= 0) return null;
+              const circ = 2 * Math.PI * 55;
+              const evLen = (evTotal / total) * circ;
+              const evPct = ((evTotal / total) * 100).toFixed(1);
+              const nonEvPct = ((nonEvTotal / total) * 100).toFixed(1);
+              return (
+                <div className="flex flex-col items-center py-2">
+                  <svg width="150" height="150" viewBox="0 0 150 150">
+                    {/* Background ring */}
+                    <circle cx="75" cy="75" r="60" fill="none" className="stroke-muted" strokeWidth="22" />
+                    {/* EV arc */}
+                    {evTotal > 0 && (
+                      <circle cx="75" cy="75" r="60" fill="none" className="stroke-sky-500" strokeWidth="22"
+                        strokeDasharray={`${evLen} ${circ}`}
+                        transform="rotate(-90 75 75)"
+                        strokeLinecap="round"
+                      />
+                    )}
+                    {/* Non-EV arc */}
+                    {nonEvTotal > 0 && (
+                      <circle cx="75" cy="75" r="60" fill="none" className="stroke-emerald-600" strokeWidth="22"
+                        strokeDasharray={`${circ - evLen} ${circ}`}
+                        strokeDashoffset={-evLen}
+                        transform="rotate(-90 75 75)"
+                        strokeLinecap="round"
+                      />
+                    )}
+                    {/* Center total */}
+                    <text x="75" y="70" textAnchor="middle" className="fill-foreground" fontSize="22" fontWeight="bold">
+                      {formatKwh(total)}
+                    </text>
+                    <text x="75" y="92" textAnchor="middle" className="fill-muted-foreground" fontSize="12">
+                      kWh
+                    </text>
+                  </svg>
+                  <div className="flex gap-6 mt-2">
+                    <span className="flex items-center gap-1.5 text-sm">
+                      <span className="inline-block w-3 h-3 rounded-sm bg-sky-500" />
+                      <strong>{formatKwh(evTotal)}</strong> kWh ({evPct}%)
+                    </span>
+                    <span className="flex items-center gap-1.5 text-sm">
+                      <span className="inline-block w-3 h-3 rounded-sm bg-emerald-600" />
+                      <strong>{formatKwh(nonEvTotal)}</strong> kWh ({nonEvPct}%)
+                    </span>
+                  </div>
+                </div>
+              );
+            })()}
 
             {monthsWithData > 0 && (
               <>
