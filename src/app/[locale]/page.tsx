@@ -719,7 +719,7 @@ export default function Home() {
                       </TableHeader>
                       <TableBody>
                         {summaryData.map((s) => (
-                          <TableRow key={s.month} className={s.month === selectedMonth ? "bg-emerald-50/50 dark:bg-emerald-950/20" : ""}>
+                          <TableRow key={s.month} className={s.month === nowDate.month && selectedYear === nowDate.year ? "bg-amber-50/50 dark:bg-amber-950/20" : ""}>
                             <TableCell className="font-medium">{monthLabel(s.month)}</TableCell>
                             <TableCell className="text-right">{formatKwh(s.peakKwh)}</TableCell>
                             <TableCell className="text-right">{formatKwh(s.offPeakKwh)}</TableCell>
@@ -933,7 +933,7 @@ export default function Home() {
                     billEvData.map((m) => {
                       const evPct = m.totalKwh > 0 ? (m.evKwh / m.totalKwh) * 100 : 0;
                       return (
-                        <TableRow key={m.month}>
+                        <TableRow key={m.month} className={m.month === nowDate.month && selectedYear === nowDate.year ? "bg-amber-50/50 dark:bg-amber-950/20" : ""}>
                           <TableCell className="font-medium">{monthLabel(m.month)}</TableCell>
                           <TableCell>{formatKwh(m.totalKwh)}</TableCell>
                           <TableCell>
