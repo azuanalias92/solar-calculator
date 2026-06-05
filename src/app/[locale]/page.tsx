@@ -18,6 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 
 // ── Shared Types ──
 
@@ -599,40 +600,33 @@ export default function Home() {
               {dailyData.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8 text-sm">{loadingDaily ? t("dashboard.loading") : t("dashboard.noDataThisMonth")}</p>
               ) : (
-                <div className="w-full overflow-x-auto">
-                  <div className="min-w-[660px]">
-                    <div className="flex">
-                      <div className="flex flex-col justify-between h-48 pr-2 pb-5 text-xs text-muted-foreground text-right shrink-0">
-                        {yAxisLabels(maxDailyTotal).map((v) => (
-                          <span key={v}>{formatKwh(v)}</span>
-                        ))}
-                      </div>
-                      <div className="flex-1 flex items-end gap-1 h-48">
-                      {dailyData.map((d) => {
-                        const total = d.peakKwh + d.offPeakKwh;
-                        const peakPct = barHeightPct(d.peakKwh);
-                        const offPeakPct = barHeightPct(total);
-                        return (
-                          <div key={d.date} className="flex-1 flex flex-col items-center gap-1">
-                            <div className="w-full h-40 flex flex-col justify-end">
-                                  <div
-                                    className="w-full bg-amber-500 rounded-t-sm transition-all cursor-pointer"
-                                    style={{ height: `${Math.max(peakPct, 0.5)}%` }}
-                                    title={`Peak: ${formatKwh(d.peakKwh)} kWh`}
-                                    onPointerDown={(e) => { e.stopPropagation(); setBarTooltip(`Peak: ${formatKwh(d.peakKwh)} kWh`); }} />
-                                  <div
-                                    className="w-full bg-emerald-600 transition-all cursor-pointer"
-                                    style={{ height: `${Math.max(offPeakPct - peakPct, 0.5)}%` }}
-                                    title={`Off-Peak: ${formatKwh(d.offPeakKwh)} kWh`}
-                                    onPointerDown={(e) => { e.stopPropagation(); setBarTooltip(`Off-Peak: ${formatKwh(d.offPeakKwh)} kWh`); }} />
-                            </div>
-                            <div className="text-[10px] text-muted-foreground">{getDay(d.date)}</div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    </div>
-                  </div>
+                <div className="w-full" style={{ height: 280 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={dailyData.map((d) => ({ ...d, day: getDay(d.date) }))} barGap={0} barCategoryGap={2}>
+                      <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+                      <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                      <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
+                      <Tooltip
+                        contentStyle={{
+                          background: "hsl(var(--background))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                          fontSize: "12px",
+                        }}
+                        formatter={(value: unknown, name: unknown) => [
+                          `${formatKwh(Number(value))} kWh`,
+                          name === "peak" ? t("dashboard.peak") : t("dashboard.offPeak"),
+                        ]}
+                      />
+                      <Legend
+                        formatter={(value: string) =>
+                          value === "peak" ? t("dashboard.peak") : t("dashboard.offPeak")
+                        }
+                      />
+                      <Bar dataKey="peak" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={24} />
+                      <Bar dataKey="offPeak" stackId="a" fill="#059669" radius={[0, 0, 4, 4]} maxBarSize={24} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               )}
 
@@ -704,55 +698,24 @@ export default function Home() {
               ) : (
                 <>
                   {/* ── Monthly bar chart ── */}
-                  <div className="w-full overflow-x-auto">
-                    <div className="min-w-[800px]">
-                      <div className="flex">
-                        <div className="flex flex-col justify-between h-64 pr-2 pb-6 text-xs text-muted-foreground text-right shrink-0">
-                          {(() => {
-                            const maxTotal = Math.max(...summaryData.map((m) => m.totalKwh), 1);
-                            return yAxisLabels(maxTotal).map((v) => (
-                              <span key={v}>{formatKwh(v)}</span>
-                            ));
-                          })()}
-                        </div>
-                        <div className="flex-1 flex items-end gap-2 h-64">
-                        {(() => {
-                          const maxTotal = Math.max(...summaryData.map((m) => m.totalKwh), 1);
-                          return summaryData.map((m) => {
-                            const totalPct = (m.totalKwh / maxTotal) * 100;
-                            const peakPct = (m.peakKwh / maxTotal) * 100;
-                            return (
-                              <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
-                                <div className="w-full h-56 flex flex-col justify-end">
-                                  <div
-                                    className="w-full bg-amber-500 rounded-t-sm cursor-pointer"
-                                    style={{ height: `${Math.max(peakPct, 0.5)}%` }}
-                                    title={`Peak: ${formatKwh(m.peakKwh)} kWh`}
-                                    onPointerDown={(e) => { e.stopPropagation(); setBarTooltip(`Peak: ${formatKwh(m.peakKwh)} kWh`); }} />
-                                  <div
-                                    className="w-full bg-emerald-600 rounded-b-sm cursor-pointer"
-                                    style={{ height: `${Math.max(totalPct - peakPct, 0.5)}%` }}
-                                    title={`Off-Peak: ${formatKwh(m.offPeakKwh)} kWh`}
-                                    onPointerDown={(e) => { e.stopPropagation(); setBarTooltip(`Off-Peak: ${formatKwh(m.offPeakKwh)} kWh`); }} />
-                                </div>
-                                <div className="text-xs text-muted-foreground">{monthLabel(m.month)}</div>
-                              </div>
-                            );
-                          });
-                        })()}
-                      </div>
-                    </div>
-                  </div>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="flex items-center gap-2">
-                      <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" />
-                      {t("dashboard.peak")}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />
-                      {t("dashboard.offPeak")}
-                    </span>
+                  <div className="w-full" style={{ height: 300 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={summaryData} barGap={0} barCategoryGap={4}>
+                        <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+                        <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => monthLabel(v)} />
+                        <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
+                        <Tooltip
+                          contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
+                          formatter={(value: unknown, name: unknown) => [
+                            `${formatKwh(Number(value))} kWh`,
+                            name === "peak" ? t("dashboard.peak") : t("dashboard.offPeak"),
+                          ]}
+                        />
+                        <Legend formatter={(value: unknown) => value === "peak" ? t("dashboard.peak") : t("dashboard.offPeak")} />
+                        <Bar dataKey="peak" stackId="a" fill="#f59e0b" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                        <Bar dataKey="offPeak" stackId="a" fill="#059669" radius={[0, 0, 4, 4]} maxBarSize={32} />
+                      </BarChart>
+                    </ResponsiveContainer>
                   </div>
                   {/* ── Monthly bill table ── */}
                   <Accordion type="single" collapsible>
@@ -925,51 +888,24 @@ export default function Home() {
 
             {monthsWithData > 0 && (
               <>
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="flex items-center gap-2">
-                    <span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />
-                    {t("dashboard.nonEv")}
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <span className="inline-block h-3 w-3 rounded-sm bg-sky-500" />
-                    {t("dashboard.evCharging")}
-                  </span>
-                </div>
-                <div className="w-full overflow-x-auto">
-                  <div className="min-w-[800px]">
-                    <div className="flex">
-                      <div className="flex flex-col justify-between h-64 pr-2 pb-6 text-xs text-muted-foreground text-right shrink-0">
-                        {yAxisLabels(maxTotal).map((v) => (
-                          <span key={v}>{formatKwh(v)}</span>
-                        ))}
-                      </div>
-                      <div className="flex-1 flex items-end gap-2 h-64">
-                      {billEvData.map((m) => {
-                        const { nonEvPct, evPct } = getBarHeights(m.totalKwh, m.evKwh, maxTotal);
-                        return (
-                          <div key={m.month} className="flex-1 flex flex-col items-center gap-2">
-                            <div className="w-full h-56 flex flex-col justify-end">
-                                  <div
-                                    className="w-full bg-sky-500 rounded-t-sm cursor-pointer"
-                                    style={{ height: `${Math.round(evPct * 100)}%` }}
-                                    title={`EV: ${formatKwh(m.evKwh)} kWh`}
-                                    onPointerDown={(e) => { e.stopPropagation(); setBarTooltip(`EV: ${formatKwh(m.evKwh)} kWh`); }} />
-                                  <div
-                                    className="w-full bg-emerald-600 rounded-b-sm cursor-pointer"
-                                    style={{ height: `${Math.round(nonEvPct * 100)}%` }}
-                                    title={`Non-EV: ${formatKwh(m.nonEvKwh)} kWh`}
-                                    onPointerDown={(e) => { e.stopPropagation(); setBarTooltip(`Non-EV: ${formatKwh(m.nonEvKwh)} kWh`); }} />
-                            </div>
-                            <div className="text-xs text-muted-foreground">{monthLabel(m.month)}</div>
-                            <div className="text-xs font-medium">
-                              {formatKwh(m.totalKwh)} {t("dashboard.kwh")}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                    </div>
-                  </div>
+                <div className="w-full" style={{ height: 300 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={billEvData} barGap={0} barCategoryGap={4}>
+                      <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+                      <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => monthLabel(v)} />
+                      <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
+                      <Tooltip
+                        contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
+                        formatter={(value: unknown, name: unknown) => [
+                          `${formatKwh(Number(value))} kWh`,
+                          name === "evKwh" || name === "evCharging" ? t("dashboard.evCharging") : t("dashboard.nonEv"),
+                        ]}
+                      />
+                      <Legend formatter={(value: unknown) => value === "evKwh" || value === "evCharging" ? t("dashboard.evCharging") : t("dashboard.nonEv")} />
+                      <Bar dataKey="evKwh" name="evCharging" stackId="a" fill="#0ea5e9" radius={[4, 4, 0, 0]} maxBarSize={32} />
+                      <Bar dataKey="nonEvKwh" name="nonEv" stackId="a" fill="#059669" radius={[0, 0, 4, 4]} maxBarSize={32} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </div>
               </>
             )}
