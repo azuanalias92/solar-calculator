@@ -746,7 +746,7 @@ export default function Home() {
               </CardTitle>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
+                  <Button variant="secondary" size="sm">
                     <Upload className="w-4 h-4 mr-1" />
                     {t("dashboard.importPlus")}
                   </Button>
