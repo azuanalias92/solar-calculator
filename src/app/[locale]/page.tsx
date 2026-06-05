@@ -89,6 +89,11 @@ function emptyYearData(): MonthUsage[] {
 function dedupeYears(years: number[]): number[] {
   return Array.from(new Set(years.filter((y) => Number.isFinite(y)))).sort((a, b) => b - a);
 }
+function yAxisLabels(max: number): number[] {
+  if (max <= 0) return [0, 0, 0, 0, 0];
+  const step = max / 4;
+  return [max, max - step, max - 2 * step, max - 3 * step, 0];
+}
 
 export default function Home() {
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
@@ -593,8 +598,14 @@ export default function Home() {
                 <p className="text-center text-muted-foreground py-8 text-sm">{loadingDaily ? t("dashboard.loading") : t("dashboard.noDataThisMonth")}</p>
               ) : (
                 <div className="w-full overflow-x-auto">
-                  <div className="min-w-[600px]">
-                    <div className="flex items-end gap-1 h-48">
+                  <div className="min-w-[660px]">
+                    <div className="flex">
+                      <div className="flex flex-col justify-between h-48 pr-2 pb-5 text-xs text-muted-foreground text-right shrink-0">
+                        {yAxisLabels(maxDailyTotal).map((v) => (
+                          <span key={v}>{formatKwh(v)}</span>
+                        ))}
+                      </div>
+                      <div className="flex-1 flex items-end gap-1 h-48">
                       {dailyData.map((d) => {
                         const total = d.peakKwh + d.offPeakKwh;
                         const peakPct = barHeightPct(d.peakKwh);
@@ -617,6 +628,7 @@ export default function Home() {
                           </div>
                         );
                       })}
+                    </div>
                     </div>
                   </div>
                 </div>
@@ -684,8 +696,17 @@ export default function Home() {
                 <>
                   {/* ── Monthly bar chart ── */}
                   <div className="w-full overflow-x-auto">
-                    <div className="min-w-[760px]">
-                      <div className="flex items-end gap-2 h-64">
+                    <div className="min-w-[800px]">
+                      <div className="flex">
+                        <div className="flex flex-col justify-between h-64 pr-2 pb-6 text-xs text-muted-foreground text-right shrink-0">
+                          {(() => {
+                            const maxTotal = Math.max(...summaryData.map((m) => m.totalKwh), 1);
+                            return yAxisLabels(maxTotal).map((v) => (
+                              <span key={v}>{formatKwh(v)}</span>
+                            ));
+                          })()}
+                        </div>
+                        <div className="flex-1 flex items-end gap-2 h-64">
                         {(() => {
                           const maxTotal = Math.max(...summaryData.map((m) => m.totalKwh), 1);
                           return summaryData.map((m) => {
@@ -712,6 +733,7 @@ export default function Home() {
                         })()}
                       </div>
                     </div>
+                  </div>
                   </div>
                   <div className="flex items-center gap-4 text-sm">
                     <span className="flex items-center gap-2">
@@ -898,8 +920,14 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="w-full overflow-x-auto">
-                  <div className="min-w-[760px]">
-                    <div className="flex items-end gap-2 h-64">
+                  <div className="min-w-[800px]">
+                    <div className="flex">
+                      <div className="flex flex-col justify-between h-64 pr-2 pb-6 text-xs text-muted-foreground text-right shrink-0">
+                        {yAxisLabels(maxTotal).map((v) => (
+                          <span key={v}>{formatKwh(v)}</span>
+                        ))}
+                      </div>
+                      <div className="flex-1 flex items-end gap-2 h-64">
                       {billEvData.map((m) => {
                         const { nonEvPct, evPct } = getBarHeights(m.totalKwh, m.evKwh, maxTotal);
                         return (
@@ -923,6 +951,7 @@ export default function Home() {
                           </div>
                         );
                       })}
+                    </div>
                     </div>
                   </div>
                 </div>
