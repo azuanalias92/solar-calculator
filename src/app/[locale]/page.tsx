@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { getAuthState, type AuthState } from "@/lib/auth";
@@ -637,28 +638,35 @@ export default function Home() {
 
               {/* ── Daily breakdown table ── */}
               {dailyData.length > 0 && (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t("dashboard.date")}</TableHead>
-                        <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
-                        <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
-                        <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {dailyData.map((d) => (
-                        <TableRow key={d.date}>
-                          <TableCell className="font-medium">{formatDisplayDate(d.date)}</TableCell>
-                          <TableCell className="text-right">{formatKwh(d.peakKwh)}</TableCell>
-                          <TableCell className="text-right">{formatKwh(d.offPeakKwh)}</TableCell>
-                          <TableCell className="text-right font-medium">{formatKwh(d.peakKwh + d.offPeakKwh)}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                <Accordion type="single" collapsible defaultValue="daily-table">
+                  <AccordionItem value="daily-table">
+                    <AccordionTrigger className="text-sm font-medium">{t("dashboard.dailyBreakdown")}</AccordionTrigger>
+                    <AccordionContent>
+                      <div className="overflow-x-auto">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>{t("dashboard.date")}</TableHead>
+                              <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
+                              <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
+                              <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {dailyData.map((d) => (
+                              <TableRow key={d.date}>
+                                <TableCell className="font-medium">{formatDisplayDate(d.date)}</TableCell>
+                                <TableCell className="text-right">{formatKwh(d.peakKwh)}</TableCell>
+                                <TableCell className="text-right">{formatKwh(d.offPeakKwh)}</TableCell>
+                                <TableCell className="text-right font-medium">{formatKwh(d.peakKwh + d.offPeakKwh)}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               )}
             </CardContent>
           )}
@@ -747,30 +755,37 @@ export default function Home() {
                     </span>
                   </div>
                   {/* ── Monthly bill table ── */}
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>{t("dashboard.month")}</TableHead>
-                          <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
-                          <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
-                          <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
-                          <TableHead className="text-right">{t("dashboard.estBill")}</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {summaryData.map((s) => (
-                          <TableRow key={s.month} className={s.month === selectedMonth ? "bg-emerald-100/80 dark:bg-emerald-900/30" : ""}>
-                            <TableCell className="font-medium">{monthLabel(s.month)}</TableCell>
-                            <TableCell className="text-right">{formatKwh(s.peakKwh)}</TableCell>
-                            <TableCell className="text-right">{formatKwh(s.offPeakKwh)}</TableCell>
-                            <TableCell className="text-right font-medium">{formatKwh(s.totalKwh)}</TableCell>
-                            <TableCell className="text-right">{s.billAmount != null ? formatMoney(s.billAmount) : "—"}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value="monthly-table">
+                      <AccordionTrigger className="text-sm font-medium">{t("dashboard.monthlyBreakdownKwh")}</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="overflow-x-auto">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>{t("dashboard.month")}</TableHead>
+                                <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
+                                <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
+                                <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
+                                <TableHead className="text-right">{t("dashboard.estBill")}</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {summaryData.map((s) => (
+                                <TableRow key={s.month} className={s.month === selectedMonth ? "bg-emerald-100/80 dark:bg-emerald-900/30" : ""}>
+                                  <TableCell className="font-medium">{monthLabel(s.month)}</TableCell>
+                                  <TableCell className="text-right">{formatKwh(s.peakKwh)}</TableCell>
+                                  <TableCell className="text-right">{formatKwh(s.offPeakKwh)}</TableCell>
+                                  <TableCell className="text-right font-medium">{formatKwh(s.totalKwh)}</TableCell>
+                                  <TableCell className="text-right">{s.billAmount != null ? formatMoney(s.billAmount) : "—"}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 </>
               )}
             </CardContent>
@@ -959,45 +974,52 @@ export default function Home() {
               </>
             )}
 
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{t("dashboard.month")}</TableHead>
-                    <TableHead>{t("dashboard.totalUsage")}</TableHead>
-                    <TableHead>{t("dashboard.evCharging")}</TableHead>
-                    <TableHead>{t("dashboard.nonEv")}</TableHead>
-                    <TableHead className="text-right">{t("dashboard.evPercent")}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {billEvData.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5} className="text-center text-muted-foreground py-6">
-                        {!auth?.token ? t("dashboard.loginToView") : loadingBillEv ? t("dashboard.loading") : `${t("dashboard.noDataFor")} ${selectedYear}.`}
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    billEvData.map((m) => {
-                      const evPct = m.totalKwh > 0 ? (m.evKwh / m.totalKwh) * 100 : 0;
-                      return (
-                        <TableRow key={m.month} className={m.month === selectedMonth ? "bg-emerald-100/80 dark:bg-emerald-900/30" : ""}>
-                          <TableCell className="font-medium">{monthLabel(m.month)}</TableCell>
-                          <TableCell>{formatKwh(m.totalKwh)}</TableCell>
-                          <TableCell>
-                            <span className="text-sky-600">{formatKwh(m.evKwh)}</span>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-emerald-600">{formatKwh(m.nonEvKwh)}</span>
-                          </TableCell>
-                          <TableCell className="text-right">{evPct.toFixed(1)}%</TableCell>
+            <Accordion type="single" collapsible>
+              <AccordionItem value="ev-table">
+                <AccordionTrigger className="text-sm font-medium">{t("dashboard.totalUsage")}</AccordionTrigger>
+                <AccordionContent>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>{t("dashboard.month")}</TableHead>
+                          <TableHead>{t("dashboard.totalUsage")}</TableHead>
+                          <TableHead>{t("dashboard.evCharging")}</TableHead>
+                          <TableHead>{t("dashboard.nonEv")}</TableHead>
+                          <TableHead className="text-right">{t("dashboard.evPercent")}</TableHead>
                         </TableRow>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                      </TableHeader>
+                      <TableBody>
+                        {billEvData.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center text-muted-foreground py-6">
+                              {!auth?.token ? t("dashboard.loginToView") : loadingBillEv ? t("dashboard.loading") : `${t("dashboard.noDataFor")} ${selectedYear}.`}
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          billEvData.map((m) => {
+                            const evPct = m.totalKwh > 0 ? (m.evKwh / m.totalKwh) * 100 : 0;
+                            return (
+                              <TableRow key={m.month} className={m.month === selectedMonth ? "bg-emerald-100/80 dark:bg-emerald-900/30" : ""}>
+                                <TableCell className="font-medium">{monthLabel(m.month)}</TableCell>
+                                <TableCell>{formatKwh(m.totalKwh)}</TableCell>
+                                <TableCell>
+                                  <span className="text-sky-600">{formatKwh(m.evKwh)}</span>
+                                </TableCell>
+                                <TableCell>
+                                  <span className="text-emerald-600">{formatKwh(m.nonEvKwh)}</span>
+                                </TableCell>
+                                <TableCell className="text-right">{evPct.toFixed(1)}%</TableCell>
+                              </TableRow>
+                            );
+                          })
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
 
             {!auth?.token && (
               <div className="text-center py-4">
