@@ -746,9 +746,7 @@ export default function Home() {
                 </span>
               ) : billEvError ? (
                 <span className="text-red-600">{billEvError}</span>
-              ) : monthsWithData > 0 ? (
-                <span className="text-emerald-600">{t("dashboard.dataLoaded")}</span>
-              ) : (
+              ) : monthsWithData > 0 ? null : (
                 <span>
                   {t("dashboard.noDataFor")} {selectedYear}
                 </span>
