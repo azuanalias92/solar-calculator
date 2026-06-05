@@ -528,7 +528,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <BarChart3 className="w-5 h-5 text-emerald-600" />
-                {t("dashboard.dailyEnergyUsage")} {t("dashboard.for")} {monthLabel(selectedMonth)} {selectedYear}
+                {t("dashboard.dailyEnergyUsage")} For {monthLabel(selectedMonth)} {selectedYear}
               </CardTitle>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-sm text-muted-foreground">
