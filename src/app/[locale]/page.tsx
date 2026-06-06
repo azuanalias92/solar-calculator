@@ -18,7 +18,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
 
 // ── Shared Types ──
 
@@ -600,28 +600,32 @@ export default function Home() {
               {dailyData.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8 text-sm">{loadingDaily ? t("dashboard.loading") : t("dashboard.noDataThisMonth")}</p>
               ) : (
-                <div className="w-full" style={{ height: 300 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={dailyData.map((d) => ({ ...d, day: getDay(d.date) }))} barGap={0} barCategoryGap={4}>
-                      <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
-                      <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} />
-                      <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
-                      <Tooltip
-                        contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
-                        formatter={(value: unknown, name: unknown) => [
-                          `${formatKwh(Number(value))} kWh`,
-                          name === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak"),
-                        ]}
-                      />
-                      <Legend
-                        formatter={(value: unknown) =>
-                          value === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak")
-                        }
-                      />
-                      <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" maxBarSize={32} />
-                      <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" maxBarSize={32} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                <div className="w-full overflow-x-auto" style={{ height: 300 }}>
+                  <BarChart
+                    width={Math.max(dailyData.length * 40, 300)}
+                    height={300}
+                    data={dailyData.map((d) => ({ ...d, day: getDay(d.date) }))}
+                    barGap={0}
+                    barCategoryGap={4}
+                  >
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+                    <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                    <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
+                    <Tooltip
+                      contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
+                      formatter={(value: unknown, name: unknown) => [
+                        `${formatKwh(Number(value))} kWh`,
+                        name === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak"),
+                      ]}
+                    />
+                    <Legend
+                      formatter={(value: unknown) =>
+                        value === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak")
+                      }
+                    />
+                    <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" maxBarSize={32} />
+                    <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" maxBarSize={32} />
+                  </BarChart>
                 </div>
               )}
 
@@ -693,24 +697,28 @@ export default function Home() {
               ) : (
                 <>
                   {/* ── Monthly bar chart ── */}
-                  <div className="w-full" style={{ height: 300 }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={summaryData} barGap={0} barCategoryGap={4}>
-                        <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
-                        <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => monthLabel(v)} />
-                        <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
-                        <Tooltip
-                          contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
-                          formatter={(value: unknown, name: unknown) => [
-                            `${formatKwh(Number(value))} kWh`,
-                            name === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak"),
-                          ]}
-                        />
-                        <Legend formatter={(value: unknown) => value === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak")} />
-                        <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" maxBarSize={32} />
-                        <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" maxBarSize={32} />
-                      </BarChart>
-                    </ResponsiveContainer>
+                  <div className="w-full overflow-x-auto" style={{ height: 300 }}>
+                    <BarChart
+                      width={Math.max(summaryData.length * 40, 300)}
+                      height={300}
+                      data={summaryData}
+                      barGap={0}
+                      barCategoryGap={4}
+                    >
+                      <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+                      <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => monthLabel(v)} />
+                      <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
+                      <Tooltip
+                        contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
+                        formatter={(value: unknown, name: unknown) => [
+                          `${formatKwh(Number(value))} kWh`,
+                          name === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak"),
+                        ]}
+                      />
+                      <Legend formatter={(value: unknown) => value === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak")} />
+                      <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" maxBarSize={32} />
+                      <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" maxBarSize={32} />
+                    </BarChart>
                   </div>
                   {/* ── Monthly bill table ── */}
                   <Accordion type="single" collapsible>
@@ -883,24 +891,28 @@ export default function Home() {
 
             {monthsWithData > 0 && (
               <>
-                <div className="w-full" style={{ height: 300 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={billEvData} barGap={0} barCategoryGap={4}>
-                      <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
-                      <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => monthLabel(v)} />
-                      <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
-                      <Tooltip
-                        contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
-                        formatter={(value: unknown, name: unknown) => [
-                          `${formatKwh(Number(value))} kWh`,
-                          name === "evKwh" || name === "evCharging" ? t("dashboard.evCharging") : t("dashboard.nonEv"),
-                        ]}
-                      />
-                      <Legend formatter={(value: unknown) => value === "evKwh" || value === "evCharging" ? t("dashboard.evCharging") : t("dashboard.nonEv")} />
-                      <Bar dataKey="evKwh" name="evCharging" stackId="a" fill="#0ea5e9" maxBarSize={32} />
-                      <Bar dataKey="nonEvKwh" name="nonEv" stackId="a" fill="#059669" maxBarSize={32} />
-                    </BarChart>
-                  </ResponsiveContainer>
+                <div className="w-full overflow-x-auto" style={{ height: 300 }}>
+                  <BarChart
+                    width={Math.max(billEvData.length * 40, 300)}
+                    height={300}
+                    data={billEvData}
+                    barGap={0}
+                    barCategoryGap={4}
+                  >
+                    <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
+                    <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => monthLabel(v)} />
+                    <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
+                    <Tooltip
+                      contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
+                      formatter={(value: unknown, name: unknown) => [
+                        `${formatKwh(Number(value))} kWh`,
+                        name === "evKwh" || name === "evCharging" ? t("dashboard.evCharging") : t("dashboard.nonEv"),
+                      ]}
+                    />
+                    <Legend formatter={(value: unknown) => value === "evKwh" || value === "evCharging" ? t("dashboard.evCharging") : t("dashboard.nonEv")} />
+                    <Bar dataKey="evKwh" name="evCharging" stackId="a" fill="#0ea5e9" maxBarSize={32} />
+                    <Bar dataKey="nonEvKwh" name="nonEv" stackId="a" fill="#059669" maxBarSize={32} />
+                  </BarChart>
                 </div>
               </>
             )}
