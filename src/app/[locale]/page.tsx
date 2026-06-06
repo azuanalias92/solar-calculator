@@ -631,7 +631,7 @@ export default function Home() {
 
               {/* ── Daily breakdown table ── */}
               {dailyData.length > 0 && (
-                <Accordion type="single" collapsible defaultValue="daily-table">
+                <Accordion type="single" collapsible>
                   <AccordionItem value="daily-table">
                     <AccordionTrigger className="text-sm font-medium">{t("dashboard.dailyBreakdown")}</AccordionTrigger>
                     <AccordionContent>
