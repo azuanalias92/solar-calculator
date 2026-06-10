@@ -12,6 +12,8 @@ import { useTranslation } from "@/lib/useTranslation";
 import { ModeToggle } from "@/components/ModeToggle";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
 import { Coffee, Github, Globe, LogOut, Sun, Zap, Info } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
 import AppHeader from "@/components/AppHeader";
 
 interface SolarConfig {
@@ -370,6 +372,8 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
+        <Separator className="my-2" />
+
         {/* Solar System Configuration */}
         <Card>
           <CardHeader>
@@ -382,7 +386,12 @@ export default function SettingsPage() {
             {!auth?.token ? (
               <div className="text-sm text-muted-foreground py-2">{t("settings.signInToConfigure")}</div>
             ) : solarLoading ? (
-              <div className="text-sm text-muted-foreground py-2">{t("settings.loading")}</div>
+              <div className="space-y-3 py-2">
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-32" />
+              </div>
             ) : (
               <div className="space-y-4">
                 <div className="grid gap-4 sm:grid-cols-3">
@@ -458,6 +467,8 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
+        <Separator className="my-2" />
+
         {/* Tariff Configuration */}
         <Card>
           <CardHeader>
@@ -508,6 +519,8 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
+        <Separator className="my-2" />
+
         {/* Tariff Rate Details */}
         <Card id="tariff-rate-details">
           <CardHeader className="space-y-2">
@@ -518,7 +531,7 @@ export default function SettingsPage() {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <div>{t("settings.asOf")}</div>
               <Input type="date" value={ratesAsOf} onChange={(e) => setRatesAsOf(e.target.value)} className="w-44" />
-              {ratesLoading ? <div>{t("settings.loading")}</div> : null}
+              {ratesLoading ? <Skeleton className="h-5 w-20" /> : null}
               {ratesError ? <div className="text-destructive">{ratesError}</div> : null}
             </div>
           </CardHeader>

@@ -10,6 +10,14 @@ import { getAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
 import { Coffee, Github, BarChart3, CalendarDays, Upload, Loader2, Car, Zap, Sun, BatteryCharging, Fuel, Plus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import AppHeader from "@/components/AppHeader";
 import {
   Dialog,
@@ -523,28 +531,36 @@ export default function Home() {
 
       {/* ── Global Year/Month Filter ── */}
       <div className="w-full max-w-6xl mx-auto py-4 flex items-center justify-end gap-3">
-        <select
+        <Select
           value={String(selectedYear)}
-          onChange={(e) => setSelectedYear(Number.parseInt(e.target.value, 10))}
-          className="flex h-9 w-28 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm"
+          onValueChange={(v) => setSelectedYear(Number.parseInt(v, 10))}
         >
-          {availableYears.map((y) => (
-            <option key={y} value={String(y)}>
-              {y}
-            </option>
-          ))}
-        </select>
-        <select
+          <SelectTrigger className="w-28" aria-label="Select year">
+            <SelectValue placeholder={String(selectedYear)} />
+          </SelectTrigger>
+          <SelectContent>
+            {availableYears.map((y) => (
+              <SelectItem key={y} value={String(y)}>
+                {y}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
           value={String(selectedMonth)}
-          onChange={(e) => setSelectedMonth(Number.parseInt(e.target.value, 10))}
-          className="flex h-9 w-28 rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm md:text-sm"
+          onValueChange={(v) => setSelectedMonth(Number.parseInt(v, 10))}
         >
-          {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-            <option key={m} value={String(m)}>
-              {monthLabel(m)}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="w-28" aria-label="Select month">
+            <SelectValue placeholder={monthLabel(selectedMonth)} />
+          </SelectTrigger>
+          <SelectContent>
+            {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+              <SelectItem key={m} value={String(m)}>
+                {monthLabel(m)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="flex-1 w-full max-w-6xl mx-auto space-y-6">

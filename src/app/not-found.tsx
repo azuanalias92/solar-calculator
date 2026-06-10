@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/lib/useTranslation'
 
 export default function NotFound() {
@@ -21,19 +22,15 @@ export default function NotFound() {
         </div>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link 
-            href="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            {t('common.goHome') || 'Go Home'}
-          </Link>
+          <Button asChild>
+            <Link href="/">
+              {t('common.goHome') || 'Go Home'}
+            </Link>
+          </Button>
           
-          <button 
-            onClick={() => window.history.back()}
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-6 py-3 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
+          <Button variant="outline" onClick={() => window.history.back()}>
             {t('common.goBack') || 'Go Back'}
-          </button>
+          </Button>
         </div>
         
         <div className="pt-8">

@@ -55,32 +55,33 @@ export default function EvCalculatorPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-              <div className="space-y-2">
-                <Label htmlFor="batteryKwh">{t("evCalc.quickPresets")}</Label>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    { label: t("evCalc.presets.20to80"), bat: "60.22", cur: "20", tgt: "80", price: "1.20" },
-                    { label: t("evCalc.presets.30to80"), bat: "60.22", cur: "30", tgt: "80", price: "1.20" },
-                    { label: t("evCalc.presets.10to90"), bat: "60.22", cur: "10", tgt: "100", price: "1.20" },
-                    { label: t("evCalc.presets.0to100"), bat: "60.22", cur: "0", tgt: "100", price: "1.20" },
-                  ].map((p) => (
-                    <Button
-                      key={p.label}
-                      variant="default"
-                      size="sm"
-                      className="text-xs"
-                      onClick={() => {
-                        setBatteryKwh(p.bat);
-                        setCurrentPct(p.cur);
-                        setTargetPct(p.tgt);
-                        setPricePerKwh(p.price);
-                      }}
-                    >
-                      {p.label}
-                    </Button>
-                  ))}
-                </div>
+            {/* Presets: inline row on web, single column on mobile */}
+            <div className="mb-4">
+              <Label className="text-xs sm:text-sm font-medium block sm:inline sm:mr-2 mb-2 sm:mb-0">
+                {t("evCalc.quickPresets")}
+              </Label>
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2">
+                {[
+                  { label: t("evCalc.presets.20to80"), bat: "60.22", cur: "20", tgt: "80", price: "1.20" },
+                  { label: t("evCalc.presets.30to80"), bat: "60.22", cur: "30", tgt: "80", price: "1.20" },
+                  { label: t("evCalc.presets.10to90"), bat: "60.22", cur: "10", tgt: "100", price: "1.20" },
+                  { label: t("evCalc.presets.0to100"), bat: "60.22", cur: "0", tgt: "100", price: "1.20" },
+                ].map((p) => (
+                  <Button
+                    key={p.label}
+                    variant="default"
+                    size="sm"
+                    className="text-xs w-full sm:w-auto"
+                    onClick={() => {
+                      setBatteryKwh(p.bat);
+                      setCurrentPct(p.cur);
+                      setTargetPct(p.tgt);
+                      setPricePerKwh(p.price);
+                    }}
+                  >
+                    {p.label}
+                  </Button>
+                ))}
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">

@@ -8,6 +8,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { exportToPDF } from "@/lib/pdfExport";
 import { Plus, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2, RotateCcw } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import ItemForm from "../items/form";
 import { useTranslation } from "@/lib/useTranslation";
 import AppHeader from "@/components/AppHeader";
@@ -286,19 +294,19 @@ export default function SolarCalculatorPage() {
           )}
         </div>
 
-        <div className="text-center text-sm text-muted-foreground mb-6">
+        <div className="text-center text-sm mb-6">
           {!auth?.token ? (
-            <span>Login to save to backend</span>
+            <Badge variant="outline" className="text-muted-foreground">Login to save to backend</Badge>
           ) : loading ? (
-            <span>Loading…</span>
+            <Badge variant="secondary">{t("common.loading") || "Loading…"}</Badge>
           ) : saving ? (
-            <span>Saving…</span>
+            <Badge variant="secondary">Saving…</Badge>
           ) : dirty ? (
-            <span className="text-amber-600">Unsaved changes • auto-saving…</span>
+            <Badge variant="outline" className="text-amber-600 border-amber-300 dark:border-amber-700">Unsaved changes • auto-saving…</Badge>
           ) : message ? (
-            <span className="text-foreground">{message}</span>
+            <Badge variant="default">{message}</Badge>
           ) : (
-            <span className="text-emerald-600">Synced ✓</span>
+            <Badge variant="default" className="bg-emerald-600 hover:bg-emerald-600">Synced ✓</Badge>
           )}
         </div>
 
@@ -368,17 +376,21 @@ export default function SolarCalculatorPage() {
                 <p className="text-sm text-muted-foreground">
                   Home tariff: <strong className="text-foreground">{currentTariffLabel}</strong>
                 </p>
-                <select
+                <Select
                   value={tariff}
-                  onChange={(e) => {
-                    setTariff(e.target.value);
-                    saveTariff(e.target.value);
+                  onValueChange={(v) => {
+                    setTariff(v);
+                    saveTariff(v);
                   }}
-                  className="flex h-9 w-56 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
-                  <option value="TNB_DOMESTIC_TOU">TNB Domestic TOU (Peak/Off-Peak)</option>
-                  <option value="TNB_DOMESTIC_AM">TNB Domestic AM (Flat Rate)</option>
-                </select>
+                  <SelectTrigger className="w-56" aria-label="Select tariff">
+                    <SelectValue placeholder={currentTariffLabel} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="TNB_DOMESTIC_TOU">TNB Domestic TOU (Peak/Off-Peak)</SelectItem>
+                    <SelectItem value="TNB_DOMESTIC_AM">TNB Domestic AM (Flat Rate)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <Link href={`/${locale}/settings`} className="text-xs text-muted-foreground hover:text-primary underline transition-colors">
                 Manage in Settings →
