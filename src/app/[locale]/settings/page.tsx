@@ -456,8 +456,8 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <Button onClick={() => void saveSolarConfig()} disabled={solarSaving}>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  <Button onClick={() => void saveSolarConfig()} disabled={solarSaving} className="w-full sm:w-auto">
                     {solarSaving ? t("settings.saving") : t("settings.saveConfig")}
                   </Button>
                   {solarMessage && <span className={`text-sm ${solarMessage.includes("✓") ? "text-emerald-600" : "text-red-600"}`}>{solarMessage}</span>}
