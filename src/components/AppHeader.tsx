@@ -22,7 +22,7 @@ export default function AppHeader({ locale, title, description, logoAlt }: Props
             <NavBar locale={locale} />
           </div>
         </div>
-        <p className="text-sm sm:text-base text-muted-foreground mt-2 items-start">{description}</p>
+        <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2 items-start">{description}</p>
       </div>
     </div>
   );
