@@ -21,6 +21,7 @@ import { useTranslation } from "@/lib/useTranslation";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { getAuthState, type AuthState } from "@/lib/auth";
+import { toast } from "sonner";
 
 interface Item {
   id: string;
@@ -63,7 +64,6 @@ export default function SolarCalculatorPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
   const saveTimerRef = useRef<number | null>(null);
   const skipNextSaveRef = useRef(true);
@@ -107,7 +107,6 @@ export default function SolarCalculatorPage() {
   useEffect(() => {
     let canceled = false;
     const run = async () => {
-      setMessage(null);
       setLoading(true);
       setIsLoaded(false);
       skipNextSaveRef.current = true;
@@ -127,7 +126,7 @@ export default function SolarCalculatorPage() {
           headers: { Authorization: `Bearer ${auth.token}` },
         });
         if (!res.ok) {
-          if (!canceled) setMessage("Failed to load from backend");
+          if (!canceled) toast.error("Failed to load from backend");
           if (!canceled) setIsLoaded(true);
           if (!canceled) setLoading(false);
           return;
@@ -143,7 +142,7 @@ export default function SolarCalculatorPage() {
         }
       } catch {
         if (!canceled) {
-          setMessage("Unable to reach the server. Please try again later.");
+          toast.error("Unable to reach the server. Please try again later.", { id: "conn-error" });
           setIsLoaded(true);
         }
       } finally {
@@ -168,14 +167,13 @@ export default function SolarCalculatorPage() {
         body: JSON.stringify({ items: nextItems, config: nextConfig }),
       });
       if (!res.ok) {
-        setMessage("Failed to save");
+        toast.error("Failed to save");
         return;
       }
       setDirty(false);
-      setMessage("Saved");
-      window.setTimeout(() => setMessage(null), 1200);
+      toast.success("Saved", { duration: 1200 });
     } catch {
-      setMessage("Unable to reach the server. Please try again later.");
+      toast.error("Unable to reach the server. Please try again later.", { id: "conn-error" });
     } finally {
       setSaving(false);
     }
@@ -299,17 +297,15 @@ export default function SolarCalculatorPage() {
 
         <div className="text-center text-sm mb-6">
           {!auth?.token ? (
-            <Badge variant="outline" className="text-muted-foreground">Login to save to backend</Badge>
+            <Badge variant="outline" className="text-muted-foreground">{t("sync.loginToSave")}</Badge>
           ) : loading ? (
-            <Badge variant="secondary">{t("common.loading") || "Loading…"}</Badge>
+            <Badge variant="secondary">{t("sync.loading")}</Badge>
           ) : saving ? (
-            <Badge variant="secondary">Saving…</Badge>
+            <Badge variant="secondary">{t("sync.saving")}</Badge>
           ) : dirty ? (
-            <Badge variant="outline" className="text-amber-600 border-amber-300 dark:border-amber-700">Unsaved changes • auto-saving…</Badge>
-          ) : message ? (
-            <Badge variant="default">{message}</Badge>
+            <Badge variant="outline" className="text-amber-600 border-amber-300 dark:border-amber-700">{t("sync.unsaved")} • {t("sync.autoSaving")}</Badge>
           ) : (
-            <Badge variant="default" className="bg-emerald-600 hover:bg-emerald-600">Synced ✓</Badge>
+            <Badge variant="default" className="bg-emerald-600 hover:bg-emerald-600">{t("sync.synced")} ✓</Badge>
           )}
         </div>
 

@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getAuthState, clearAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
+import { toast } from "sonner";
 import { ModeToggle } from "@/components/ModeToggle";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
 import { Coffee, Github, Globe, LogOut, Sun, Zap, Info } from "lucide-react";

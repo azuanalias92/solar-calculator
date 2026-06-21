@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/lib/ThemeProvider";
 import "./globals.css";
 
@@ -138,6 +139,11 @@ export default function RootLayout({
               "if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js');});}",
           }}
         />
+<script
+          dangerouslySetInnerHTML={{
+            __html: "let deferredPrompt;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;var btn=document.createElement('button');btn.textContent='Install App';btn.className='fixed bottom-4 right-4 z-50 px-4 py-2 bg-emerald-600 text-white rounded-lg shadow-lg hover:bg-emerald-700 text-sm font-medium transition-all';btn.onclick=function(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(r){if(r.outcome==='accepted'){btn.remove();}});}};document.body.appendChild(btn);});",
+          }}
+        />
       </head>
       <body className={inter.className}>
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-background focus:border focus:rounded focus:text-foreground focus:outline-none">
@@ -158,6 +164,7 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
+        <Toaster richColors closeButton />
         <Analytics />
         <SpeedInsights />
       </body>

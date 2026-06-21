@@ -1,15 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { getAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
-import GoogleAuthButton from "@/components/GoogleAuthButton";
-import { Coffee, Github, BarChart3, CalendarDays, Upload, Loader2, Car, Zap, Sun, BatteryCharging, Fuel, Plus } from "lucide-react";
+import { toast } from "sonner";
+import { BarChart3, Fuel, Car } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,94 +13,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import AppHeader from "@/components/AppHeader";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts"
-
-// ── Shared Types ──
-
-type DailyUsageItem = { date: string; peakKwh: number; offPeakKwh: number };
-type DailyUsageSummaryItem = {
-  month: number;
-  peakKwh: number;
-  offPeakKwh: number;
-  totalKwh: number;
-  billAmount: number | null;
-};
-type MonthSummary = { month: number; totalKwh: number; evKwh: number; nonEvKwh: number };
-type ChargingSession = { date: string; startTime: string; endTime: string; duration: string; kwh: number; cost: number };
-type MonthUsage = { month: number; evKwh: number; nonEvKwh: number };
-
-// ── Helpers ──
-
-function monthLabel(month: number): string {
-  return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][month - 1] ?? String(month);
-}
-function formatKwh(value: number): string {
-  return new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
-}
-function formatMoney(value: number): string {
-  const n = value.toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  return `RM ${n}`;
-}
-function parseCsvDate(dateStr: string): string {
-  const months: Record<string, string> = {
-    jan: "01",
-    feb: "02",
-    mar: "03",
-    apr: "04",
-    may: "05",
-    jun: "06",
-    jul: "07",
-    aug: "08",
-    sep: "09",
-    oct: "10",
-    nov: "11",
-    dec: "12",
-  };
-  const cleaned = dateStr.trim().replace(/\s+/g, " ");
-  const parts = cleaned.split(" ");
-  if (parts.length < 3) return "";
-  const mon = parts[0].toLowerCase().slice(0, 3);
-  const day = parts[1].replace(",", "").padStart(2, "0");
-  const year = parts[2];
-  const mm = months[mon];
-  if (!mm) return "";
-  return `${year}-${mm}-${day}`;
-}
-function formatDisplayDate(isoDate: string): string {
-  const [y, m, d] = isoDate.split("-");
-  return `${d}/${m}/${y}`;
-}
-
-function getDay(dateStr: string): number {
-  return Number.parseInt(dateStr.slice(8, 10), 10);
-}
-function getBarHeights(total: number, ev: number, maxTotal: number): { nonEvPct: number; evPct: number } {
-  if (maxTotal <= 0) return { nonEvPct: 0, evPct: 0 };
-  const totalPct = Math.max(0, Math.min(1, total / maxTotal));
-  const evPct = total > 0 ? (ev / total) * totalPct : 0;
-  const nonEvPct = totalPct - evPct;
-  return { nonEvPct, evPct };
-}
-function emptyYearData(): MonthUsage[] {
-  return Array.from({ length: 12 }, (_, idx) => ({ month: idx + 1, evKwh: 0, nonEvKwh: 0 }));
-}
-function dedupeYears(years: number[]): number[] {
-  return Array.from(new Set(years.filter((y) => Number.isFinite(y)))).sort((a, b) => b - a);
-}
-function yAxisLabels(max: number): number[] {
-  if (max <= 0) return [0, 0, 0, 0, 0];
-  const step = max / 4;
-  return [max, max - step, max - 2 * step, max - 3 * step, 0];
-}
+import Footer from "@/components/Footer";
+import DailyUsageSection from "@/components/dashboard/DailyUsageSection";
+import EvUsageSection from "@/components/dashboard/EvUsageSection";
+import ChargingSessionsSection from "@/components/dashboard/ChargingSessionsSection";
+import type { DailyUsageItem, DailyUsageSummaryItem, MonthSummary, ChargingSession, MonthUsage } from "@/components/dashboard/types";
+import { monthLabel, parseCsvDate, emptyYearData } from "@/components/dashboard/utils";
 
 export default function Home() {
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
@@ -129,6 +44,9 @@ export default function Home() {
     };
   }, []);
 
+  // ── Tab State ──
+  const [activeTab, setActiveTab] = useState<"daily" | "ev" | "sessions">("daily");
+
   // ── Global Filters ──
   const [selectedYear, setSelectedYear] = useState(currentYear);
   const [selectedMonth, setSelectedMonth] = useState(nowDate.month);
@@ -144,7 +62,6 @@ export default function Home() {
       if (!tooltipDismissed.current) setBarTooltip(null);
       tooltipDismissed.current = true;
     };
-    // Delay adding listener so current pointer event doesn't trigger it
     const id = setTimeout(() => document.addEventListener("pointerdown", handler), 50);
     return () => {
       clearTimeout(id);
@@ -273,13 +190,6 @@ export default function Home() {
     const offPeak = dailyData.reduce((s, d) => s + d.offPeakKwh, 0);
     return { peak, offPeak, total: peak + offPeak };
   }, [dailyData]);
-
-  const maxDailyTotal = useMemo(() => dailyData.reduce((max, d) => Math.max(max, d.peakKwh + d.offPeakKwh), 0), [dailyData]);
-
-  const barHeightPct = (value: number): number => {
-    if (maxDailyTotal <= 0) return 0;
-    return Math.max(0, Math.min(100, (value / maxDailyTotal) * 100));
-  };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -412,7 +322,6 @@ export default function Home() {
     });
   }, [billEvData]);
 
-  const maxTotal = useMemo(() => billEvData.reduce((max, m) => Math.max(max, m.totalKwh), 0), [billEvData]);
   const monthsWithData = useMemo(() => billEvData.filter((m) => m.totalKwh > 0).length, [billEvData]);
 
   // ═══════════════════════════════════════════════
@@ -483,10 +392,6 @@ export default function Home() {
     return byMonth;
   }, [sessions]);
 
-  const mergedEvData = useMemo(() => existingEvData.map((m) => ({ ...m, evKwh: m.evKwh + (monthlyEv.get(m.month) ?? 0) })), [existingEvData, monthlyEv]);
-
-  const evTotals = useMemo(() => existingEvData.reduce((s, m) => ({ evKwh: s.evKwh + m.evKwh, nonEvKwh: s.nonEvKwh + m.nonEvKwh }), { evKwh: 0, nonEvKwh: 0 }), [existingEvData]);
-
   const sessionTotals = useMemo(() => sessions.reduce((s, c) => ({ kwh: s.kwh + c.kwh, cost: s.cost + c.cost }), { kwh: 0, cost: 0 }), [sessions]);
 
   const handleSaveEv = async () => {
@@ -524,6 +429,12 @@ export default function Home() {
   // ═══════════════════════════════════════════════
   // RENDER
   // ═══════════════════════════════════════════════
+
+  const tabs = [
+    { id: "daily" as const, label: t("dashboard.dailyEnergyUsage"), icon: BarChart3 },
+    { id: "ev" as const, label: t("dashboard.evVsNonEv"), icon: Fuel },
+    { id: "sessions" as const, label: t("dashboard.chargingSessions"), icon: Car },
+  ];
 
   return (
     <div className="flex flex-col min-h-screen p-2 sm:p-6 lg:p-8 bg-background">
@@ -563,515 +474,87 @@ export default function Home() {
         </Select>
       </div>
 
-      <div className="flex-1 w-full max-w-6xl mx-auto space-y-6">
-        {/* ════════════════════════ SECTION 1: Daily Energy Usage ════════════════════════ */}
-        <Card>
-          <CardHeader className="space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <BarChart3 className="w-5 h-5 text-emerald-600" />
-                {t("dashboard.dailyEnergyUsage")} For {monthLabel(selectedMonth)} {selectedYear}
-              </CardTitle>
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="text-sm text-muted-foreground">
-                  {!auth?.token ? t("dashboard.loginToView") : ""}
-                  {loadingDaily ? <Loader2 className="w-3 h-3 inline animate-spin ml-1" /> : null}
-                  {usageMsg ? <span className="text-foreground ml-2">{usageMsg}</span> : null}
-                </span>
-                <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleFileUpload} />
-                <Button variant="secondary" size="sm" disabled={!auth?.token || uploading} onClick={() => fileInputRef.current?.click()}>
-                  {uploading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Upload className="w-4 h-4 mr-1" />}
-                  {t("dashboard.uploadCsv")}
-                </Button>
-              </div>
-            </div>
-            {auth?.token && (
-              <div className="flex flex-wrap gap-4 text-sm pt-1">
-                <div className="flex items-center gap-1">
-                  <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" />
-                  {t("dashboard.peak")}:{" "}
-                  <strong>
-                  {formatKwh(dailyTotals.peak)} {t("dashboard.kwh")}
-                  </strong>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />
-                  {t("dashboard.offPeak")}:{" "}
-                  <strong>
-                  {formatKwh(dailyTotals.offPeak)} {t("dashboard.kwh")}
-                  </strong>
-                </div>
-                <div>
-                  {t("dashboard.total")}:{" "}
-                  <strong>
-                    {formatKwh(dailyTotals.total)} {t("dashboard.kwh")}
-                  </strong>
-                </div>
-              </div>
-            )}
-          </CardHeader>
-          {auth?.token && (
-            <CardContent className="space-y-6">
-              {/* ── Bar chart ── */}
-              {dailyData.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8 text-sm">{loadingDaily ? t("dashboard.loading") : t("dashboard.noDataThisMonth")}</p>
-              ) : (
-                <div className="w-full overflow-x-auto" style={{ height: 300 }}>
-                  <BarChart
-                    width={Math.max(dailyData.length * 40, 300)}
-                    height={300}
-                    data={dailyData.map((d) => ({ ...d, day: getDay(d.date) }))}
-                    barGap={0}
-                    barCategoryGap={4}
-                  >
-                    <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
-                    <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} />
-                    <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
-                    <Tooltip
-                      contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
-                      formatter={(value: unknown, name: unknown) => [
-                        `${formatKwh(Number(value))} kWh`,
-                        name === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak"),
-                      ]}
-                    />
-                    <Legend
-                      formatter={(value: unknown) =>
-                        value === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak")
-                      }
-                    />
-                    <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" maxBarSize={32} />
-                    <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" maxBarSize={32} />
-                  </BarChart>
-                </div>
-              )}
-
-              {/* ── Daily breakdown table ── */}
-              {dailyData.length > 0 && (
-                <Accordion type="single" collapsible>
-                  <AccordionItem value="daily-table">
-                    <AccordionTrigger className="text-sm font-medium">{t("dashboard.dailyBreakdown")}</AccordionTrigger>
-                    <AccordionContent>
-                      <div className="overflow-x-auto">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>{t("dashboard.date")}</TableHead>
-                              <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
-                              <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
-                              <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {dailyData.map((d) => (
-                              <TableRow key={d.date}>
-                                <TableCell className="font-medium">{formatDisplayDate(d.date)}</TableCell>
-                                <TableCell className="text-right">{formatKwh(d.peakKwh)}</TableCell>
-                                <TableCell className="text-right">{formatKwh(d.offPeakKwh)}</TableCell>
-                                <TableCell className="text-right font-medium">{formatKwh(d.peakKwh + d.offPeakKwh)}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              )}
-            </CardContent>
-          )}
-        </Card>
-
-        {auth?.token && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <BarChart3 className="w-4 h-4 text-emerald-600" />
-                {t("dashboard.monthlyBillSummary")} For {selectedYear}
-              </CardTitle>
-              {summaryData.length > 0 && (
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <span>
-                    {t("dashboard.total")}:{" "}
-                    <strong>
-                      {formatKwh(summaryData.reduce((s, m) => s + m.totalKwh, 0))} {t("dashboard.kwh")}
-                    </strong>
-                  </span>
-                  <span>
-                    {t("dashboard.estBill")}:{" "}
-                    <strong>
-                      {formatMoney(summaryData.reduce((s, m) => s + (m.billAmount ?? 0), 0))}
-                    </strong>
-                  </span>
-                </div>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {loadingSummary ? (
-                <p className="text-center text-muted-foreground py-4">{t("dashboard.loading")}</p>
-              ) : summaryData.length === 0 ? (
-                <p className="text-center text-muted-foreground py-4">{t("dashboard.noDataYet")}</p>
-              ) : (
-                <>
-                  {/* ── Monthly bar chart ── */}
-                  <div className="w-full overflow-x-auto" style={{ height: 300 }}>
-                    <BarChart
-                      width={Math.max(summaryData.length * 40, 300)}
-                      height={300}
-                      data={summaryData}
-                      barGap={0}
-                      barCategoryGap={4}
-                    >
-                      <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
-                      <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => monthLabel(v)} />
-                      <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
-                      <Tooltip
-                        contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
-                        formatter={(value: unknown, name: unknown) => [
-                          `${formatKwh(Number(value))} kWh`,
-                          name === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak"),
-                        ]}
-                      />
-                      <Legend formatter={(value: unknown) => value === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak")} />
-                      <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" maxBarSize={32} />
-                      <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" maxBarSize={32} />
-                    </BarChart>
-                  </div>
-                  {/* ── Monthly bill table ── */}
-                  <Accordion type="single" collapsible>
-                    <AccordionItem value="monthly-table">
-                      <AccordionTrigger className="text-sm font-medium">{t("dashboard.monthlyBreakdownKwh")}</AccordionTrigger>
-                      <AccordionContent>
-                        <div className="overflow-x-auto">
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead>{t("dashboard.month")}</TableHead>
-                                <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
-                                <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
-                                <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
-                                <TableHead className="text-right">{t("dashboard.estBill")}</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {summaryData.map((s) => (
-                                <TableRow key={s.month} className={s.month === selectedMonth ? "bg-muted/50" : ""}>
-                                  <TableCell className="font-medium">{monthLabel(s.month)}</TableCell>
-                                  <TableCell className="text-right">{formatKwh(s.peakKwh)}</TableCell>
-                                  <TableCell className="text-right">{formatKwh(s.offPeakKwh)}</TableCell>
-                                  <TableCell className="text-right font-medium">{formatKwh(s.totalKwh)}</TableCell>
-                                  <TableCell className="text-right">{s.billAmount != null ? formatMoney(s.billAmount) : "—"}</TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* ════════════════════════ SECTION 2: EV vs Non-EV ════════════════════════ */}
-        <Card>
-          <CardHeader className="space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Fuel className="w-5 h-5 text-emerald-600" />
-                {t("dashboard.evVsNonEv")} {selectedYear}
-              </CardTitle>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="secondary" size="sm">
-                    <Upload className="w-4 h-4 mr-1" />
-                    {t("dashboard.importPlus")}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <Car className="w-5 h-5 text-emerald-600" />
-                      {t("dashboard.evChargingImport")}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 pt-2">
-                    <p className="text-sm text-muted-foreground">{t("dashboard.pasteInstructions")}</p>
-                    <details className="text-xs text-muted-foreground bg-muted/30 rounded-md p-3">
-                      <summary className="cursor-pointer font-medium text-foreground text-sm mb-1">How to extract text from PDF</summary>
-                      <ol className="list-decimal list-inside space-y-1 mt-2 text-xs sm:text-sm">
-                        <li>Open your Easy Charging PDF</li>
-                        <li>Copy all text from the PDF (<code className="bg-muted px-1 rounded">Ctrl+A</code> → <code className="bg-muted px-1 rounded">Ctrl+C</code>)</li>
-                        <li>Paste it in the text area below</li>
-                      </ol>
-                      <p className="mt-2 text-xs sm:text-sm">
-                        <strong>Tip:</strong> If copying doesn't work, use{" "}
-                        <a href="https://www.pdftotext.com" target="_blank" rel="noopener noreferrer" className="underline">pdftotext.com</a>{" "}
-                        or run <code className="bg-muted px-1 rounded break-all">pdftotext -layout charging.pdf output.txt</code> on desktop.
-                      </p>
-                      <p className="mt-2 text-xs sm:text-sm">
-                        <strong>Expected format per line:</strong>
-                      </p>
-                      <pre className="bg-muted p-2 rounded mt-1 text-[10px] sm:text-xs overflow-x-auto whitespace-nowrap">
-254902721  Azuan Alias  2026-06-05  00:06:39  2026-06-05  10:13:03  10H06M  61.0  17.57</pre>
-                    </details>
-                    <Textarea placeholder={t("dashboard.pastePlaceholder")} value={rawInput} onChange={(e) => setRawInput(e.target.value)} rows={6} className="font-mono text-sm" />
-                    <div className="flex gap-2">
-                      <Button onClick={handleParse} disabled={!rawInput.trim()}>
-                        <Upload className="w-4 h-4 mr-1" />
-                        {t("dashboard.parseSessions")}
-                      </Button>
-                      {sessions.length > 0 && auth?.token && (
-                        <Button onClick={handleSaveEv} variant="secondary" disabled={saving}>
-                          {saving ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Zap className="w-4 h-4 mr-1" />}
-                          {saving ? t("dashboard.saving") : `${t("dashboard.saveTo")} ${selectedYear}`}
-                        </Button>
-                      )}
-                    </div>
-                    {evMsg && <p className="text-sm text-foreground">{evMsg}</p>}
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {!auth?.token ? (
-                <span>{t("dashboard.loginToView")}</span>
-              ) : loadingBillEv ? (
-                <span>
-                  <Loader2 className="w-3 h-3 inline animate-spin mr-1" />
-                  {t("dashboard.loading")}
-                </span>
-              ) : billEvError ? (
-                <span className="text-red-600">{billEvError}</span>
-              ) : monthsWithData > 0 ? null : (
-                <span>
-                  {t("dashboard.noDataFor")} {selectedYear}
-                </span>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {(() => {
-              const total = billEvTotals.grandTotal;
-              const evTotal = billEvTotals.evTotal;
-              const nonEvTotal = billEvTotals.nonEvTotal;
-              if (total <= 0) return null;
-              const circ = 2 * Math.PI * 55;
-              const evLen = (evTotal / total) * circ;
-              const evPct = ((evTotal / total) * 100).toFixed(1);
-              const nonEvPct = ((nonEvTotal / total) * 100).toFixed(1);
-              return (
-                <div className="flex flex-col items-center py-2">
-                  <svg width="150" height="150" viewBox="0 0 150 150">
-                    {/* Background ring */}
-                    <circle cx="75" cy="75" r="60" fill="none" className="stroke-muted" strokeWidth="22" />
-                    {/* EV arc */}
-                    {evTotal > 0 && (
-                      <circle cx="75" cy="75" r="60" fill="none" className="stroke-sky-500" strokeWidth="22"
-                        strokeDasharray={`${evLen} ${circ}`}
-                        transform="rotate(-90 75 75)"
-                        strokeLinecap="round"
-                      />
-                    )}
-                    {/* Non-EV arc */}
-                    {nonEvTotal > 0 && (
-                      <circle cx="75" cy="75" r="60" fill="none" className="stroke-emerald-600" strokeWidth="22"
-                        strokeDasharray={`${circ - evLen} ${circ}`}
-                        strokeDashoffset={-evLen}
-                        transform="rotate(-90 75 75)"
-                        strokeLinecap="round"
-                      />
-                    )}
-                    {/* Center total */}
-                    <text x="75" y="70" textAnchor="middle" className="fill-foreground" fontSize="22" fontWeight="bold">
-                      {formatKwh(total)}
-                    </text>
-                    <text x="75" y="92" textAnchor="middle" className="fill-muted-foreground" fontSize="12">
-                      kWh
-                    </text>
-                  </svg>
-                  <div className="flex gap-6 mt-2">
-                    <span className="flex items-center gap-1.5 text-sm">
-                      <span className="inline-block w-3 h-3 rounded-sm bg-sky-500" />
-                      <strong>{formatKwh(evTotal)}</strong> kWh ({evPct}%)
-                    </span>
-                    <span className="flex items-center gap-1.5 text-sm">
-                      <span className="inline-block w-3 h-3 rounded-sm bg-emerald-600" />
-                      <strong>{formatKwh(nonEvTotal)}</strong> kWh ({nonEvPct}%)
-                    </span>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {monthsWithData > 0 && (
-              <>
-                <div className="w-full overflow-x-auto" style={{ height: 300 }}>
-                  <BarChart
-                    width={Math.max(billEvData.length * 40, 300)}
-                    height={300}
-                    data={billEvData}
-                    barGap={0}
-                    barCategoryGap={4}
-                  >
-                    <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.5} />
-                    <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => monthLabel(v)} />
-                    <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
-                    <Tooltip
-                      contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
-                      formatter={(value: unknown, name: unknown) => [
-                        `${formatKwh(Number(value))} kWh`,
-                        name === "evKwh" || name === "evCharging" ? t("dashboard.evCharging") : t("dashboard.nonEv"),
-                      ]}
-                    />
-                    <Legend formatter={(value: unknown) => value === "evKwh" || value === "evCharging" ? t("dashboard.evCharging") : t("dashboard.nonEv")} />
-                    <Bar dataKey="evKwh" name="evCharging" stackId="a" fill="#0ea5e9" maxBarSize={32} />
-                    <Bar dataKey="nonEvKwh" name="nonEv" stackId="a" fill="#059669" maxBarSize={32} />
-                  </BarChart>
-                </div>
-              </>
-            )}
-
-            <Accordion type="single" collapsible>
-              <AccordionItem value="ev-table">
-                <AccordionTrigger className="text-sm font-medium">{t("dashboard.totalUsage")}</AccordionTrigger>
-                <AccordionContent>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>{t("dashboard.month")}</TableHead>
-                          <TableHead>{t("dashboard.totalUsage")}</TableHead>
-                          <TableHead>{t("dashboard.evCharging")}</TableHead>
-                          <TableHead>{t("dashboard.nonEv")}</TableHead>
-                          <TableHead className="text-right">{t("dashboard.evPercent")}</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {billEvData.length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={5} className="text-center text-muted-foreground py-6">
-                              {!auth?.token ? t("dashboard.loginToView") : loadingBillEv ? t("dashboard.loading") : `${t("dashboard.noDataFor")} ${selectedYear}.`}
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          billEvData.map((m) => {
-                            const evPct = m.totalKwh > 0 ? (m.evKwh / m.totalKwh) * 100 : 0;
-                            return (
-                              <TableRow key={m.month} className={m.month === selectedMonth ? "bg-muted/50" : ""}>
-                              <TableCell className="font-medium">{monthLabel(m.month)}</TableCell>
-                              <TableCell>{formatKwh(m.totalKwh)}</TableCell>
-                              <TableCell>
-                                <span>{formatKwh(m.evKwh)}</span>
-                              </TableCell>
-                              <TableCell>
-                                <span>{formatKwh(m.nonEvKwh)}</span>
-                              </TableCell>
-                                <TableCell className="text-right">{evPct.toFixed(1)}%</TableCell>
-                              </TableRow>
-                            );
-                          })
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-
-            {!auth?.token && (
-              <div className="text-center py-4">
-                <p className="text-sm text-muted-foreground mb-2">{t("dashboard.signInToView")}</p>
-                <GoogleAuthButton locale={locale} />
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-
-        {sessions.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Car className="w-4 h-4 text-emerald-600" />
-                {t("dashboard.chargingSessions")} ({sessions.length})
-              </CardTitle>
-              <div className="flex gap-4 text-sm">
-                <span>
-                  {t("dashboard.total")}:{" "}
-                  <strong>
-                    {formatKwh(sessionTotals.kwh)} {t("dashboard.kwh")}
-                  </strong>
-                </span>
-                <span>
-                  {t("dashboard.cost")}: <strong>{formatMoney(sessionTotals.cost)}</strong>
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent className="p-2 sm:p-6">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t("dashboard.date")}</TableHead>
-                      <TableHead>{t("dashboard.start")}</TableHead>
-                      <TableHead>{t("dashboard.end")}</TableHead>
-                      <TableHead>{t("dashboard.duration")}</TableHead>
-                      <TableHead className="text-right">{t("dashboard.kwh")}</TableHead>
-                      <TableHead className="text-right">{t("dashboard.costRm")}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {sessions.map((s, i) => (
-                      <TableRow key={i}>
-                        <TableCell className="font-medium">{s.date}</TableCell>
-                        <TableCell>{s.startTime}</TableCell>
-                        <TableCell>{s.endTime}</TableCell>
-                        <TableCell>{s.duration}</TableCell>
-                        <TableCell className="text-right">{s.kwh.toFixed(1)}</TableCell>
-                        <TableCell className="text-right">{s.cost.toFixed(2)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-      </div>
-      <footer className="border-t bg-card/50 backdrop-blur-sm mt-4">
-        <div className="w-full max-w-6xl mx-auto flex flex-col gap-3 sm:gap-4 mt-3 sm:mt-4 md:flex-row md:justify-between md:items-center px-2 sm:px-0">
-          <div className="text-base sm:text-lg font-semibold text-primary text-center md:text-left">{t("common.title")}</div>
-          <div className="text-xs sm:text-sm text-muted-foreground text-center md:text-left order-3 md:order-2">
-            {t("footer.madeBy")}{" "}
-            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-outline transition-colors">
-              Azuan Alias
-            </a>
-          </div>
-          <div className="flex items-center justify-center gap-3 sm:gap-4 order-2 md:order-3">
-            <a
-              href="https://github.com/azuanalias92"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              <Github className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t("footer.github")}</span>
-            </a>
-            <a
-              href="https://ko-fi.com/azuanalias"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              <Coffee className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t("footer.buyMeCoffee")}</span>
-            </a>
-          </div>
+      {/* ── Tab Navigation ── */}
+      <div className="w-full max-w-6xl mx-auto pb-4">
+        <div className="flex gap-1 bg-muted rounded-lg p-1">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <Button
+                key={tab.id}
+                variant={activeTab === tab.id ? "default" : "ghost"}
+                size="sm"
+                className="flex-1 gap-1.5"
+                onClick={() => setActiveTab(tab.id)}
+              >
+                <Icon className="w-4 h-4" />
+                <span className="hidden sm:inline">{tab.label}</span>
+              </Button>
+            );
+          })}
         </div>
-      </footer>
+      </div>
+
+      <div className="flex-1 w-full max-w-6xl mx-auto space-y-6">
+        {/* ════════════════════════ Daily Usage Tab ════════════════════════ */}
+        {activeTab === "daily" && (
+          <DailyUsageSection
+            auth={auth}
+            t={t}
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+            loadingDaily={loadingDaily}
+            loadingSummary={loadingSummary}
+            uploading={uploading}
+            usageMsg={usageMsg}
+            dailyData={dailyData}
+            summaryData={summaryData}
+            dailyTotals={dailyTotals}
+            fileInputRef={fileInputRef}
+            handleFileUpload={handleFileUpload}
+          />
+        )}
+
+        {/* ════════════════════════ EV vs Non-EV Tab ════════════════════════ */}
+        {activeTab === "ev" && (
+          <EvUsageSection
+            auth={auth}
+            t={t}
+            locale={locale}
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
+            billEvData={billEvData}
+            loadingBillEv={loadingBillEv}
+            billEvError={billEvError}
+            billEvTotals={billEvTotals}
+            monthsWithData={monthsWithData}
+            rawInput={rawInput}
+            setRawInput={setRawInput}
+            sessions={sessions}
+            evMsg={evMsg}
+            handleParse={handleParse}
+            handleSaveEv={handleSaveEv}
+            saving={saving}
+          />
+        )}
+
+        {/* ════════════════════════ Charging Sessions Tab ════════════════════════ */}
+        {activeTab === "sessions" && sessions.length > 0 && (
+          <ChargingSessionsSection
+            t={t}
+            sessions={sessions}
+            sessionTotals={sessionTotals}
+          />
+        )}
+        {activeTab === "sessions" && sessions.length === 0 && (
+          <div className="text-center py-16 text-muted-foreground">
+            <Car className="w-12 h-12 mx-auto mb-4 opacity-30" />
+            <p className="text-sm">{t("dashboard.noSessions")}</p>
+          </div>
+        )}
+      </div>
+
+      <Footer />
 
       {barTooltip && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-md border bg-popover px-4 py-2.5 text-sm shadow-md text-center font-medium">
