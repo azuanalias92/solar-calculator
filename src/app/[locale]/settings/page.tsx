@@ -181,11 +181,12 @@ export default function SettingsPage() {
           setTouRate(touJson?.data ?? null);
           setAmRate(amJson?.data ?? null);
         }
-      } catch {
+      } catch (err) {
         if (!canceled) {
           setTouRate(null);
           setAmRate(null);
-          setRatesError(t("settings.unableToReachApi") + ` ${apiBaseUrl}.`);
+          setRatesError(t("settings.unableToReachApi"));
+          toast.error(t("settings.unableToReachApi"));
         }
       } finally {
         if (!canceled) setRatesLoading(false);
@@ -244,8 +245,8 @@ export default function SettingsPage() {
             });
           }
         }
-      } catch {
-        /* ignore */
+      } catch (err) {
+        if (!canceled) toast.error(t("settings.unableToReachApi"));
       } finally {
         if (!canceled) {
           setSolarLoaded(true);
