@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { exportToPDF } from "@/lib/pdfExport";
-import { Plus, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2, RotateCcw } from "lucide-react";
+import { Plus, FileUp, Zap, Package, BarChart3, Sun, Trash2, RotateCcw } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -15,13 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import ItemForm from "../items/form";
 import { useTranslation } from "@/lib/useTranslation";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { getAuthState, handleAuthFailure, type AuthState } from "@/lib/auth";
-import { toast } from "sonner";
 
 interface Item {
   id: string;
@@ -131,8 +129,7 @@ export default function SolarCalculatorPage() {
           return;
         }
         if (!res.ok) {
-          if (!canceled) toast.error("Failed to load from backend");
-          if (!canceled) setIsLoaded(true);
+          if (!canceled)           if (!canceled) setIsLoaded(true);
           if (!canceled) setLoading(false);
           return;
         }
@@ -147,8 +144,7 @@ export default function SolarCalculatorPage() {
         }
       } catch {
         if (!canceled) {
-          toast.error("Unable to reach the server. Please try again later.", { id: "conn-error" });
-          setIsLoaded(true);
+                    setIsLoaded(true);
         }
       } finally {
         if (!canceled) setLoading(false);
@@ -172,14 +168,11 @@ export default function SolarCalculatorPage() {
       });
       if (handleAuthFailure(res)) return;
       if (!res.ok) {
-        toast.error("Failed to save");
-        return;
+                return;
       }
       setDirty(false);
-      toast.success("Saved", { duration: 1200 });
-    } catch {
-      toast.error("Unable to reach the server. Please try again later.", { id: "conn-error" });
-    } finally {
+          } catch {
+          } finally {
       setSaving(false);
     }
   };
@@ -300,17 +293,7 @@ export default function SolarCalculatorPage() {
           )}
         </div>
 
-        <div className="text-center text-sm mb-6">
-          {loading ? (
-            <Badge variant="secondary">{t("sync.loading")}</Badge>
-          ) : saving ? (
-            <Badge variant="secondary">{t("sync.saving")}</Badge>
-          ) : dirty ? (
-            <Badge variant="outline" className="text-amber-600 border-amber-300 dark:border-amber-700">{t("sync.unsaved")} • {t("sync.autoSaving")}</Badge>
-          ) : (
-            <Badge variant="default" className="bg-emerald-600 hover:bg-emerald-600">{t("sync.synced")} ✓</Badge>
-          )}
-        </div>
+
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8 px-2 sm:px-0">
@@ -447,40 +430,7 @@ export default function SolarCalculatorPage() {
         </Card>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t bg-card/50 backdrop-blur-sm mt-4">
-        <div className="w-full max-w-6xl mx-auto flex flex-col gap-3 sm:gap-4 mt-3 sm:mt-4 md:flex-row md:justify-between md:items-center px-2 sm:px-0">
-          <div className="text-base sm:text-lg font-semibold text-primary text-center md:text-left">{t("common.title")}</div>
-
-          <div className="text-xs sm:text-sm text-muted-foreground text-center md:text-left order-3 md:order-2">
-            {t("footer.madeBy")}{" "}
-            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-primary hover:text-primary/70 transition-colors">
-              Azuan Alias
-            </a>
-          </div>
-
-          <div className="flex items-center justify-center gap-3 sm:gap-4 order-2 md:order-3">
-            <a
-              href="https://github.com/azuanalias92"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              <Github className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t("footer.github")}</span>
-            </a>
-            <a
-              href="https://ko-fi.com/azuanalias"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              <Coffee className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t("footer.buyMeCoffee")}</span>
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
