@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { exportToPDF } from "@/lib/pdfExport";
-import { Plus, FileUp, Zap, Package, BarChart3, Sun, Github, Trash2, RotateCcw } from "lucide-react";
+import { Plus, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2, RotateCcw } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -159,7 +159,6 @@ export default function SolarCalculatorPage() {
   const saveRemote = async (nextItems: Item[], nextConfig: SolarConfig) => {
     if (!auth?.token) return;
     setSaving(true);
-    setMessage(null);
     try {
       const res = await fetch(`${apiBaseUrl}/calculator/state`, {
         method: "PUT",
@@ -377,7 +376,7 @@ export default function SolarCalculatorPage() {
                 </p>
                 <Select
                   value={tariff}
-                  onValueChange={(v) => {
+                  onValueChange={(v: string) => {
                     setTariff(v);
                     saveTariff(v);
                   }}
