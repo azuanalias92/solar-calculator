@@ -145,7 +145,7 @@
     "totalEv": "Total EV",
     "totalNonEv": "Total Non-EV",
     "nonEv": "Non-EV",
-    "evCharging": "EV Charging",
+    "evCharging": "Manage EV charging costs",
     "monthlyBreakdownKwh": "Monthly Breakdown (kWh)",
     "evChargingImport": "EV Charging Import",
     "pasteInstructions": "Paste Easy Charging PDF text below. The parser extracts dates, kWh, and costs.",
@@ -191,7 +191,9 @@
     "dailyConsumption": "Daily Consumption",
     "dataForThisMonth": "No data for this month.",
     "signInToViewData": "Sign in to view data",
-    "totalLabel": "Total"
+    "totalLabel": "Total",
+    "trackEnergy": "Track your energy usage",
+    "monitorSolar": "Monitor your solar savings"
   },
   "settings": {
     "account": "Account",
@@ -294,7 +296,8 @@
     "loading": "Google sign-in is still loading",
     "notConfigured": "Google sign-in is not configured",
     "promptUnavailable": "Google sign-in prompt could not be shown",
-    "failed": "Google sign-in failed"
+    "failed": "Google sign-in failed",
+    "signInPrompt": "Sign in to access your dashboard"
   },
   "theme": {
     "light": "Light",

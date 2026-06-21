@@ -145,7 +145,7 @@
     "totalEv": "Jumlah EV",
     "totalNonEv": "Jumlah Bukan EV",
     "nonEv": "Bukan EV",
-    "evCharging": "Pengecasan EV",
+    "evCharging": "Urus kos pengecasan EV",
     "monthlyBreakdownKwh": "Pecahan Bulanan (kWh)",
     "evChargingImport": "Import Pengecasan EV",
     "pasteInstructions": "Tampal teks PDF Easy Charging di bawah. Pengekstrak tarikh, kWh, dan kos.",
@@ -191,7 +191,9 @@
     "dailyConsumption": "Penggunaan Harian",
     "dataForThisMonth": "Tiada data untuk bulan ini.",
     "signInToViewData": "Log masuk untuk melihat data",
-    "totalLabel": "Jumlah"
+    "totalLabel": "Jumlah",
+    "trackEnergy": "Jejaki penggunaan tenaga anda",
+    "monitorSolar": "Pantau penjimatan solar anda"
   },
   "settings": {
     "account": "Akaun",
@@ -294,7 +296,8 @@
     "loading": "Log masuk Google masih dimuatkan",
     "notConfigured": "Log masuk Google belum dikonfigurasi",
     "promptUnavailable": "Prompt log masuk Google tidak dapat dipaparkan",
-    "failed": "Log masuk Google gagal"
+    "failed": "Log masuk Google gagal",
+    "signInPrompt": "Log masuk untuk mengakses papan pemuka anda"
   },
   "theme": {
     "light": "Terang",

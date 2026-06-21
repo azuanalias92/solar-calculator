@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { getAuthState, handleAuthFailure, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import { toast } from "sonner";
-import { BarChart3, Fuel, Car } from "lucide-react";
+import { BarChart3, Fuel, Car, Sun, Zap } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import GoogleAuthButton from "@/components/GoogleAuthButton";
 import {
   Select,
   SelectContent,
@@ -451,6 +453,49 @@ export default function Home() {
     { id: "ev" as const, label: t("dashboard.evVsNonEv"), icon: Fuel },
     { id: "sessions" as const, label: t("dashboard.chargingSessions"), icon: Car },
   ];
+
+  // ── Not logged in → show login wall ──
+  if (!auth?.token) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background">
+        <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md border-emerald-200 dark:border-emerald-800 shadow-lg">
+            <CardContent className="pt-8 pb-8 space-y-6 text-center">
+              <div className="mx-auto w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                <Sun className="w-8 h-8 text-emerald-600" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold tracking-tight">{t("common.title")}</h2>
+                <p className="text-sm text-muted-foreground">{t("common.description")}</p>
+              </div>
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                  <Zap className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>{t("dashboard.trackEnergy") ?? "Track your energy usage"}</span>
+                </div>
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                  <BarChart3 className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>{t("dashboard.monitorSolar") ?? "Monitor your solar savings"}</span>
+                </div>
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                  <Fuel className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>{t("dashboard.evCharging") ?? "Manage EV charging costs"}</span>
+                </div>
+              </div>
+              <div className="pt-2">
+                <GoogleAuthButton locale={locale} />
+              </div>
+              <p className="text-[11px] text-muted-foreground/60">
+                {t("auth.signInPrompt") ?? "Sign in to access your dashboard"}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen p-2 sm:p-6 lg:p-8 bg-background">
