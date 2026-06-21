@@ -53,14 +53,14 @@ export default function DailyUsageSection({
               <BarChart3 className="w-5 h-5 text-emerald-600" />
               {t("dashboard.dailyEnergyUsage")} For {monthLabel(selectedMonth)} {selectedYear}
             </CardTitle>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
               <span className="text-sm text-muted-foreground">
                 {!auth?.token ? t("dashboard.loginToView") : ""}
                 {loadingDaily ? <Loader2 className="w-3 h-3 inline animate-spin ml-1" /> : null}
                 {usageMsg ? <span className="text-foreground ml-2">{usageMsg}</span> : null}
               </span>
               <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleFileUpload} />
-              <Button variant="secondary" size="sm" disabled={!auth?.token || uploading} onClick={() => fileInputRef.current?.click()}>
+              <Button variant="secondary" size="sm" className="flex-1 sm:flex-none" disabled={!auth?.token || uploading} onClick={() => fileInputRef.current?.click()}>
                 {uploading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Upload className="w-4 h-4 mr-1" />}
                 {t("dashboard.uploadCsv")}
               </Button>
