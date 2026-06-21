@@ -301,9 +301,7 @@ export default function SolarCalculatorPage() {
         </div>
 
         <div className="text-center text-sm mb-6">
-          {!auth?.token ? (
-            <Badge variant="outline" className="text-muted-foreground">{t("sync.loginToSave")}</Badge>
-          ) : loading ? (
+          {loading ? (
             <Badge variant="secondary">{t("sync.loading")}</Badge>
           ) : saving ? (
             <Badge variant="secondary">{t("sync.saving")}</Badge>
