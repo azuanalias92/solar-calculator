@@ -160,6 +160,7 @@
     "fromImport": "from import",
     "signInToViewEv": "Sign in to view EV data",
     "csvEmpty": "CSV is empty",
+    "csvTooLarge": "File is too large (max 10 MB, 10 000 rows)",
     "noValidRows": "No valid rows found",
     "uploadFailed": "Upload failed",
     "uploaded": "Uploaded",

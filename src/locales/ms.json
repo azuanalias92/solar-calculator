@@ -160,6 +160,7 @@
     "fromImport": "dari import",
     "signInToViewEv": "Log masuk untuk melihat data EV",
     "csvEmpty": "CSV kosong",
+    "csvTooLarge": "Fail terlalu besar (maks 10 MB, 10 000 baris)",
     "noValidRows": "Tiada baris sah ditemui",
     "uploadFailed": "Muat naik gagal",
     "uploaded": "Dimuat naik",

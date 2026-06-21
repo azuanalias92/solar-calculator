@@ -20,7 +20,7 @@ import ItemForm from "../items/form";
 import { useTranslation } from "@/lib/useTranslation";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
-import { getAuthState, type AuthState } from "@/lib/auth";
+import { getAuthState, handleAuthFailure, type AuthState } from "@/lib/auth";
 import { toast } from "sonner";
 
 interface Item {
@@ -125,6 +125,11 @@ export default function SolarCalculatorPage() {
         const res = await fetch(`${apiBaseUrl}/calculator/state`, {
           headers: { Authorization: `Bearer ${auth.token}` },
         });
+        if (handleAuthFailure(res)) {
+          if (!canceled) setIsLoaded(true);
+          if (!canceled) setLoading(false);
+          return;
+        }
         if (!res.ok) {
           if (!canceled) toast.error("Failed to load from backend");
           if (!canceled) setIsLoaded(true);
@@ -165,6 +170,7 @@ export default function SolarCalculatorPage() {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         body: JSON.stringify({ items: nextItems, config: nextConfig }),
       });
+      if (handleAuthFailure(res)) return;
       if (!res.ok) {
         toast.error("Failed to save");
         return;

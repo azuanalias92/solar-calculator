@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getAuthState, clearAuthState, type AuthState } from "@/lib/auth";
+import { getAuthState, clearAuthState, handleAuthFailure, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import { toast } from "sonner";
 import { ModeToggle } from "@/components/ModeToggle";
@@ -233,6 +233,13 @@ export default function SettingsPage() {
         const res = await fetch(`${apiBaseUrl}/calculator/state`, {
           headers: { Authorization: `Bearer ${auth.token}` },
         });
+        if (handleAuthFailure(res)) {
+          if (!canceled) {
+            setSolarLoaded(true);
+            setSolarLoading(false);
+          }
+          return;
+        }
         if (res.ok) {
           const payload = (await res.json()) as {
             data: { items: unknown[]; config: SolarConfig };
@@ -272,6 +279,7 @@ export default function SettingsPage() {
       const getRes = await fetch(`${apiBaseUrl}/calculator/state`, {
         headers: { Authorization: `Bearer ${auth.token}` },
       });
+      if (handleAuthFailure(getRes)) return;
       const existing = getRes.ok ? ((await getRes.json()) as { data: { items: unknown[]; config: SolarConfig } }) : { data: { items: [], config: DEFAULT_SOLAR } };
 
       // PUT with existing items + updated config
@@ -283,6 +291,7 @@ export default function SettingsPage() {
           config: solarConfig,
         }),
       });
+      if (handleAuthFailure(res)) return;
 
       if (res.ok) {
         setSolarMessage(t("settings.configSaved"));

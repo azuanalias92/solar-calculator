@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { getAuthState, type AuthState } from "@/lib/auth";
+import { getAuthState, handleAuthFailure, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import { toast } from "sonner";
 import { BarChart3, Fuel, Car } from "lucide-react";
@@ -198,6 +198,13 @@ export default function Home() {
     setUsageMsg(null);
     try {
       const text = await file.text();
+      // Bound ingestion: reject oversized payloads early to protect the backend.
+      const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+      if (text.length > MAX_BYTES) {
+        setUsageMsg(t("dashboard.csvTooLarge"));
+        setUploading(false);
+        return;
+      }
       const lines = text.split("\n").filter((l) => l.trim());
       if (lines.length < 2) {
         setUsageMsg(t("dashboard.csvEmpty"));
@@ -205,7 +212,8 @@ export default function Home() {
         return;
       }
       const rows: DailyUsageItem[] = [];
-      for (let i = 1; i < lines.length; i++) {
+      const MAX_ROWS = 10000;
+      for (let i = 1; i < lines.length && rows.length < MAX_ROWS; i++) {
         const line = lines[i].trim();
         if (!line) continue;
         const cols = line.split('","').map((c) => c.replace(/^"|"$/g, "").trim());
@@ -227,6 +235,10 @@ export default function Home() {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         body: JSON.stringify({ data: rows }),
       });
+      if (handleAuthFailure(res)) {
+        setUploading(false);
+        return;
+      }
       if (!res.ok) {
         setUsageMsg(t("dashboard.uploadFailed"));
         setUploading(false);
@@ -241,6 +253,10 @@ export default function Home() {
           headers: { Authorization: `Bearer ${auth.token}` },
         }),
       ]);
+      if (handleAuthFailure(dailyRes) || handleAuthFailure(summaryRes)) {
+        setUploading(false);
+        return;
+      }
       if (dailyRes.ok) {
         const p = (await dailyRes.json()) as { data: DailyUsageItem[] };
         setDailyData(p.data ?? []);

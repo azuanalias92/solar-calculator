@@ -21,7 +21,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' https://*.googleusercontent.com https://*.vercel.app data: blob:",
               "font-src 'self'",
-              "connect-src 'self' https://kirasolar-api.workers.dev https://*.vercel.app http://localhost:8787 https://*.pages.dev",
+              "connect-src 'self' https://kirasolar-api.traone.workers.dev https://kirasolar-api.workers.dev https://*.vercel.app https://*.pages.dev",
               "frame-ancestors 'none'",
               "form-action 'self'",
               "base-uri 'self'",
