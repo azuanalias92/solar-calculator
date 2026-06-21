@@ -170,7 +170,7 @@
     "failedToLoadData": "Failed to load data",
     "failedToSave": "Failed to save",
     "saved": "Saved!",
-    "noSessions": "No sessions parsed",
+    "noSessions": "No charging sessions yet",
     "parsed": "Parsed",
     "sessionsLabel": "sessions",
     "date": "Date",
@@ -193,7 +193,8 @@
     "signInToViewData": "Sign in to view data",
     "totalLabel": "Total",
     "trackEnergy": "Track your energy usage",
-    "monitorSolar": "Monitor your solar savings"
+    "monitorSolar": "Monitor your solar savings",
+    "noSessionsHint": "Go to the EV tab, paste your charging text, and click Parse to generate sessions."
   },
   "settings": {
     "account": "Account",

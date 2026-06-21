@@ -170,7 +170,7 @@
     "failedToLoadData": "Gagal memuat data",
     "failedToSave": "Gagal menyimpan",
     "saved": "Disimpan!",
-    "noSessions": "Tiada sesi diparse",
+    "noSessions": "Tiada sesi pengecasan lagi",
     "parsed": "Diparse",
     "sessionsLabel": "sesi",
     "date": "Tarikh",
@@ -193,7 +193,8 @@
     "signInToViewData": "Log masuk untuk melihat data",
     "totalLabel": "Jumlah",
     "trackEnergy": "Jejaki penggunaan tenaga anda",
-    "monitorSolar": "Pantau penjimatan solar anda"
+    "monitorSolar": "Pantau penjimatan solar anda",
+    "noSessionsHint": "Pergi ke tab EV, tampal teks pengecasan anda, dan klik Parse untuk menjana sesi."
   },
   "settings": {
     "account": "Akaun",

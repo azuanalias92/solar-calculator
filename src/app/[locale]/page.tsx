@@ -610,7 +610,8 @@ export default function Home() {
         {activeTab === "sessions" && sessions.length === 0 && (
           <div className="text-center py-16 text-muted-foreground">
             <Car className="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p className="text-sm">{t("dashboard.noSessions")}</p>
+            <p className="text-sm font-medium">{t("dashboard.noSessions")}</p>
+            <p className="text-xs mt-2 max-w-xs mx-auto">{t("dashboard.noSessionsHint")}</p>
           </div>
         )}
       </div>
