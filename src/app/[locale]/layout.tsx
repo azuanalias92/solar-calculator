@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import en from "../../locales/en.json";
 import ms from "../../locales/ms.json";
 import Script from "next/script";
+import NavWrapper from "@/components/NavWrapper";
 
 const translations = {
   en,
@@ -141,7 +142,9 @@ export default async function LocaleLayout({
         />
       ))}
       <Script src="https://accounts.google.com/gsi/client" strategy="afterInteractive" />
-      {children}
+      <NavWrapper locale={locale}>
+        {children}
+      </NavWrapper>
     </>
   );
 }

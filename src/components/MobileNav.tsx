@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { BarChart3, Sun, Car, Settings } from "lucide-react";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function MobileNav({ locale }: { locale: string }) {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   const isDashboard =
     pathname === `/${locale}` || pathname.includes("/bill-ev") || pathname.includes("/usage") || (pathname.includes("/ev") && !pathname.includes("/ev-calculator"));
@@ -16,28 +16,33 @@ export default function MobileNav({ locale }: { locale: string }) {
   const isSettings = pathname.includes("/settings");
 
   const items = [
-    { label: "Dashboard", href: `/${locale}`, active: isDashboard },
-    { label: "Solar Calculator", href: `/${locale}/solar-calculator`, active: isCalculator },
-    { label: "EV Calculator", href: `/${locale}/ev-calculator`, active: isEvCalculator },
-    { label: "Settings", href: `/${locale}/settings`, active: isSettings },
+    { label: t("nav.dashboard"), href: `/${locale}`, icon: BarChart3, active: isDashboard },
+    { label: t("nav.solarCalculator"), href: `/${locale}/solar-calculator`, icon: Sun, active: isCalculator },
+    { label: t("nav.evCalculator"), href: `/${locale}/ev-calculator`, icon: Car, active: isEvCalculator },
+    { label: t("nav.settings"), href: `/${locale}/settings`, icon: Settings, active: isSettings },
   ];
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" aria-label="Navigation menu">
-          <Menu className="h-5 w-5" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[180px]">
-        {items.map((item) => (
-          <DropdownMenuItem key={item.href} asChild>
-            <Link href={item.href} className={item.active ? "font-semibold" : ""}>
-              {item.active ? `✓ ${item.label}` : item.label}
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 safe-area-bottom">
+      <div className="flex items-center justify-around h-16 max-w-lg mx-auto px-2">
+        {items.map((item) => {
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${
+                item.active
+                  ? "text-emerald-600"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              <span className="text-[10px] font-medium leading-tight">{item.label}</span>
             </Link>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+          );
+        })}
+      </div>
+    </nav>
   );
 }

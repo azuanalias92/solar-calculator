@@ -1,7 +1,6 @@
 "use client";
 
 import NavBar from "@/components/NavBar";
-import MobileNav from "@/components/MobileNav";
 
 type Props = {
   locale: string;
@@ -21,9 +20,6 @@ export default function AppHeader({ locale, title, description, logoAlt }: Props
           </div>
           <div className="hidden md:flex justify-center items-center">
             <NavBar locale={locale} />
-          </div>
-          <div className="md:hidden">
-            <MobileNav locale={locale} />
           </div>
         </div>
         <p className="text-sm sm:text-base text-muted-foreground mt-2 items-start">{description}</p>
