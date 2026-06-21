@@ -290,7 +290,11 @@
     "signIn": "Log masuk dengan Google",
     "signingIn": "Sedang log masuk...",
     "login": "Log Masuk",
-    "logout": "Log Keluar"
+    "logout": "Log Keluar",
+    "loading": "Log masuk Google masih dimuatkan",
+    "notConfigured": "Log masuk Google belum dikonfigurasi",
+    "promptUnavailable": "Prompt log masuk Google tidak dapat dipaparkan",
+    "failed": "Log masuk Google gagal"
   },
   "theme": {
     "light": "Terang",

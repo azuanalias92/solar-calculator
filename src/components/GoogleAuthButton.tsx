@@ -2,9 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { clearAuthState, getAuthState, setAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
+
+type GooglePromptNotification = {
+  isNotDisplayed?: () => boolean;
+  isSkippedMoment?: () => boolean;
+  getNotDisplayedReason?: () => string;
+  getSkippedReason?: () => string;
+};
 
 declare global {
   interface Window {
@@ -17,7 +25,7 @@ declare global {
             auto_select?: boolean;
             cancel_on_tap_outside?: boolean;
           }) => void;
-          prompt: () => void;
+          prompt: (momentListener?: (notification: GooglePromptNotification) => void) => void;
           disableAutoSelect: () => void;
         };
       };
@@ -28,6 +36,9 @@ declare global {
 type Props = {
   locale?: string;
 };
+
+const DEFAULT_GOOGLE_CLIENT_ID =
+  "1004921240672-ong7k2d2fv3t1n6nfoen7d5cit6vptfi.apps.googleusercontent.com";
 
 function GoogleIcon({ className }: { className?: string }) {
   return (
@@ -52,13 +63,16 @@ function GoogleIcon({ className }: { className?: string }) {
   );
 }
 
-export default function GoogleAuthButton({ locale }: Props) {
+export default function GoogleAuthButton(_: Props) {
   const { t } = useTranslation();
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [signingIn, setSigningIn] = useState(false);
   const initializedRef = useRef(false);
 
-  const clientId = useMemo(() => process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "", []);
+  const clientId = useMemo(
+    () => (process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? DEFAULT_GOOGLE_CLIENT_ID).trim(),
+    [],
+  );
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
 
   useEffect(() => {
@@ -88,6 +102,11 @@ export default function GoogleAuthButton({ locale }: Props) {
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: async ({ credential }) => {
+          if (!credential) {
+            toast.error(t("auth.failed"));
+            return;
+          }
+
           setSigningIn(true);
           try {
             const response = await fetch(`${apiBaseUrl}/auth/google`, {
@@ -96,9 +115,15 @@ export default function GoogleAuthButton({ locale }: Props) {
               body: JSON.stringify({ credential }),
             });
 
-            if (!response.ok) return;
+            if (!response.ok) {
+              const errorPayload = (await response.json().catch(() => null)) as { error?: string } | null;
+              throw new Error(errorPayload?.error ?? t("auth.failed"));
+            }
+
             const payload = (await response.json()) as { token: string; user: AuthState["user"] };
             setAuthState({ token: payload.token, user: payload.user });
+          } catch (error) {
+            toast.error(error instanceof Error ? error.message : t("auth.failed"));
           } finally {
             setSigningIn(false);
           }
@@ -114,11 +139,32 @@ export default function GoogleAuthButton({ locale }: Props) {
     return () => {
       canceled = true;
     };
-  }, [apiBaseUrl, clientId]);
+  }, [apiBaseUrl, clientId, t]);
 
   const handleSignIn = () => {
-    if (!window.google?.accounts?.id) return;
-    window.google.accounts.id.prompt();
+    if (!clientId) {
+      toast.error(t("auth.notConfigured"));
+      return;
+    }
+    if (!window.google?.accounts?.id) {
+      toast.error(t("auth.loading"));
+      return;
+    }
+
+    window.google.accounts.id.prompt((notification) => {
+      if (notification.isNotDisplayed?.()) {
+        const reason = notification.getNotDisplayedReason?.();
+        toast.error(reason ? `${t("auth.promptUnavailable")}: ${reason}` : t("auth.promptUnavailable"));
+        return;
+      }
+
+      if (notification.isSkippedMoment?.()) {
+        const reason = notification.getSkippedReason?.();
+        if (reason && reason !== "auto_cancel") {
+          toast.error(`${t("auth.promptUnavailable")}: ${reason}`);
+        }
+      }
+    });
   };
 
   if (auth) {

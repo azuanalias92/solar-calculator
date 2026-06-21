@@ -290,7 +290,11 @@
     "signIn": "Sign in with Google",
     "signingIn": "Signing in...",
     "login": "Login",
-    "logout": "Logout"
+    "logout": "Logout",
+    "loading": "Google sign-in is still loading",
+    "notConfigured": "Google sign-in is not configured",
+    "promptUnavailable": "Google sign-in prompt could not be shown",
+    "failed": "Google sign-in failed"
   },
   "theme": {
     "light": "Light",
