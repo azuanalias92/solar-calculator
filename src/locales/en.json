@@ -118,7 +118,7 @@
     "estimatedCost": "Estimated Installation Cost",
     "monthlySavings": "Estimated Monthly Savings",
     "paybackPeriod": "Payback Period",
-    "co2Reduction": "Annual CO₂ Reduction",
+    "co2Reduction": "Annual CO\u2082 Reduction",
     "downloadPdf": "Download PDF Report",
     "recalculate": "Recalculate"
   },
@@ -137,10 +137,10 @@
     "offPeak": "Off-Peak",
     "total": "Total",
     "dailyBreakdown": "Daily Breakdown",
-    "monthlyBillSummary": "Monthly Bill Summary —",
+    "monthlyBillSummary": "Monthly Bill Summary \u2014",
     "noDataYet": "No data yet",
     "evVsNonEv": "EV vs Non-EV Monthly Usage",
-    "dataLoaded": "Data loaded ✓",
+    "dataLoaded": "Data loaded \u2713",
     "noDataFor": "No data for",
     "totalEv": "Total EV",
     "totalNonEv": "Total Non-EV",
@@ -197,14 +197,14 @@
     "asOf": "As of",
     "below": "below",
     "configSaveFailed": "Failed to save",
-    "configSaved": "Solar configuration saved ✓",
+    "configSaved": "Solar configuration saved \u2713",
     "defaultUsername": "User",
-    "loading": "Loading…",
+    "loading": "Loading\u2026",
     "noRateFound": "No rate found.",
     "panelWatts": "Panel Wattage (W)",
-    "panelWattsDesc": "Wattage per solar panel (typical: 300–600W)",
+    "panelWattsDesc": "Wattage per solar panel (typical: 300\u2013600W)",
     "peakSunHours": "Peak Sun Hours",
-    "peakSunHoursDesc": "Avg daily peak sun hours at your location (e.g. Malaysia ~4.5–5.5)",
+    "peakSunHoursDesc": "Avg daily peak sun hours at your location (e.g. Malaysia ~4.5\u20135.5)",
     "rateAfaRate": "AFA Rate (RM/kWh)",
     "rateCapacityCharge": "Capacity Charge (RM/kWh)",
     "rateEffectiveDate": "Effective Date",
@@ -220,15 +220,15 @@
     "rateTariffType": "Tariff Type",
     "rateValue": "Value",
     "saveConfig": "Save Solar Configuration",
-    "saving": "Saving…",
+    "saving": "Saving\u2026",
     "signInPrompt": "Sign in with Google to sync your data to the cloud",
     "signInToConfigure": "Sign in to configure your solar system settings and sync them to the cloud.",
     "signOut": "Sign Out",
     "solarConfigTitle": "Solar System Configuration",
     "summary": "Summary:",
-    "syncingStatus": "Syncing data to cloud ✓",
+    "syncingStatus": "Syncing data to cloud \u2713",
     "systemEfficiency": "System Efficiency (%)",
-    "systemEfficiencyDesc": "Overall system efficiency including inverter losses (typical: 80–90%)",
+    "systemEfficiencyDesc": "Overall system efficiency including inverter losses (typical: 80\u201390%)",
     "tariffActive": "Active:",
     "tariffDescription": "Select your home's TNB electricity tariff to use in bill calculations and the solar calculator.",
     "tariffRateDetails": "Tariff Rate Details",
@@ -254,10 +254,10 @@
     "ratePlaceholder": "e.g. 1.30",
     "quickPresets": "Quick Presets",
     "presets": {
-      "20to80": "20→80% (60kWh)",
-      "30to80": "30→80% (60kWh)",
-      "10to90": "10→90% (40kWh)",
-      "0to100": "0→100% (60kWh)"
+      "20to80": "20\u219280% (60kWh)",
+      "30to80": "30\u219280% (60kWh)",
+      "10to90": "10\u219290% (40kWh)",
+      "0to100": "0\u2192100% (60kWh)"
     },
     "batteryVisual": "Battery Visual",
     "currentTitle": "Current:",
@@ -277,5 +277,36 @@
     "chargingSummaryCostsApprox": "costs approx",
     "drivingRange": "Driving Range (km)",
     "drivingRangePlaceholder": "e.g. 400"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "solarCalculator": "Solar Calculator",
+    "evCalculator": "EV Calculator",
+    "settings": "Settings",
+    "menu": "Navigation menu"
+  },
+  "auth": {
+    "signIn": "Sign in with Google",
+    "signingIn": "Signing in...",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "toggle": "Toggle theme"
+  },
+  "sync": {
+    "synced": "Synced",
+    "unsaved": "Unsaved changes",
+    "saving": "Saving...",
+    "loading": "Loading...",
+    "autoSaving": "auto-saving...",
+    "loginToSave": "Login to save to backend"
+  },
+  "offline": {
+    "banner": "You are offline. Some features may not work.",
+    "retry": "Retry"
   }
 }

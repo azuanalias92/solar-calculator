@@ -117,7 +117,7 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="ms" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -140,6 +140,16 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-background focus:border focus:rounded focus:text-foreground focus:outline-none">
+          Skip to main content
+        </a>
+
+        <script
+          dangerouslySetInnerHTML={{
+            __html: "window.addEventListener('offline',function(){document.body.setAttribute('data-offline','true');});window.addEventListener('online',function(){document.body.removeAttribute('data-offline');});if(!navigator.onLine){document.body.setAttribute('data-offline','true');}",
+          }}
+        />
+
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

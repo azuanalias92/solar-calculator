@@ -44,7 +44,7 @@ export function useTranslation() {
 
   const switchLanguage = (newLocale: string) => {
     // Save preference in a cookie (1 year expiry)
-    document.cookie = `preferred_lang=${newLocale};path=/;max-age=${365 * 24 * 60 * 60};SameSite=Lax`;
+    document.cookie = `preferred_lang=${newLocale};path=/;max-age=${365 * 24 * 60 * 60};SameSite=Lax;Secure`;
     // For App Router with [locale] structure
     const currentPath = pathname.replace(/^\/(en|ms)/, "") || "";
     const newPath = `/${newLocale}${currentPath}`;

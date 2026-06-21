@@ -111,7 +111,7 @@
     "estimatedCost": "Anggaran Kos Pemasangan",
     "monthlySavings": "Anggaran Penjimatan Bulanan",
     "paybackPeriod": "Tempoh Pulangan Modal",
-    "co2Reduction": "Pengurangan CO₂ Tahunan",
+    "co2Reduction": "Pengurangan CO\u2082 Tahunan",
     "downloadPdf": "Muat Turun Laporan PDF",
     "recalculate": "Kira Semula"
   },
@@ -137,10 +137,10 @@
     "offPeak": "Luar Puncak",
     "total": "Jumlah",
     "dailyBreakdown": "Pecahan Harian",
-    "monthlyBillSummary": "Ringkasan Bil Bulanan —",
+    "monthlyBillSummary": "Ringkasan Bil Bulanan \u2014",
     "noDataYet": "Belum ada data",
     "evVsNonEv": "Penggunaan Bulanan EV vs Bukan EV",
-    "dataLoaded": "Data dimuat ✓",
+    "dataLoaded": "Data dimuat \u2713",
     "noDataFor": "Tiada data untuk",
     "totalEv": "Jumlah EV",
     "totalNonEv": "Jumlah Bukan EV",
@@ -197,14 +197,14 @@
     "asOf": "Setakat",
     "below": "di bawah",
     "configSaveFailed": "Gagal menyimpan",
-    "configSaved": "Konfigurasi solar disimpan ✓",
+    "configSaved": "Konfigurasi solar disimpan \u2713",
     "defaultUsername": "Pengguna",
-    "loading": "Memuatkan…",
+    "loading": "Memuatkan\u2026",
     "noRateFound": "Tiada kadar ditemui.",
     "panelWatts": "Watt Panel (W)",
-    "panelWattsDesc": "Watt setiap panel solar (biasa: 300–600W)",
+    "panelWattsDesc": "Watt setiap panel solar (biasa: 300\u2013600W)",
     "peakSunHours": "Jam Puncak Matahari",
-    "peakSunHoursDesc": "Purata jam puncak matahari harian (cth. Malaysia ~4.5–5.5)",
+    "peakSunHoursDesc": "Purata jam puncak matahari harian (cth. Malaysia ~4.5\u20135.5)",
     "rateAfaRate": "Kadar AFA (RM/kWh)",
     "rateCapacityCharge": "Caj Kapasiti (RM/kWh)",
     "rateEffectiveDate": "Tarikh Berkuat Kuasa",
@@ -220,15 +220,15 @@
     "rateTariffType": "Jenis Tarif",
     "rateValue": "Nilai",
     "saveConfig": "Simpan Konfigurasi Solar",
-    "saving": "Menyimpan…",
+    "saving": "Menyimpan\u2026",
     "signInPrompt": "Log masuk dengan Google untuk menyegerakkan data ke awan",
     "signInToConfigure": "Log masuk untuk mengkonfigurasi sistem solar anda.",
     "signOut": "Log Keluar",
     "solarConfigTitle": "Konfigurasi Sistem Solar",
     "summary": "Ringkasan:",
-    "syncingStatus": "Menyegerakkan data ke awan ✓",
+    "syncingStatus": "Menyegerakkan data ke awan \u2713",
     "systemEfficiency": "Kecekapan Sistem (%)",
-    "systemEfficiencyDesc": "Kecekapan keseluruhan sistem termasuk kehilangan inverter (biasa: 80–90%)",
+    "systemEfficiencyDesc": "Kecekapan keseluruhan sistem termasuk kehilangan inverter (biasa: 80\u201390%)",
     "tariffActive": "Aktif:",
     "tariffDescription": "Pilih tarif elektrik TNB rumah anda untuk pengiraan bil dan kalkulator solar.",
     "tariffRateDetails": "Butiran Kadar Tarif",
@@ -254,10 +254,10 @@
     "ratePlaceholder": "cth. 1.30",
     "quickPresets": "Praset Pantas",
     "presets": {
-      "20to80": "20→80% (60kWh)",
-      "30to80": "30→80% (60kWh)",
-      "10to90": "10→90% (40kWh)",
-      "0to100": "0→100% (60kWh)"
+      "20to80": "20\u219280% (60kWh)",
+      "30to80": "30\u219280% (60kWh)",
+      "10to90": "10\u219290% (40kWh)",
+      "0to100": "0\u2192100% (60kWh)"
     },
     "batteryVisual": "Visual Bateri",
     "currentTitle": "Semasa:",
@@ -277,5 +277,36 @@
     "chargingSummaryCostsApprox": "berjumlah lebih kurang",
     "drivingRange": "Jarak Pemanduan (km)",
     "drivingRangePlaceholder": "cth. 400"
+  },
+  "nav": {
+    "dashboard": "Papan Pemuka",
+    "solarCalculator": "Kalkulator Solar",
+    "evCalculator": "Kalkulator EV",
+    "settings": "Tetapan",
+    "menu": "Menu navigasi"
+  },
+  "auth": {
+    "signIn": "Log masuk dengan Google",
+    "signingIn": "Sedang log masuk...",
+    "login": "Log Masuk",
+    "logout": "Log Keluar"
+  },
+  "theme": {
+    "light": "Terang",
+    "dark": "Gelap",
+    "system": "Sistem",
+    "toggle": "Tukar tema"
+  },
+  "sync": {
+    "synced": "Disegerakkan",
+    "unsaved": "Perubahan belum disimpan",
+    "saving": "Menyimpan...",
+    "loading": "Memuatkan...",
+    "autoSaving": "auto-simpan...",
+    "loginToSave": "Log masuk untuk simpan ke pelayan"
+  },
+  "offline": {
+    "banner": "Anda berada di luar talian. Sesetengah fungsi mungkin tidak berfungsi.",
+    "retry": "Cuba lagi"
   }
 }

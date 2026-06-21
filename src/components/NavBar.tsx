@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/useTranslation";
 
 export default function NavBar({ locale }: { locale: string }) {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   const isDashboard =
     pathname === `/${locale}` || pathname.includes("/bill-ev") || pathname.includes("/usage") || (pathname.includes("/ev") && !pathname.includes("/ev-calculator"));
@@ -15,22 +17,22 @@ export default function NavBar({ locale }: { locale: string }) {
 
   const items = [
     {
-      label: "Dashboard",
+      labelKey: "nav.dashboard",
       href: `/${locale}`,
       active: isDashboard,
     },
     {
-      label: "Solar Calculator",
+      labelKey: "nav.solarCalculator",
       href: `/${locale}/solar-calculator`,
       active: isCalculator,
     },
     {
-      label: "EV Calculator",
+      labelKey: "nav.evCalculator",
       href: `/${locale}/ev-calculator`,
       active: isEvCalculator,
     },
     {
-      label: "Settings",
+      labelKey: "nav.settings",
       href: `/${locale}/settings`,
       active: isSettings,
     },
@@ -40,7 +42,7 @@ export default function NavBar({ locale }: { locale: string }) {
     <div className="hidden md:inline-flex gap-2 rounded-lg border border-input bg-background p-1">
       {items.map((item) => (
         <Button asChild key={item.href} size="sm" variant={item.active ? "secondary" : "outline"}>
-          <Link href={item.href}>{item.label}</Link>
+          <Link href={item.href}>{t(item.labelKey)}</Link>
         </Button>
       ))}
     </div>

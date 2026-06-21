@@ -6,6 +6,7 @@ import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useTranslation } from "@/lib/useTranslation"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,13 +16,14 @@ import {
 
 export function ModeToggle({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme()
+  const { t } = useTranslation()
 
-  const themeLabel = theme === "light" ? "Light" : theme === "dark" ? "Dark" : "System"
+  const themeLabel = theme === "light" ? t("theme.light") : theme === "dark" ? t("theme.dark") : t("theme.system")
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className={cn("w-full justify-center gap-2", className)}>
+        <Button variant="outline" size="sm" className={cn("w-full justify-center gap-2", className)} aria-label={t("theme.toggle")}>
           <Sun className="h-[1.2rem] w-[1.2rem] transition-all dark:hidden" />
           <Moon className="h-[1.2rem] w-[1.2rem] hidden dark:block" />
           <span>{themeLabel}</span>
@@ -29,13 +31,13 @@ export function ModeToggle({ className }: { className?: string }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme("light")}>
-          Light
+          {t("theme.light")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("dark")}>
-          Dark
+          {t("theme.dark")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme("system")}>
-          System
+          {t("theme.system")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

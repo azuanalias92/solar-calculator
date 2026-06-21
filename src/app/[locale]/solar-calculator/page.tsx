@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { exportToPDF } from "@/lib/pdfExport";
-import { Plus, FileUp, Zap, Package, BarChart3, Sun, Github, Coffee, Trash2, RotateCcw } from "lucide-react";
+import { Plus, FileUp, Zap, Package, BarChart3, Sun, Github, Trash2, RotateCcw } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import ItemForm from "../items/form";
 import { useTranslation } from "@/lib/useTranslation";
 import AppHeader from "@/components/AppHeader";
+import Footer from "@/components/Footer";
 import { getAuthState, type AuthState } from "@/lib/auth";
 
 interface Item {
@@ -142,7 +143,7 @@ export default function SolarCalculatorPage() {
         }
       } catch {
         if (!canceled) {
-          setMessage(`Unable to reach API at ${apiBaseUrl}. Start the backend or set NEXT_PUBLIC_API_BASE_URL.`);
+          setMessage("Unable to reach the server. Please try again later.");
           setIsLoaded(true);
         }
       } finally {
@@ -174,7 +175,7 @@ export default function SolarCalculatorPage() {
       setMessage("Saved");
       window.setTimeout(() => setMessage(null), 1200);
     } catch {
-      setMessage(`Unable to reach API at ${apiBaseUrl}. Start the backend or set NEXT_PUBLIC_API_BASE_URL.`);
+      setMessage("Unable to reach the server. Please try again later.");
     } finally {
       setSaving(false);
     }
@@ -234,6 +235,7 @@ export default function SolarCalculatorPage() {
   };
 
   const removeItem = (itemId: string) => {
+    if (!window.confirm("Remove this item?")) return;
     setItems(items.filter((item) => item.id !== itemId));
   };
 
@@ -242,6 +244,7 @@ export default function SolarCalculatorPage() {
   };
 
   const handleReset = () => {
+    if (!window.confirm("Reset all data? This cannot be undone.")) return;
     // Reset state to initial values
     const nextItems: Item[] = [];
     const nextConfig: SolarConfig = {
@@ -255,7 +258,7 @@ export default function SolarCalculatorPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen p-2 sm:p-6 lg:p-8 bg-background">
+    <div id="main-content" className="flex flex-col min-h-screen p-2 sm:p-6 lg:p-8 bg-background">
       <AppHeader
         locale={locale}
         title={t("common.title")}
@@ -430,7 +433,7 @@ export default function SolarCalculatorPage() {
                           <TableCell className="text-xs sm:text-sm">{item.quantity}</TableCell>
                           <TableCell className="text-xs sm:text-sm font-medium">{item.estimatekWh.toFixed(2)}</TableCell>
                           <TableCell>
-                            <Button variant="outline" size="sm" onClick={() => removeItem(item.id)} className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0">
+                            <Button variant="outline" size="sm" onClick={() => removeItem(item.id)} className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0" aria-label="Remove item">
                               <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                             </Button>
                           </TableCell>
@@ -452,7 +455,7 @@ export default function SolarCalculatorPage() {
 
           <div className="text-xs sm:text-sm text-muted-foreground text-center md:text-left order-3 md:order-2">
             {t("footer.madeBy")}{" "}
-            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-primary hover:text-outline transition-colors">
+            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-primary hover:text-primary/70 transition-colors">
               Azuan Alias
             </a>
           </div>

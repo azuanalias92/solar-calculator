@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { clearAuthState, getAuthState, setAuthState, type AuthState } from "@/lib/auth";
+import { useTranslation } from "@/lib/useTranslation";
 
 declare global {
   interface Window {
@@ -52,6 +53,7 @@ function GoogleIcon({ className }: { className?: string }) {
 }
 
 export default function GoogleAuthButton({ locale }: Props) {
+  const { t } = useTranslation();
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [signingIn, setSigningIn] = useState(false);
   const initializedRef = useRef(false);
@@ -147,7 +149,7 @@ export default function GoogleAuthButton({ locale }: Props) {
             clearAuthState();
           }}
         >
-          Logout
+          {t("auth.logout")}
         </Button>
       </div>
     );
@@ -156,7 +158,7 @@ export default function GoogleAuthButton({ locale }: Props) {
   if (!clientId) {
     return (
       <Button variant="outline" size="sm" disabled>
-        Login
+        {t("auth.login")}
       </Button>
     );
   }
@@ -170,7 +172,7 @@ export default function GoogleAuthButton({ locale }: Props) {
       className="gap-2 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 transition-all"
     >
       <GoogleIcon className="w-4 h-4" />
-      <span>{signingIn ? "Signing in..." : "Sign in with Google"}</span>
+      <span>{signingIn ? t("auth.signingIn") : t("auth.signIn")}</span>
     </Button>
   );
 }
