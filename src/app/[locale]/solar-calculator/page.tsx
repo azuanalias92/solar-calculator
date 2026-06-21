@@ -306,7 +306,7 @@ export default function SolarCalculatorPage() {
             </CardHeader>
             <CardContent className="pt-0 sm:pt-6">
               <p className="text-xl sm:text-2xl font-bold">{stats.totalkWh.toFixed(2)}</p>
-              <p className="text-xs sm:text-sm text-gray-500">{t("stats.perDay")}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">{t("stats.perDay")}</p>
             </CardContent>
           </Card>
 
@@ -391,7 +391,7 @@ export default function SolarCalculatorPage() {
           </CardHeader>
           <CardContent className="p-2 sm:p-6">
             {items.length === 0 ? (
-              <p className="text-gray-500 text-center py-8 text-sm sm:text-base">{t("table.noItems")}</p>
+              <p className="text-muted-foreground text-center py-8 text-sm sm:text-base">{t("table.noItems")}</p>
             ) : (
               <div className="overflow-x-auto -mx-2 sm:mx-0">
                 <div className="min-w-full inline-block align-middle">

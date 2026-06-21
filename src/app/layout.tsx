@@ -127,7 +127,7 @@ export default function RootLayout({
           }}
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="canonical" href="https://solar-calculator.vercel.app" />
+        <link rel="canonical" href="https://kirasolar.my" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Kira Solar" />
