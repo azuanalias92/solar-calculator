@@ -1,12 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { exportToPDF } from "@/lib/pdfExport";
 import { Plus, FileUp, Zap, Package, BarChart3, Sun, Trash2, RotateCcw } from "lucide-react";
 import {
   Select,
@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import ItemForm from "../items/form";
+const ItemForm = dynamic(() => import("../items/form"), { ssr: false });
 import { useTranslation } from "@/lib/useTranslation";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
@@ -235,7 +235,8 @@ export default function SolarCalculatorPage() {
     setItems(items.filter((item) => item.id !== itemId));
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
+    const { exportToPDF } = await import("@/lib/pdfExport");
     exportToPDF(items, stats, solarConfig);
   };
 

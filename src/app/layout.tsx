@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/lib/ThemeProvider";
 import "./globals.css";
 
+import Script from "next/script";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -35,15 +37,12 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://solar-calculator.vercel.app"),
-  alternates: {
-    canonical: "/",
-  },
+  metadataBase: new URL("https://kirasolar.my"),
   openGraph: {
     title: "Kira Solar - Calculate Your Solar Energy Needs",
     description:
       "Free solar panel calculator to estimate how many solar panels you need for your home. Calculate energy consumption, solar system requirements, and potential savings.",
-    url: "https://solar-calculator.vercel.app",
+    url: "https://kirasolar.my",
     siteName: "Kira Solar",
     images: [
       {
@@ -98,7 +97,7 @@ export default function RootLayout({
     name: "Kira Solar",
     description:
       "Free solar panel calculator to estimate how many solar panels you need for your home. Calculate energy consumption, solar system requirements, and potential savings.",
-    url: "https://solar-panel-estimator.vercel.app",
+    url: "https://kirasolar.my",
     applicationCategory: "UtilityApplication",
     operatingSystem: "Web Browser",
     offers: {
@@ -127,34 +126,27 @@ export default function RootLayout({
           }}
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="canonical" href="https://kirasolar.my" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Kira Solar" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="application-name" content="Kira Solar" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              "if('serviceWorker'in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js');});}",
-          }}
-        />
-<script
-          dangerouslySetInnerHTML={{
-            __html: "let deferredPrompt;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;var btn=document.createElement('button');btn.textContent='Install App';btn.className='fixed bottom-4 right-4 z-50 px-4 py-2 bg-emerald-600 text-white rounded-lg shadow-lg hover:bg-emerald-700 text-sm font-medium transition-all';btn.onclick=function(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(r){if(r.outcome==='accepted'){btn.remove();}});}};document.body.appendChild(btn);});",
-          }}
-        />
       </head>
       <body className={inter.className}>
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-background focus:border focus:rounded focus:text-foreground focus:outline-none">
           Skip to main content
         </a>
 
-        <script
-          dangerouslySetInnerHTML={{
-            __html: "window.addEventListener('offline',function(){document.body.setAttribute('data-offline','true');});window.addEventListener('online',function(){document.body.removeAttribute('data-offline');});if(!navigator.onLine){document.body.setAttribute('data-offline','true');}",
-          }}
-        />
+        {/* Deferred non-critical scripts */}
+        <Script id="sw-register" strategy="lazyOnload">
+          {`if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js');});}`}
+        </Script>
+        <Script id="pwa-install" strategy="lazyOnload">
+          {`let deferredPrompt;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;var btn=document.createElement('button');btn.textContent='Install App';btn.className='fixed bottom-4 right-4 z-50 px-4 py-2 bg-emerald-600 text-white rounded-lg shadow-lg hover:bg-emerald-700 text-sm font-medium transition-all';btn.onclick=function(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(r){if(r.outcome==='accepted'){btn.remove();}});}};document.body.appendChild(btn);});`}
+        </Script>
+        <Script id="offline-detect" strategy="lazyOnload">
+          {`window.addEventListener('offline',function(){document.body.setAttribute('data-offline','true');});window.addEventListener('online',function(){document.body.removeAttribute('data-offline');});if(!navigator.onLine){document.body.setAttribute('data-offline','true');}`}
+        </Script>
 
         <ThemeProvider
           attribute="class"

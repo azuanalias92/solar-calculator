@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useRef } from "react";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { getAuthState, handleAuthFailure, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
@@ -17,9 +18,9 @@ import {
 } from "@/components/ui/select";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
-import DailyUsageSection from "@/components/dashboard/DailyUsageSection";
-import EvUsageSection from "@/components/dashboard/EvUsageSection";
-import ChargingSessionsSection from "@/components/dashboard/ChargingSessionsSection";
+const DailyUsageSection = dynamic(() => import("@/components/dashboard/DailyUsageSection"), { ssr: false });
+const EvUsageSection = dynamic(() => import("@/components/dashboard/EvUsageSection"), { ssr: false });
+const ChargingSessionsSection = dynamic(() => import("@/components/dashboard/ChargingSessionsSection"), { ssr: false });
 import type { DailyUsageItem, DailyUsageSummaryItem, MonthSummary, ChargingSession, MonthUsage } from "@/components/dashboard/types";
 import { monthLabel, parseCsvDate, emptyYearData } from "@/components/dashboard/utils";
 
@@ -486,7 +487,7 @@ export default function Home() {
               <div className="pt-2">
                 <GoogleAuthButton locale={locale} />
               </div>
-              <p className="text-[11px] text-muted-foreground/60">
+              <p className="text-[11px] text-muted-foreground/70">
                 {t("auth.signInPrompt") ?? "Sign in to access your dashboard"}
               </p>
             </CardContent>

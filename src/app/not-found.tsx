@@ -35,7 +35,7 @@ export default function NotFound() {
         
         <div className="pt-8">
           <svg 
-            className="mx-auto h-32 w-32 text-muted-foreground/20" 
+            className="mx-auto h-32 w-32 text-muted-foreground/30" 
             fill="none" 
             viewBox="0 0 24 24" 
             stroke="currentColor"

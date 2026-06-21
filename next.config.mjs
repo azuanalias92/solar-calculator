@@ -8,6 +8,17 @@ const nextConfig = {
       { protocol: "https", hostname: "lh6.googleusercontent.com" },
     ],
   },
+  optimizePackageImports: [
+    "recharts",
+    "lucide-react",
+    "react-icons",
+    "@radix-ui/react-accordion",
+    "@radix-ui/react-dialog",
+    "@radix-ui/react-dropdown-menu",
+  ],
+  experimental: {
+    optimizeCss: true,
+  },
   async headers() {
     return [
       {
