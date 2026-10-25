@@ -194,7 +194,9 @@
     "totalLabel": "Total",
     "trackEnergy": "Track your energy usage",
     "monitorSolar": "Monitor your solar savings",
-    "noSessionsHint": "Go to the EV tab, paste your charging text, and click Parse to generate sessions."
+    "noSessionsHint": "Go to Import data, paste your Easy Charging statement, and press Parse Sessions.",
+    "importData": "Import data",
+    "goToImport": "Import data"
   },
   "settings": {
     "account": "Account",

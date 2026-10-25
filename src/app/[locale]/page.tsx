@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { getAuthState, handleAuthFailure, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import { toast } from "sonner";
-import { BarChart3, Fuel, Car, Sun, ShieldCheck } from "lucide-react";
+import { BarChart3, Fuel, Car, Sun, ShieldCheck, Upload } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +24,7 @@ import InstallPrompt from "@/components/InstallPrompt";
 const DailyUsageSection = dynamic(() => import("@/components/dashboard/DailyUsageSection"), { ssr: false });
 const EvUsageSection = dynamic(() => import("@/components/dashboard/EvUsageSection"), { ssr: false });
 const ChargingSessionsSection = dynamic(() => import("@/components/dashboard/ChargingSessionsSection"), { ssr: false });
+const ImportDataSection = dynamic(() => import("@/components/dashboard/ImportDataSection"), { ssr: false });
 import type { DailyUsageItem, DailyUsageSummaryItem, MonthSummary, ChargingSession, MonthUsage } from "@/components/dashboard/types";
 import { monthLabel, emptyYearData } from "@/components/dashboard/utils";
 import { isImported, loadImportedLedger, parseEasyCharging, recordImported, sessionKey } from "@/lib/evSessions";
@@ -56,7 +57,7 @@ export default function Home() {
   }, []);
 
   // ── Tab State ──
-  const [activeTab, setActiveTab] = useState<"daily" | "ev" | "sessions">("daily");
+  const [activeTab, setActiveTab] = useState<"daily" | "ev" | "sessions" | "import">("daily");
 
   // ── Global Filters ──
   const [selectedYear, setSelectedYear] = useState(currentYear);
@@ -483,6 +484,7 @@ export default function Home() {
     { id: "daily" as const, label: t("dashboard.dailyEnergyUsage"), icon: BarChart3 },
     { id: "ev" as const, label: t("dashboard.evVsNonEv"), icon: Fuel },
     { id: "sessions" as const, label: t("dashboard.chargingSessions"), icon: Car },
+    { id: "import" as const, label: t("dashboard.importData"), icon: Upload },
   ];
 
   // ── Auth not read yet → keep the layout without flashing the sign-in screen ──
@@ -654,8 +656,7 @@ export default function Home() {
             dailyData={dailyData}
             summaryData={summaryData}
             dailyTotals={dailyTotals}
-            locale={locale}
-            onImport={importUsage}
+            onGoToImport={() => setActiveTab("import")}
           />
         )}
 
@@ -672,14 +673,7 @@ export default function Home() {
             billEvError={billEvError}
             billEvTotals={billEvTotals}
             monthsWithData={monthsWithData}
-            rawInput={rawInput}
-            setRawInput={setRawInput}
-            sessions={sessions}
-            importedKeys={importedKeys}
-            evMsg={evMsg}
-            handleParse={handleParse}
-            handleSaveEv={handleSaveEv}
-            saving={saving}
+            onGoToImport={() => setActiveTab("import")}
           />
         )}
 
@@ -696,7 +690,34 @@ export default function Home() {
             <Car className="w-12 h-12 mx-auto mb-4 opacity-30" />
             <p className="text-sm font-medium">{t("dashboard.noSessions")}</p>
             <p className="text-xs mt-2 max-w-xs mx-auto">{t("dashboard.noSessionsHint")}</p>
+            <Button variant="outline" size="sm" className="mt-4" onClick={() => setActiveTab("import")}>
+              <Upload />
+              {t("dashboard.goToImport")}
+            </Button>
           </div>
+        )}
+
+        {/* ════════════════════════ Import Data Tab ════════════════════════ */}
+        {activeTab === "import" && (
+          <ImportDataSection
+            auth={auth}
+            t={t}
+            locale={locale}
+            onImportUsage={async (rows) => {
+              const ok = await importUsage(rows);
+              // Show the imported month straight away.
+              if (ok) setActiveTab("daily");
+              return ok;
+            }}
+            rawInput={rawInput}
+            setRawInput={setRawInput}
+            sessions={sessions}
+            importedKeys={importedKeys}
+            evMsg={evMsg}
+            handleParse={handleParse}
+            handleSaveEv={handleSaveEv}
+            saving={saving}
+          />
         )}
       </div>
 

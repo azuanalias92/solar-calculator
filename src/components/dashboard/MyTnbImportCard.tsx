@@ -3,7 +3,7 @@
 import { useId, useState, type DragEvent } from "react";
 import { ExternalLink, FileText, Loader2, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { mergeUsageRows, parseTnbCsv, type ParsedCsv } from "@/lib/tnbCsv";
 import type { DailyUsageItem } from "./types";
@@ -18,7 +18,6 @@ type Props = {
   disabled?: boolean;
   /** Saves the rows; resolves to true on success. */
   onImport: (rows: DailyUsageItem[]) => Promise<boolean>;
-  triggerClassName?: string;
 };
 
 function formatRange(rows: DailyUsageItem[], locale: string): string {
@@ -28,9 +27,9 @@ function formatRange(rows: DailyUsageItem[], locale: string): string {
   return first === last ? first : `${first} – ${last}`;
 }
 
-export default function UsageImportDialog({ t, locale, disabled, onImport, triggerClassName }: Props) {
+/** Imports daily peak/off-peak usage from myTNB Smart Living CSV downloads. */
+export default function MyTnbImportCard({ t, locale, disabled, onImport }: Props) {
   const inputId = useId();
-  const [open, setOpen] = useState(false);
   const [files, setFiles] = useState<ParsedFile[]>([]);
   const [dragging, setDragging] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -70,7 +69,6 @@ export default function UsageImportDialog({ t, locale, disabled, onImport, trigg
     setImporting(false);
     if (ok) {
       setFiles([]);
-      setOpen(false);
     } else {
       setFailed(true);
     }
@@ -85,29 +83,15 @@ export default function UsageImportDialog({ t, locale, disabled, onImport, trigg
   const steps = [t("import.step1"), t("import.step2"), t("import.step3"), t("import.step4")];
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(next) => {
-        if (importing) return;
-        setOpen(next);
-        if (!next) {
-          setFiles([]);
-          setFailed(false);
-        }
-      }}
-    >
-      <DialogTrigger asChild>
-        <Button variant="secondary" size="sm" disabled={disabled} className={triggerClassName}>
-          <Upload />
-          {t("import.trigger")}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>{t("import.title")}</DialogTitle>
-          <DialogDescription>{t("import.description")}</DialogDescription>
-        </DialogHeader>
-
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Upload className="h-5 w-5 text-link" aria-hidden />
+          {t("import.title")}
+        </CardTitle>
+        <CardDescription>{t("import.description")}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
         <ol className="space-y-3">
           {steps.map((step, i) => (
             <li key={step} className="flex gap-3 text-sm">
@@ -200,16 +184,26 @@ export default function UsageImportDialog({ t, locale, disabled, onImport, trigg
           </p>
         ) : null}
 
-        <DialogFooter className="gap-2 sm:gap-0">
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={importing}>
-            {t("common.cancel")}
+      </CardContent>
+      <CardFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        {files.length > 0 ? (
+          <Button
+            variant="outline"
+            className="w-full sm:w-auto"
+            disabled={importing}
+            onClick={() => {
+              setFiles([]);
+              setFailed(false);
+            }}
+          >
+            {t("import.clear")}
           </Button>
-          <Button onClick={submit} disabled={rows.length === 0 || importing}>
-            {importing ? <Loader2 className="animate-spin" /> : <Upload />}
-            {rows.length > 0 ? `${t("import.importAction")} ${rows.length} ${t("import.days")}` : t("import.importAction")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        ) : null}
+        <Button className="w-full sm:w-auto" onClick={submit} disabled={disabled || rows.length === 0 || importing}>
+          {importing ? <Loader2 className="animate-spin" /> : <Upload />}
+          {rows.length > 0 ? `${t("import.importAction")} ${rows.length} ${t("import.days")}` : t("import.importAction")}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }

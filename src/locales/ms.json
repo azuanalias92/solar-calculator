@@ -194,7 +194,9 @@
     "totalLabel": "Jumlah",
     "trackEnergy": "Jejaki penggunaan tenaga anda",
     "monitorSolar": "Pantau penjimatan solar anda",
-    "noSessionsHint": "Pergi ke tab EV, tampal teks pengecasan anda, dan klik Parse untuk menjana sesi."
+    "noSessionsHint": "Pergi ke Import data, tampal penyata Easy Charging anda, dan tekan Parse Sesi.",
+    "importData": "Import data",
+    "goToImport": "Import data"
   },
   "settings": {
     "account": "Akaun",

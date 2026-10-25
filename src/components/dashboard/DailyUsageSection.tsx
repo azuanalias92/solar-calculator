@@ -4,11 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import type { AuthState } from "@/lib/auth";
-import { BarChart3, Loader2 } from "lucide-react";
+import { BarChart3, Loader2, Upload } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import type { DailyUsageItem, DailyUsageSummaryItem } from "./types";
 import { monthLabel, formatKwh, formatMoney, formatDisplayDate, getDay } from "./utils";
-import UsageImportDialog from "./UsageImportDialog";
 
 interface DailyUsageSectionProps {
   auth: AuthState | null;
@@ -20,8 +20,7 @@ interface DailyUsageSectionProps {
   dailyData: DailyUsageItem[];
   summaryData: DailyUsageSummaryItem[];
   dailyTotals: { peak: number; offPeak: number; total: number };
-  locale: string;
-  onImport: (rows: DailyUsageItem[]) => Promise<boolean>;
+  onGoToImport: () => void;
 }
 
 export default function DailyUsageSection({
@@ -34,8 +33,7 @@ export default function DailyUsageSection({
   dailyData,
   summaryData,
   dailyTotals,
-  locale,
-  onImport,
+  onGoToImport,
 }: DailyUsageSectionProps) {
   const maxDailyTotal = dailyData.reduce((max, d) => Math.max(max, d.peakKwh + d.offPeakKwh), 0);
 
@@ -54,7 +52,6 @@ export default function DailyUsageSection({
                 {!auth?.token ? t("dashboard.loginToView") : ""}
                 {loadingDaily ? <Loader2 className="w-3 h-3 inline animate-spin ml-1" /> : null}
               </span>
-              <UsageImportDialog t={t} locale={locale} disabled={!auth?.token} onImport={onImport} triggerClassName="flex-1 sm:flex-none" />
             </div>
           </div>
           {auth?.token && (
@@ -91,7 +88,10 @@ export default function DailyUsageSection({
               ) : (
                 <div className="flex flex-col items-center gap-3 py-8 text-center">
                   <p className="text-sm text-muted-foreground">{t("dashboard.noDataThisMonth")}</p>
-                  <UsageImportDialog t={t} locale={locale} onImport={onImport} />
+                  <Button variant="outline" size="sm" onClick={onGoToImport}>
+                    <Upload />
+                    {t("dashboard.goToImport")}
+                  </Button>
                 </div>
               )
             ) : (
