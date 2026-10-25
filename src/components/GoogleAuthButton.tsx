@@ -189,11 +189,11 @@ export default function GoogleAuthButton(_: Props) {
             alt={auth.user.name ?? "User"}
             width={36}
             height={36}
-            className="h-9 w-9 rounded-full border-2 border-emerald-200"
+            className="h-9 w-9 rounded-full border-2 border-primary/30"
             unoptimized
           />
         ) : (
-          <div className="h-9 w-9 rounded-full bg-emerald-100 flex items-center justify-center text-sm font-medium text-emerald-700">
+          <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-link">
             {(auth.user.name ?? "U")[0]}
           </div>
         )}

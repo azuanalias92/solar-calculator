@@ -21,7 +21,7 @@ export default function ChargingSessionsSection({
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
-          <Car className="w-4 h-4 text-emerald-600" />
+          <Car className="w-4 h-4 text-link" />
           {t("dashboard.chargingSessions")} ({sessions.length})
         </CardTitle>
         <div className="flex gap-4 text-sm">

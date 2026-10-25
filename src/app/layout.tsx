@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Poppins, Source_Code_Pro } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "@/components/ui/sonner";
@@ -8,7 +8,8 @@ import "./globals.css";
 
 import Script from "next/script";
 
-const inter = Inter({ subsets: ["latin"] });
+const poppins = Poppins({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-sans", display: "swap" });
+const sourceCodePro = Source_Code_Pro({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
   title: {
@@ -132,8 +133,8 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="application-name" content="Kira Solar" />
       </head>
-      <body className={inter.className}>
-        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-background focus:border focus:rounded focus:text-foreground focus:outline-none">
+      <body className={`${poppins.variable} ${sourceCodePro.variable}`}>
+        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-background focus:border focus:rounded-md focus:text-foreground focus:outline-none">
           Skip to main content
         </a>
 
@@ -142,7 +143,7 @@ export default function RootLayout({
           {`if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js');});}`}
         </Script>
         <Script id="pwa-install" strategy="lazyOnload">
-          {`let deferredPrompt;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;var btn=document.createElement('button');btn.textContent='Install App';btn.className='fixed bottom-4 right-4 z-50 px-4 py-2 bg-emerald-600 text-white rounded-lg shadow-lg hover:bg-emerald-700 text-sm font-medium transition-all';btn.onclick=function(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(r){if(r.outcome==='accepted'){btn.remove();}});}};document.body.appendChild(btn);});`}
+          {`let deferredPrompt;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;var btn=document.createElement('button');btn.textContent='Install App';btn.className='fixed bottom-4 right-4 z-50 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50';btn.onclick=function(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(r){if(r.outcome==='accepted'){btn.remove();}});}};document.body.appendChild(btn);});`}
         </Script>
         <Script id="offline-detect" strategy="lazyOnload">
           {`window.addEventListener('offline',function(){document.body.setAttribute('data-offline','true');});window.addEventListener('online',function(){document.body.removeAttribute('data-offline');});if(!navigator.onLine){document.body.setAttribute('data-offline','true');}`}

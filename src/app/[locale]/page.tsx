@@ -77,7 +77,10 @@ export default function Home() {
     let canceled = false;
     const run = async () => {
       if (!auth?.token) {
-        if (!canceled) setAvailableYears([currentYear]);
+        if (!canceled) {
+          setAvailableYears([currentYear]);
+          setSelectedYear(currentYear);
+        }
         return;
       }
       const yearsSet = new Set<number>([currentYear]);
@@ -106,20 +109,16 @@ export default function Home() {
       const sorted = Array.from(yearsSet)
         .filter((y) => Number.isFinite(y))
         .sort((a, b) => b - a);
-      if (!canceled) setAvailableYears(sorted.length ? sorted : [currentYear]);
+      if (canceled) return;
+      const years = sorted.length ? sorted : [currentYear];
+      setAvailableYears(years);
+      setSelectedYear((prev) => (years.includes(prev) ? prev : years[0]));
     };
     void run();
     return () => {
       canceled = true;
     };
   }, [apiBaseUrl, auth?.token, currentYear]);
-
-  // Sync selectedYear to available years
-  useEffect(() => {
-    if (!availableYears.includes(selectedYear) && availableYears.length > 0) {
-      setSelectedYear(availableYears[0]);
-    }
-  }, [availableYears, selectedYear]);
 
   // ═══════════════════════════════════════════════
   // SECTION 1: Daily Energy Usage
@@ -461,26 +460,26 @@ export default function Home() {
       <div className="flex flex-col min-h-screen bg-background">
         <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
         <div className="flex-1 flex items-center justify-center p-4">
-          <Card className="w-full max-w-md border-emerald-200 dark:border-emerald-800 shadow-lg">
+          <Card className="w-full max-w-md border-primary/30">
             <CardContent className="pt-8 pb-8 space-y-6 text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
-                <Sun className="w-8 h-8 text-emerald-600" />
+              <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <Sun className="w-8 h-8 text-link" />
               </div>
               <div className="space-y-2">
-                <h2 className="text-xl font-bold tracking-tight">{t("common.title")}</h2>
+                <h2 className="text-xl font-medium tracking-tight">{t("common.title")}</h2>
                 <p className="text-sm text-muted-foreground">{t("common.description")}</p>
               </div>
               <div className="space-y-3 pt-2">
                 <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                  <Zap className="w-3.5 h-3.5 text-emerald-500" />
+                  <Zap className="w-3.5 h-3.5 text-link" />
                   <span>{t("dashboard.trackEnergy") ?? "Track your energy usage"}</span>
                 </div>
                 <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                  <BarChart3 className="w-3.5 h-3.5 text-emerald-500" />
+                  <BarChart3 className="w-3.5 h-3.5 text-link" />
                   <span>{t("dashboard.monitorSolar") ?? "Monitor your solar savings"}</span>
                 </div>
                 <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                  <Fuel className="w-3.5 h-3.5 text-emerald-500" />
+                  <Fuel className="w-3.5 h-3.5 text-link" />
                   <span>{t("dashboard.evCharging") ?? "Manage EV charging costs"}</span>
                 </div>
               </div>
@@ -620,7 +619,7 @@ export default function Home() {
       <Footer />
 
       {barTooltip && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-md border bg-popover px-4 py-2.5 text-sm shadow-md text-center font-medium">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-md border bg-popover px-4 py-2.5 text-sm shadow-[0_4px_12px_rgba(0,0,0,0.1)] text-center font-medium">
           {barTooltip}
         </div>
       )}

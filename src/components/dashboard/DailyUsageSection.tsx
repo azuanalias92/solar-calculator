@@ -50,7 +50,7 @@ export default function DailyUsageSection({
         <CardHeader className="space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <BarChart3 className="w-5 h-5 text-emerald-600" />
+              <BarChart3 className="w-5 h-5 text-link" />
               {t("dashboard.dailyEnergyUsage")} For {monthLabel(selectedMonth)} {selectedYear}
             </CardTitle>
             <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
@@ -69,14 +69,14 @@ export default function DailyUsageSection({
           {auth?.token && (
             <div className="flex flex-wrap gap-4 text-sm pt-1">
               <div className="flex items-center gap-1">
-                <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" />
+                <span className="inline-block h-3 w-3 rounded-sm bg-warning" />
                 {t("dashboard.peak")}:{" "}
                 <strong>
                 {formatKwh(dailyTotals.peak)} {t("dashboard.kwh")}
                 </strong>
               </div>
               <div className="flex items-center gap-1">
-                <span className="inline-block h-3 w-3 rounded-sm bg-emerald-600" />
+                <span className="inline-block h-3 w-3 rounded-sm bg-primary" />
                 {t("dashboard.offPeak")}:{" "}
                 <strong>
                 {formatKwh(dailyTotals.offPeak)} {t("dashboard.kwh")}
@@ -109,7 +109,7 @@ export default function DailyUsageSection({
                   <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} />
                   <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
                   <Tooltip
-                    contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
+                    contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border-strong))", borderRadius: "6px", fontSize: "12px" }}
                     formatter={(value: unknown, name: unknown) => [
                       `${formatKwh(Number(value))} kWh`,
                       name === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak"),
@@ -120,8 +120,8 @@ export default function DailyUsageSection({
                       value === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak")
                     }
                   />
-                  <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" maxBarSize={32} />
-                  <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" maxBarSize={32} />
+                  <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="hsl(var(--warning))" maxBarSize={32} />
+                  <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="hsl(var(--primary))" maxBarSize={32} />
                 </BarChart>
               </div>
             )}
@@ -166,7 +166,7 @@ export default function DailyUsageSection({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <BarChart3 className="w-4 h-4 text-emerald-600" />
+              <BarChart3 className="w-4 h-4 text-link" />
               {t("dashboard.monthlyBillSummary")} For {selectedYear}
             </CardTitle>
             {summaryData.length > 0 && (
@@ -206,15 +206,15 @@ export default function DailyUsageSection({
                     <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => monthLabel(v)} />
                     <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
                     <Tooltip
-                      contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
+                      contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border-strong))", borderRadius: "6px", fontSize: "12px" }}
                       formatter={(value: unknown, name: unknown) => [
                         `${formatKwh(Number(value))} kWh`,
                         name === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak"),
                       ]}
                     />
                     <Legend formatter={(value: unknown) => value === "peakKwh" ? t("dashboard.peak") : t("dashboard.offPeak")} />
-                    <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="#f59e0b" maxBarSize={32} />
-                    <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="#059669" maxBarSize={32} />
+                    <Bar dataKey="peakKwh" name="peakKwh" stackId="a" fill="hsl(var(--warning))" maxBarSize={32} />
+                    <Bar dataKey="offPeakKwh" name="offPeakKwh" stackId="a" fill="hsl(var(--primary))" maxBarSize={32} />
                   </BarChart>
                 </div>
                 {/* ── Monthly bill table ── */}

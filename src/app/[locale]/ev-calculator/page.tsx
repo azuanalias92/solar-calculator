@@ -50,7 +50,7 @@ export default function EvCalculatorPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BatteryCharging className="w-5 h-5 text-emerald-600" />
+              <BatteryCharging className="w-5 h-5 text-link" />
               {t("evCalc.title")}
             </CardTitle>
           </CardHeader>
@@ -158,7 +158,7 @@ export default function EvCalculatorPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <Zap className="w-4 h-4 text-emerald-600" />
+                  <Zap className="w-4 h-4 text-link" />
                   {t("evCalc.batteryVisual")}
                 </CardTitle>
               </CardHeader>
@@ -170,32 +170,32 @@ export default function EvCalculatorPage() {
                     <div className="absolute -right-2 top-1/2 -translate-y-1/2 w-2 h-5 rounded-r border-2 border-foreground border-l-0 bg-background" />
                     {/* Current charge */}
                     <div
-                      className="absolute left-0 top-0 h-full bg-emerald-200 dark:bg-emerald-800 transition-all"
+                      className="absolute left-0 top-0 h-full bg-primary/30 transition-all"
                       style={{ width: `${pctStart}%` }}
                       title={`${t("evCalc.currentTitle")} ${cur}%`}
                     />
                     {/* Added charge */}
                     {barAdded > 0 && (
                       <div
-                        className="absolute top-0 h-full bg-emerald-600 transition-all"
+                        className="absolute top-0 h-full bg-primary transition-all"
                         style={{ left: `${pctStart}%`, width: `${barAdded}%` }}
                         title={`${t("evCalc.afterChargingTitle")} ${tgt}%`}
                       >
                         {/* Label inside the bar */}
-                        {barAdded > 20 && <span className="absolute right-1 top-1/2 -translate-y-1/2 text-xs font-bold text-white drop-shadow-sm">{tgt}%</span>}
+                        {barAdded > 20 && <span className="absolute right-1 top-1/2 -translate-y-1/2 text-xs font-medium text-primary-foreground">{tgt}%</span>}
                       </div>
                     )}
                     {/* Current charge level marker */}
-                    <div className="absolute top-0 h-full w-0.5 bg-amber-500 z-10" style={{ left: `${pctStart}%` }} />
+                    <div className="absolute top-0 h-full w-0.5 bg-warning z-10" style={{ left: `${pctStart}%` }} />
                   </div>
                   {/* Legend */}
                   <div className="flex justify-center gap-4 mt-3 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
-                      <span className="inline-block w-3 h-3 rounded-sm bg-emerald-600" />
+                      <span className="inline-block w-3 h-3 rounded-sm bg-primary" />
                       {t("evCalc.chargeAddedLegend")} ({barAdded.toFixed(0)}%)
                     </span>
                     <span className="flex items-center gap-1">
-                      <span className="inline-block w-3 h-3 rounded-sm bg-emerald-200 dark:bg-emerald-800" />
+                      <span className="inline-block w-3 h-3 rounded-sm bg-primary/30" />
                       {t("evCalc.existingLegend")} ({cur.toFixed(0)}%)
                     </span>
                     {barRemaining > 0 && (
@@ -218,7 +218,7 @@ export default function EvCalculatorPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <Zap className="w-4 h-4 text-emerald-600" />
+                  <Zap className="w-4 h-4 text-link" />
                   {t("evCalc.costBreakdown")}
                 </CardTitle>
               </CardHeader>
@@ -226,23 +226,23 @@ export default function EvCalculatorPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="p-4 rounded-lg bg-muted/50">
                     <div className="text-sm text-muted-foreground">{t("evCalc.chargeAddedLabel")}</div>
-                    <div className="text-2xl font-bold text-emerald-600">{pctAdded.toFixed(0)}%</div>
+                    <div className="text-2xl font-medium text-link">{pctAdded.toFixed(0)}%</div>
                   </div>
                   <div className="p-4 rounded-lg bg-muted/50">
                     <div className="text-sm text-muted-foreground">{t("evCalc.energyNeeded")}</div>
-                    <div className="text-2xl font-bold">{kwhNeeded.toFixed(2)} kWh</div>
+                    <div className="text-2xl font-medium">{kwhNeeded.toFixed(2)} kWh</div>
                   </div>
-                  <div className="p-4 rounded-lg bg-emerald-600/10 dark:bg-emerald-900/30 border border-emerald-600/20 dark:border-emerald-800/40">
+                  <div className="p-4 rounded-lg bg-primary/10 border border-primary/30">
                     <div className="text-sm text-muted-foreground">{t("evCalc.estimatedCost")}</div>
-                    <div className="text-2xl font-bold text-emerald-600">{formatMoney(cost)}</div>
+                    <div className="text-2xl font-medium text-link">{formatMoney(cost)}</div>
                   </div>
                 </div>
 
-                <div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/30">
+                <div className="mt-4 p-3 rounded-lg bg-warning/10 border border-warning/40">
                   <p className="text-sm text-muted-foreground">
                     {t("evCalc.chargingSummaryPrefix")} <strong>{bKwh} kWh</strong> {t("evCalc.chargingSummaryBattery")} <strong>{cur}%</strong> {t("evCalc.chargingSummaryTo")}{" "}
                     <strong>{tgt}%</strong> ({pctAdded.toFixed(0)}% {t("evCalc.chargingSummaryCharge")}) {t("evCalc.chargingSummaryAt")} <strong>{formatMoney(price)}/kWh</strong>{" "}
-                    {t("evCalc.chargingSummaryCostsApprox")} <strong className="text-emerald-700 dark:text-emerald-400">{formatMoney(cost)}</strong>.
+                    {t("evCalc.chargingSummaryCostsApprox")} <strong className="text-link">{formatMoney(cost)}</strong>.
                   </p>
                 </div>
               </CardContent>
@@ -251,13 +251,13 @@ export default function EvCalculatorPage() {
         )}
       </div>
 
-      <footer className="border-t bg-card/50 backdrop-blur-sm mt-4">
+      <footer className="border-t bg-background mt-4">
         <div className="w-full max-w-6xl mx-auto flex flex-col gap-3 sm:gap-4 mt-3 sm:mt-4 md:flex-row md:justify-between md:items-center px-2 sm:px-0">
-          <div className="text-base sm:text-lg font-semibold text-primary text-center md:text-left">{t("common.title")}</div>
+          <div className="text-base sm:text-lg font-medium text-link text-center md:text-left">{t("common.title")}</div>
 
           <div className="text-xs sm:text-sm text-muted-foreground text-center md:text-left order-3 md:order-2">
             {t("footer.madeBy")}{" "}
-            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-primary hover:text-outline transition-colors">
+            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-link hover:underline underline-offset-4 transition-colors">
               Azuan Alias
             </a>
           </div>
@@ -267,7 +267,7 @@ export default function EvCalculatorPage() {
               href="https://github.com/azuanalias92"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
+              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-link transition-colors"
             >
               <Github className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">{t("footer.github")}</span>
@@ -276,7 +276,7 @@ export default function EvCalculatorPage() {
               href="https://ko-fi.com/azuanalias"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
+              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-link transition-colors"
             >
               <Coffee className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">{t("footer.buyMeCoffee")}</span>

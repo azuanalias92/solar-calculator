@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/lib/useTranslation";
 
 export default function NavBar({ locale }: { locale: string }) {
@@ -39,12 +38,19 @@ export default function NavBar({ locale }: { locale: string }) {
   ];
 
   return (
-    <div className="hidden md:inline-flex gap-2 rounded-lg border border-input bg-background p-1">
+    <nav className="hidden md:inline-flex gap-1 rounded-full border bg-card p-1">
       {items.map((item) => (
-        <Button asChild key={item.href} size="sm" variant={item.active ? "secondary" : "outline"}>
-          <Link href={item.href}>{t(item.labelKey)}</Link>
-        </Button>
+        <Link
+          key={item.href}
+          href={item.href}
+          aria-current={item.active ? "page" : undefined}
+          className={`inline-flex h-8 items-center rounded-full px-4 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${
+            item.active ? "bg-primary/10 text-link" : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {t(item.labelKey)}
+        </Link>
       ))}
-    </div>
+    </nav>
   );
 }

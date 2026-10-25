@@ -63,7 +63,7 @@ export default function EvUsageSection({
       <CardHeader className="space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Fuel className="w-5 h-5 text-emerald-600" />
+            <Fuel className="w-5 h-5 text-link" />
             {t("dashboard.evVsNonEv")} {selectedYear}
           </CardTitle>
           <Dialog>
@@ -76,7 +76,7 @@ export default function EvUsageSection({
             <DialogContent>
               <DialogHeader>
                 <DialogTitle className="flex items-center gap-2">
-                  <Car className="w-5 h-5 text-emerald-600" />
+                  <Car className="w-5 h-5 text-link" />
                   {t("dashboard.evChargingImport")}
                 </DialogTitle>
               </DialogHeader>
@@ -90,7 +90,7 @@ export default function EvUsageSection({
                     <li>Paste it in the text area below</li>
                   </ol>
                   <p className="mt-2 text-xs sm:text-sm">
-                    <strong>Tip:</strong> If copying doesn't work, use{" "}
+                    <strong>Tip:</strong> If copying doesn&apos;t work, use{" "}
                     <a href="https://www.pdftotext.com" target="_blank" rel="noopener noreferrer" className="underline">pdftotext.com</a>{" "}
                     or run <code className="bg-muted px-1 rounded break-all">pdftotext -layout charging.pdf output.txt</code> on desktop.
                   </p>
@@ -127,7 +127,7 @@ export default function EvUsageSection({
               {t("dashboard.loading")}
             </span>
           ) : billEvError ? (
-            <span className="text-red-600">{billEvError}</span>
+            <span className="text-destructive">{billEvError}</span>
           ) : monthsWithData > 0 ? null : (
             <span>
               {t("dashboard.noDataFor")} {selectedYear}
@@ -152,7 +152,7 @@ export default function EvUsageSection({
                 <circle cx="75" cy="75" r="60" fill="none" className="stroke-muted" strokeWidth="22" />
                 {/* EV arc */}
                 {evTotal > 0 && (
-                  <circle cx="75" cy="75" r="60" fill="none" className="stroke-sky-500" strokeWidth="22"
+                  <circle cx="75" cy="75" r="60" fill="none" className="stroke-info" strokeWidth="22"
                     strokeDasharray={`${evLen} ${circ}`}
                     transform="rotate(-90 75 75)"
                     strokeLinecap="round"
@@ -160,7 +160,7 @@ export default function EvUsageSection({
                 )}
                 {/* Non-EV arc */}
                 {nonEvTotal > 0 && (
-                  <circle cx="75" cy="75" r="60" fill="none" className="stroke-emerald-600" strokeWidth="22"
+                  <circle cx="75" cy="75" r="60" fill="none" className="stroke-primary" strokeWidth="22"
                     strokeDasharray={`${circ - evLen} ${circ}`}
                     strokeDashoffset={-evLen}
                     transform="rotate(-90 75 75)"
@@ -177,11 +177,11 @@ export default function EvUsageSection({
               </svg>
               <div className="flex gap-6 mt-2">
                 <span className="flex items-center gap-1.5 text-sm">
-                  <span className="inline-block w-3 h-3 rounded-sm bg-sky-500" />
+                  <span className="inline-block w-3 h-3 rounded-sm bg-info" />
                   <strong>{formatKwh(evTotal)}</strong> kWh ({evPct}%)
                 </span>
                 <span className="flex items-center gap-1.5 text-sm">
-                  <span className="inline-block w-3 h-3 rounded-sm bg-emerald-600" />
+                  <span className="inline-block w-3 h-3 rounded-sm bg-primary" />
                   <strong>{formatKwh(nonEvTotal)}</strong> kWh ({nonEvPct}%)
                 </span>
               </div>
@@ -203,15 +203,15 @@ export default function EvUsageSection({
                 <XAxis dataKey="month" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => monthLabel(v)} />
                 <YAxis tickLine={false} axisLine={false} fontSize={10} tick={{ fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v) => formatKwh(v)} />
                 <Tooltip
-                  contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: "8px", fontSize: "12px" }}
+                  contentStyle={{ background: "hsl(var(--popover))", border: "1px solid hsl(var(--border-strong))", borderRadius: "6px", fontSize: "12px" }}
                   formatter={(value: unknown, name: unknown) => [
                     `${formatKwh(Number(value))} kWh`,
                     name === "evKwh" || name === "evCharging" ? t("dashboard.evCharging") : t("dashboard.nonEv"),
                   ]}
                 />
                 <Legend formatter={(value: unknown) => value === "evKwh" || value === "evCharging" ? t("dashboard.evCharging") : t("dashboard.nonEv")} />
-                <Bar dataKey="evKwh" name="evCharging" stackId="a" fill="#0ea5e9" maxBarSize={32} />
-                <Bar dataKey="nonEvKwh" name="nonEv" stackId="a" fill="#059669" maxBarSize={32} />
+                <Bar dataKey="evKwh" name="evCharging" stackId="a" fill="hsl(var(--info))" maxBarSize={32} />
+                <Bar dataKey="nonEvKwh" name="nonEv" stackId="a" fill="hsl(var(--primary))" maxBarSize={32} />
               </BarChart>
             </div>
           </>

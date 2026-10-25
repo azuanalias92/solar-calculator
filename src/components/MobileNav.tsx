@@ -33,7 +33,7 @@ export default function MobileNav({ locale }: { locale: string }) {
               href={item.href}
               className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full transition-colors ${
                 item.active
-                  ? "text-emerald-600"
+                  ? "text-link"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >

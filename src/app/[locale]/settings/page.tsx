@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,29 @@ const TARIFF_TYPES = [
   { value: "TNB_DOMESTIC_TOU", labelKey: "settings.tariffTnbDomesticTou", descKey: "settings.tariffTnbDomesticTouDesc" },
   { value: "TNB_DOMESTIC_AM", labelKey: "settings.tariffTnbDomesticAm", descKey: "settings.tariffTnbDomesticAmDesc" },
 ] as const;
+
+const DEFAULT_TARIFF = "TNB_DOMESTIC_TOU";
+
+function readTariff(): string {
+  try {
+    const stored = window.localStorage.getItem("kirasolar.tariff");
+    if (stored === "TNB_DOMESTIC_TOU" || stored === "TNB_DOMESTIC_AM") return stored;
+  } catch {
+    /* ignore */
+  }
+  return DEFAULT_TARIFF;
+}
+
+function subscribeTariff(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  window.addEventListener("kirasolar:tariff", onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener("kirasolar:tariff", onChange);
+  };
+}
+
+const noopSubscribe = () => () => {};
 
 function saveTariff(value: string) {
   try {
@@ -139,26 +162,17 @@ export default function SettingsPage() {
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
 
   const [auth, setAuth] = useState<AuthState | null>(null);
-  const [tariff, setTariff] = useState<string>("TNB_DOMESTIC_TOU");
+  const tariff = useSyncExternalStore(subscribeTariff, readTariff, () => DEFAULT_TARIFF);
 
   // Solar config state (form values as strings for controlled inputs)
   const [touRate, setTouRate] = useState<TariffRate | null>(null);
   const [amRate, setAmRate] = useState<TariffRate | null>(null);
   const [ratesLoading, setRatesLoading] = useState(false);
   const [ratesError, setRatesError] = useState<string | null>(null);
-  const [ratesAsOf, setRatesAsOf] = useState<string>("");
-
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem("kirasolar.tariff");
-      if (stored === "TNB_DOMESTIC_TOU" || stored === "TNB_DOMESTIC_AM") {
-        setTariff(stored);
-      }
-    } catch {
-      /* ignore */
-    }
-    setRatesAsOf(todayIsoDate());
-  }, []);
+  // Empty on the server so prerendered HTML matches the first client render.
+  const today = useSyncExternalStore(noopSubscribe, todayIsoDate, () => "");
+  const [ratesAsOfInput, setRatesAsOf] = useState<string | null>(null);
+  const ratesAsOf = ratesAsOfInput ?? today;
 
   // Fetch tariff rates
   useEffect(() => {
@@ -308,7 +322,6 @@ export default function SettingsPage() {
   };
 
   const handleTariffChange = useCallback((value: string) => {
-    setTariff(value);
     saveTariff(value);
   }, []);
 
@@ -339,18 +352,18 @@ export default function SettingsPage() {
                       alt={auth.user.name ?? t("settings.defaultUsername")}
                       width={48}
                       height={48}
-                      className="h-12 w-12 rounded-full border-2 border-emerald-200 dark:border-emerald-800"
+                      className="h-12 w-12 rounded-full border-2 border-primary/30"
                       unoptimized
                     />
                   ) : (
-                    <div className="h-12 w-12 rounded-full bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center text-lg font-medium text-emerald-700 dark:text-emerald-300">
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-lg font-medium text-link">
                       {(auth.user.name ?? t("settings.defaultUsername"))[0]}
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="font-medium truncate">{auth.user.name ?? t("settings.defaultUsername")}</p>
                     <p className="text-sm text-muted-foreground truncate">{auth.user.email ?? ""}</p>
-                    <p className="text-xs text-emerald-600 mt-0.5">{t("settings.syncingStatus")}</p>
+                    <p className="text-xs text-link mt-0.5">{t("settings.syncingStatus")}</p>
                   </div>
                 </div>
 
@@ -372,7 +385,7 @@ export default function SettingsPage() {
                       window.google?.accounts?.id?.disableAutoSelect?.();
                       clearAuthState();
                     }}
-                    className="w-full justify-center text-red-600 border-red-200 hover:bg-red-50"
+                    className="w-full justify-center text-destructive border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
                   >
                     <LogOut className="w-3.5 h-3.5 mr-1.5" />
                     {t("settings.signOut")}
@@ -389,7 +402,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Sun className="w-5 h-5 text-emerald-600" />
+              <Sun className="w-5 h-5 text-link" />
               {t("settings.solarConfigTitle")}
             </CardTitle>
           </CardHeader>
@@ -460,7 +473,7 @@ export default function SettingsPage() {
                   <Button onClick={() => void saveSolarConfig()} disabled={solarSaving} className="w-full sm:w-auto">
                     {solarSaving ? t("settings.saving") : t("settings.saveConfig")}
                   </Button>
-                  {solarMessage && <span className={`text-sm ${solarMessage.includes("✓") ? "text-emerald-600" : "text-red-600"}`}>{solarMessage}</span>}
+                  {solarMessage && <span className={`text-sm ${solarMessage.includes("✓") ? "text-link" : "text-destructive"}`}>{solarMessage}</span>}
                 </div>
 
                 {solarLoaded && (
@@ -484,7 +497,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-emerald-600" />
+              <Zap className="w-5 h-5 text-link" />
               {t("settings.tariffTitle")}
             </CardTitle>
           </CardHeader>
@@ -499,8 +512,8 @@ export default function SettingsPage() {
                   onClick={() => handleTariffChange(tt.value)}
                   className={`text-left rounded-lg border p-4 transition-all cursor-pointer ${
                     tariff === tt.value
-                      ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 ring-1 ring-emerald-500"
-                      : "border-input hover:border-emerald-200 hover:bg-accent"
+                      ? "border-primary bg-primary/10 ring-1 ring-primary/30"
+                      : "border-input hover:border-border-strong hover:bg-accent"
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -509,8 +522,8 @@ export default function SettingsPage() {
                       <p className="text-xs text-muted-foreground mt-0.5">{t(tt.descKey)}</p>
                     </div>
                     {tariff === tt.value && (
-                      <span className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                      <span className="w-4 h-4 rounded-full bg-primary flex items-center justify-center">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />
                       </span>
                     )}
                   </div>
@@ -521,7 +534,7 @@ export default function SettingsPage() {
             {currentTariff && (
               <div className="rounded-lg bg-muted p-3 text-sm">
                 {t("settings.tariffActive")} <strong>{t(currentTariff.labelKey)}</strong> — {t(currentTariff.descKey)}. {t("settings.tariffViewRates")}{" "}
-                <a href="#tariff-rate-details" className="text-primary underline">
+                <a href="#tariff-rate-details" className="text-link underline">
                   {t("settings.below")}
                 </a>
                 .
@@ -536,7 +549,7 @@ export default function SettingsPage() {
         <Card id="tariff-rate-details">
           <CardHeader className="space-y-2">
             <CardTitle className="flex items-center gap-2">
-              <Info className="w-5 h-5 text-emerald-600" />
+              <Info className="w-5 h-5 text-link" />
               {t("settings.tariffRateDetails")}
             </CardTitle>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -548,24 +561,24 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h3 className="text-base font-semibold mb-3">{t("settings.tnbDomesticToU")}</h3>
+              <h3 className="text-base font-medium mb-3">{t("settings.tnbDomesticToU")}</h3>
               {touRate ? <RateTable rate={touRate} t={t} /> : <div className="text-sm text-muted-foreground">{t("settings.noRateFound")}</div>}
             </div>
             <div>
-              <h3 className="text-base font-semibold mb-3">{t("settings.tnbDomesticAm")}</h3>
+              <h3 className="text-base font-medium mb-3">{t("settings.tnbDomesticAm")}</h3>
               {amRate ? <RateTable rate={amRate} t={t} /> : <div className="text-sm text-muted-foreground">{t("settings.noRateFound")}</div>}
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <footer className="border-t bg-card/50 backdrop-blur-sm mt-4">
+      <footer className="border-t bg-background mt-4">
         <div className="w-full max-w-6xl mx-auto flex flex-col gap-3 sm:gap-4 mt-3 sm:mt-4 md:flex-row md:justify-between md:items-center px-2 sm:px-0">
-          <div className="text-base sm:text-lg font-semibold text-primary text-center md:text-left">{t("common.title")}</div>
+          <div className="text-base sm:text-lg font-medium text-link text-center md:text-left">{t("common.title")}</div>
 
           <div className="text-xs sm:text-sm text-muted-foreground text-center md:text-left order-3 md:order-2">
             {t("footer.madeBy")}{" "}
-            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-primary hover:text-outline transition-colors">
+            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-link hover:underline underline-offset-4 transition-colors">
               Azuan Alias
             </a>
           </div>
@@ -575,7 +588,7 @@ export default function SettingsPage() {
               href="https://github.com/azuanalias92"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
+              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-link transition-colors"
             >
               <Github className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">{t("footer.github")}</span>
@@ -584,7 +597,7 @@ export default function SettingsPage() {
               href="https://ko-fi.com/azuanalias"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-primary transition-colors"
+              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-link transition-colors"
             >
               <Coffee className="w-3 h-3 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">{t("footer.buyMeCoffee")}</span>

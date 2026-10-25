@@ -43,6 +43,26 @@ interface SolarConfig {
   systemEfficiency: number;
 }
 
+function calculateStats(itemsList: Item[], config: SolarConfig): Stats {
+  const totalItems = itemsList.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Use estimatekWh from the form instead of calculating from watt * hours
+  const totalkWh = itemsList.reduce((sum, item) => sum + item.estimatekWh, 0);
+  const totalWatt = itemsList.reduce((sum, item) => sum + item.watt * item.quantity, 0);
+  const avgWattPerItem = totalItems > 0 ? totalWatt / totalItems : 0;
+
+  // Calculate solar panels needed based on configuration
+  const dailyPanelOutput = (config.panelWatts / 1000) * config.peakSunHours * (config.systemEfficiency / 100);
+  const solarPanelsNeeded = Math.ceil(totalkWh / dailyPanelOutput);
+
+  return {
+    totalItems,
+    totalkWh,
+    avgWattPerItem,
+    solarPanelsNeeded,
+  };
+}
+
 export default function SolarCalculatorPage() {
   const { t, locale } = useTranslation();
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
@@ -52,12 +72,6 @@ export default function SolarCalculatorPage() {
     peakSunHours: 5,
     panelWatts: 300,
     systemEfficiency: 85,
-  });
-  const [stats, setStats] = useState<Stats>({
-    totalItems: 0,
-    totalkWh: 0,
-    avgWattPerItem: 0,
-    solarPanelsNeeded: 0,
   });
   const [isLoaded, setIsLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -194,32 +208,8 @@ export default function SolarCalculatorPage() {
     };
   }, [auth?.token, isLoaded, items, solarConfig]);
 
-  // Recalculate stats when items or config change
-  useEffect(() => {
-    const newStats = calculateStats(items, solarConfig);
-    setStats(newStats);
-  }, [items, solarConfig]);
+  const stats = useMemo(() => calculateStats(items, solarConfig), [items, solarConfig]);
   const [itemModalOpen, setItemModalOpen] = useState(false);
-
-  const calculateStats = (itemsList: Item[], config: SolarConfig) => {
-    const totalItems = itemsList.reduce((sum, item) => sum + item.quantity, 0);
-
-    // Use estimatekWh from the form instead of calculating from watt * hours
-    const totalkWh = itemsList.reduce((sum, item) => sum + item.estimatekWh, 0);
-    const totalWatt = itemsList.reduce((sum, item) => sum + item.watt * item.quantity, 0);
-    const avgWattPerItem = totalItems > 0 ? totalWatt / totalItems : 0;
-
-    // Calculate solar panels needed based on configuration
-    const dailyPanelOutput = (config.panelWatts / 1000) * config.peakSunHours * (config.systemEfficiency / 100);
-    const solarPanelsNeeded = Math.ceil(totalkWh / dailyPanelOutput);
-
-    return {
-      totalItems,
-      totalkWh,
-      avgWattPerItem,
-      solarPanelsNeeded,
-    };
-  };
 
   const addItem = (item: Omit<Item, "id">) => {
     const newItem = {
@@ -301,12 +291,12 @@ export default function SolarCalculatorPage() {
           <Card>
             <CardHeader className="pb-2 sm:pb-6">
               <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
+                <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-link" />
                 {t("stats.totalKwh")}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0 sm:pt-6">
-              <p className="text-xl sm:text-2xl font-bold">{stats.totalkWh.toFixed(2)}</p>
+              <p className="text-xl sm:text-2xl font-medium">{stats.totalkWh.toFixed(2)}</p>
               <p className="text-xs sm:text-sm text-muted-foreground">{t("stats.perDay")}</p>
             </CardContent>
           </Card>
@@ -314,36 +304,36 @@ export default function SolarCalculatorPage() {
           <Card>
             <CardHeader className="pb-2 sm:pb-6">
               <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                <Package className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
+                <Package className="w-4 h-4 sm:w-5 sm:h-5 text-link" />
                 {t("stats.totalItems")}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0 sm:pt-6">
-              <p className="text-xl sm:text-2xl font-bold">{stats.totalItems}</p>
+              <p className="text-xl sm:text-2xl font-medium">{stats.totalItems}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2 sm:pb-6">
               <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
+                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-link" />
                 {t("stats.avgWattPerItem")}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0 sm:pt-6">
-              <p className="text-xl sm:text-2xl font-bold">{stats.avgWattPerItem.toFixed(2)}</p>
+              <p className="text-xl sm:text-2xl font-medium">{stats.avgWattPerItem.toFixed(2)}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2 sm:pb-6">
               <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
+                <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-link" />
                 {t("stats.solarPanelsNeeded")}
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0 sm:pt-6">
-              <p className="text-xl sm:text-2xl font-bold text-emerald-600">{stats.solarPanelsNeeded}</p>
+              <p className="text-xl sm:text-2xl font-medium text-link">{stats.solarPanelsNeeded}</p>
             </CardContent>
           </Card>
         </div>
@@ -352,7 +342,7 @@ export default function SolarCalculatorPage() {
         <Card className="mb-6 sm:mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Zap className="w-4 h-4 text-emerald-600" />
+              <Zap className="w-4 h-4 text-link" />
               Tariff Configuration
             </CardTitle>
           </CardHeader>
@@ -378,7 +368,7 @@ export default function SolarCalculatorPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <Link href={`/${locale}/settings`} className="text-xs text-muted-foreground hover:text-primary underline transition-colors">
+              <Link href={`/${locale}/settings`} className="text-xs text-muted-foreground hover:text-link underline transition-colors">
                 Manage in Settings →
               </Link>
             </div>
@@ -416,7 +406,7 @@ export default function SolarCalculatorPage() {
                           <TableCell className="text-xs sm:text-sm">{item.quantity}</TableCell>
                           <TableCell className="text-xs sm:text-sm font-medium">{item.estimatekWh.toFixed(2)}</TableCell>
                           <TableCell>
-                            <Button variant="outline" size="sm" onClick={() => removeItem(item.id)} className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0" aria-label="Remove item">
+                            <Button variant="outline" size="sm" onClick={() => removeItem(item.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8 p-0" aria-label="Remove item">
                               <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                             </Button>
                           </TableCell>

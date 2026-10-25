@@ -27,7 +27,12 @@ const config: Config = {
   			'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
   			'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))'
   		},
+  		fontFamily: {
+  			sans: ['var(--font-sans)', 'Poppins', 'system-ui', '-apple-system', "'Helvetica Neue'", 'Helvetica', 'Arial', 'sans-serif'],
+  			mono: ['var(--font-mono)', "'Source Code Pro'", "'Office Code Pro'", 'Menlo', 'monospace']
+  		},
   		borderRadius: {
+  			xl: 'calc(var(--radius) * 2)',
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
@@ -63,7 +68,15 @@ const config: Config = {
   				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
-  			border: 'hsl(var(--border))',
+  			success: 'hsl(var(--success))',
+  			warning: 'hsl(var(--warning))',
+  			info: 'hsl(var(--info))',
+  			link: 'hsl(var(--link))',
+  			overlay: 'hsl(var(--overlay))',
+  			border: {
+  				DEFAULT: 'hsl(var(--border))',
+  				strong: 'hsl(var(--border-strong))'
+  			},
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
   			chart: {
