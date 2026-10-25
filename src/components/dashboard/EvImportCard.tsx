@@ -21,6 +21,8 @@ interface EvImportCardProps {
   setRawInput: (v: string) => void;
   sessions: ChargingSession[];
   importedKeys: Set<string>;
+  /** Parsed sessions whose kWh is already in the monthly totals; only their details get saved. */
+  countedKeys: Set<string>;
   evMsg: string | null;
   handleParse: () => void | Promise<void>;
   handleSaveEv: () => Promise<void>;
@@ -35,6 +37,7 @@ export default function EvImportCard({
   setRawInput,
   sessions,
   importedKeys,
+  countedKeys,
   evMsg,
   handleParse,
   handleSaveEv,
@@ -42,7 +45,10 @@ export default function EvImportCard({
 }: EvImportCardProps) {
   // Only sessions that aren't already imported get saved.
   const newSessions = sessions.filter((s) => !importedKeys.has(sessionKey(s)));
-  const sessionTotals = newSessions.reduce((acc, s) => ({ kwh: acc.kwh + s.kwh, cost: acc.cost + s.cost }), { kwh: 0, cost: 0 });
+  // kWh/cost that saving will add; already-counted sessions only get their details stored.
+  const sessionTotals = newSessions
+    .filter((s) => !countedKeys.has(sessionKey(s)))
+    .reduce((acc, s) => ({ kwh: acc.kwh + s.kwh, cost: acc.cost + s.cost }), { kwh: 0, cost: 0 });
   // Sessions are saved under their own year, which may differ from the selected one.
   const sessionYears = Array.from(new Set(newSessions.map((s) => s.date.slice(0, 4)))).sort().join(", ");
   const alreadyImported = sessions.length - newSessions.length;
@@ -110,6 +116,7 @@ export default function EvImportCard({
             <ul className="divide-y text-xs sm:text-sm">
               {sessions.slice(0, PREVIEW_ROWS).map((s) => {
                 const imported = importedKeys.has(sessionKey(s));
+                const counted = countedKeys.has(sessionKey(s));
                 return (
                   <li key={sessionKey(s)} className={`grid grid-cols-[1fr_auto_auto] items-center gap-3 px-3 py-1.5 ${imported ? "text-muted-foreground" : ""}`}>
                     <span className="flex min-w-0 items-center gap-2">
@@ -119,6 +126,10 @@ export default function EvImportCard({
                       {imported ? (
                         <Badge variant="secondary" className="shrink-0">
                           {t("evImport.importedBadge")}
+                        </Badge>
+                      ) : counted ? (
+                        <Badge variant="outline" className="shrink-0">
+                          {t("evImport.countedBadge")}
                         </Badge>
                       ) : null}
                     </span>

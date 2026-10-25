@@ -25,9 +25,9 @@ const DailyUsageSection = dynamic(() => import("@/components/dashboard/DailyUsag
 const EvUsageSection = dynamic(() => import("@/components/dashboard/EvUsageSection"), { ssr: false });
 const ChargingSessionsSection = dynamic(() => import("@/components/dashboard/ChargingSessionsSection"), { ssr: false });
 const ImportDataSection = dynamic(() => import("@/components/dashboard/ImportDataSection"), { ssr: false });
-import type { DailyUsageItem, DailyUsageSummaryItem, MonthSummary, ChargingSession, MonthUsage } from "@/components/dashboard/types";
-import { monthLabel, emptyYearData } from "@/components/dashboard/utils";
-import { isImported, loadImportedLedger, parseEasyCharging, recordImported, sessionKey } from "@/lib/evSessions";
+import type { DailyUsageItem, DailyUsageSummaryItem, MonthSummary, ChargingSession } from "@/components/dashboard/types";
+import { monthLabel } from "@/components/dashboard/utils";
+import { ApiError, fetchSavedKeys, fetchSavedSessions, loadLegacyCountedKeys, parseEasyCharging, saveSessions, sessionKey } from "@/lib/evSessions";
 
 export default function Home() {
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
@@ -318,158 +318,99 @@ export default function Home() {
   // SECTION 3: EV Charging Import
   // ═══════════════════════════════════════════════
 
-  const [existingEvData, setExistingEvData] = useState<MonthUsage[]>(() => emptyYearData());
-  const [loadingEv, setLoadingEv] = useState(false);
   const [saving, setSaving] = useState(false);
   const [evMsg, setEvMsg] = useState<string | null>(null);
+  // Parsed from the pasted statement, not yet saved.
   const [sessions, setSessions] = useState<ChargingSession[]>([]);
   const [rawInput, setRawInput] = useState("");
   // Keys of parsed sessions that are already saved, for the import preview.
   const [importedKeys, setImportedKeys] = useState<Set<string>>(new Set());
+  // Parsed sessions whose kWh the old flow already counted (details were never stored).
+  const [countedKeys, setCountedKeys] = useState<Set<string>>(new Set());
+
+  // Saved sessions for the selected year (Sessions tab).
+  const [savedSessions, setSavedSessions] = useState<ChargingSession[]>([]);
+  const [loadingSessions, setLoadingSessions] = useState(false);
 
   useEffect(() => {
     if (!auth?.token) return;
+    const token = auth.token;
     let canceled = false;
     const run = async () => {
-      setLoadingEv(true);
+      setLoadingSessions(true);
       try {
-        const res = await fetch(`${apiBaseUrl}/ev-usage?year=${selectedYear}`, {
-          headers: { Authorization: `Bearer ${auth.token}` },
-        });
-        if (!res.ok) return;
-        const p = (await res.json()) as { data: MonthUsage[] };
-        if (!canceled) {
-          setExistingEvData(p.data ?? emptyYearData());
-        }
-      } catch {
+        const data = await fetchSavedSessions(apiBaseUrl, token, selectedYear);
+        if (!canceled) setSavedSessions(data);
+      } catch (err) {
+        if (err instanceof ApiError) handleAuthFailure(err.response);
+        if (!canceled) setSavedSessions([]);
       } finally {
-        if (!canceled) setLoadingEv(false);
+        if (!canceled) setLoadingSessions(false);
       }
     };
     void run();
     return () => {
       canceled = true;
     };
-  }, [apiBaseUrl, auth?.token, selectedYear]);
+  }, [apiBaseUrl, auth?.token, selectedYear, evRefreshKey]);
 
   const handleParse = async () => {
     const parsed = parseEasyCharging(rawInput);
     setSessions(parsed);
     setImportedKeys(new Set());
+    setCountedKeys(new Set());
     if (parsed.length === 0) {
       setEvMsg(t("dashboard.noSessions"));
       return;
     }
     setEvMsg(`${t("dashboard.parsed")} ${parsed.length} ${t("dashboard.sessionsLabel")}`);
     if (!auth?.token) return;
-    // Mark sessions that were already imported; Save re-checks before writing.
+    // Preview only: the API skips saved sessions on Save regardless.
     try {
-      const ledger = await loadImportedLedger(apiBaseUrl, auth.token);
-      setImportedKeys(new Set(parsed.filter((x) => isImported(ledger, x)).map(sessionKey)));
+      const [saved, legacy] = await Promise.all([
+        fetchSavedKeys(apiBaseUrl, auth.token, parsed),
+        loadLegacyCountedKeys(apiBaseUrl, auth.token),
+      ]);
+      setImportedKeys(saved);
+      setCountedKeys(new Set(parsed.map(sessionKey).filter((k) => legacy.has(k) && !saved.has(k))));
     } catch {
-      /* preview only; Save loads the record again */
+      /* the preview just won't mark anything */
     }
   };
 
-  const sessionTotals = useMemo(() => sessions.reduce((s, c) => ({ kwh: s.kwh + c.kwh, cost: s.cost + c.cost }), { kwh: 0, cost: 0 }), [sessions]);
+  const sessionTotals = useMemo(
+    () => savedSessions.reduce((s, c) => ({ kwh: s.kwh + c.kwh, cost: s.cost + c.cost }), { kwh: 0, cost: 0 }),
+    [savedSessions],
+  );
 
-  /**
-   * Adds each new session's kWh to its own year and month, then records the sessions as
-   * imported so the same statement can't be counted twice.
-   */
+  /** Saves parsed sessions; the API skips saved ones and adds only new kWh to the monthly totals. */
   const handleSaveEv = async () => {
     if (!auth?.token || sessions.length === 0) return;
     const token = auth.token;
     setSaving(true);
     setEvMsg(null);
-    const headers = { Authorization: `Bearer ${token}` };
-    const yearOf = (x: ChargingSession) => Number.parseInt(x.date.slice(0, 4), 10);
-
-    // The API may return only months that have data; fill in the rest.
-    const fullYear = (rows: MonthUsage[] | undefined): MonthUsage[] =>
-      emptyYearData().map((m) => rows?.find((r) => r.month === m.month) ?? m);
-
     try {
-      // Without the record we can't tell what's new, so don't save at all.
-      let ledger;
-      try {
-        ledger = await loadImportedLedger(apiBaseUrl, token);
-      } catch (err) {
-        const response = (err as { response?: Response }).response;
-        if (!(response && handleAuthFailure(response))) setEvMsg(t("dashboard.failedToSave"));
-        return;
-      }
+      // Sessions counted by the old flow must not have their kWh added again.
+      const legacy = await loadLegacyCountedKeys(apiBaseUrl, token);
+      const result = await saveSessions(apiBaseUrl, token, sessions, legacy);
 
-      const fresh = sessions.filter((x) => !isImported(ledger, x));
-      const skipped = sessions.length - fresh.length;
-      if (fresh.length === 0) {
-        setImportedKeys(new Set(sessions.map(sessionKey)));
-        setEvMsg(t("evImport.allImported"));
-        return;
-      }
-
-      const byYear = new Map<number, ChargingSession[]>();
-      for (const x of fresh) byYear.set(yearOf(x), [...(byYear.get(yearOf(x)) ?? []), x]);
-      const years = Array.from(byYear.keys()).sort((x, y) => x - y);
-
-      // Load every year first so a failed read can't leave a half-finished save.
-      const existingByYear = new Map<number, MonthUsage[]>();
-      for (const year of years) {
-        if (year === selectedYear) {
-          existingByYear.set(year, fullYear(existingEvData));
-          continue;
-        }
-        const res = await fetch(`${apiBaseUrl}/ev-usage?year=${year}`, { headers });
-        if (handleAuthFailure(res)) return;
-        if (!res.ok) {
-          setEvMsg(t("dashboard.failedToSave"));
-          return;
-        }
-        existingByYear.set(year, fullYear(((await res.json()) as { data?: MonthUsage[] }).data));
-      }
-
-      const savedKeys = new Set<string>();
-      let recordFailed = false;
-      for (const year of years) {
-        const yearSessions = byYear.get(year)!;
-        const added = new Map<number, number>();
-        for (const x of yearSessions) {
-          const month = Number.parseInt(x.date.slice(5, 7), 10);
-          added.set(month, (added.get(month) ?? 0) + x.kwh);
-        }
-        const data = existingByYear.get(year)!.map((m) => ({ month: m.month, evKwh: m.evKwh + (added.get(m.month) ?? 0), nonEvKwh: m.nonEvKwh }));
-        const res = await fetch(`${apiBaseUrl}/ev-usage?year=${year}`, {
-          method: "PUT",
-          headers: { ...headers, "Content-Type": "application/json" },
-          body: JSON.stringify({ data }),
-        });
-        if (handleAuthFailure(res)) return;
-        if (!res.ok) {
-          setSessions((prev) => prev.filter((x) => !savedKeys.has(sessionKey(x))));
-          setEvMsg(`${t("dashboard.failedToSave")} (${year})`);
-          return;
-        }
-        const keys = yearSessions.map(sessionKey);
-        keys.forEach((k) => savedKeys.add(k));
-        if (!(await recordImported(apiBaseUrl, token, ledger, year, keys))) recordFailed = true;
-        if (year === selectedYear) {
-          const result = (await res.json().catch(() => null)) as { data?: MonthUsage[] } | null;
-          setExistingEvData(fullYear(result?.data ?? data));
-        }
-      }
-
-      setAvailableYears((prev) => Array.from(new Set([...prev, ...years])).sort((x, y) => y - x));
+      setAvailableYears((prev) => Array.from(new Set([...prev, ...result.years])).sort((x, y) => y - x));
       setEvRefreshKey((k) => k + 1);
       setSessions([]);
       setImportedKeys(new Set());
+      setCountedKeys(new Set());
       setRawInput("");
-      const summary = `${t("dashboard.saved")} ${fresh.length} ${t("dashboard.sessionsLabel")} (${years.join(", ")})`;
       setEvMsg(
-        [summary, skipped > 0 ? `${skipped} ${t("evImport.skippedImported")}` : "", recordFailed ? t("evImport.recordFailed") : ""]
+        [
+          `${t("dashboard.saved")} ${result.saved} ${t("dashboard.sessionsLabel")}${result.years.length ? ` (${result.years.join(", ")})` : ""}`,
+          result.skipped > 0 ? `${result.skipped} ${t("evImport.skippedImported")}` : "",
+        ]
           .filter(Boolean)
           .join(" · "),
       );
-    } catch {
+    } catch (err) {
+      if (err instanceof ApiError && handleAuthFailure(err.response)) return;
+      // Already-saved sessions are skipped, so saving again after a failure is safe.
       setEvMsg(t("dashboard.failedToSave"));
     } finally {
       setSaving(false);
@@ -678,17 +619,23 @@ export default function Home() {
         )}
 
         {/* ════════════════════════ Charging Sessions Tab ════════════════════════ */}
-        {activeTab === "sessions" && sessions.length > 0 && (
+        {activeTab === "sessions" && loadingSessions && savedSessions.length === 0 && (
+          <p className="text-center text-muted-foreground py-16 text-sm">{t("dashboard.loading")}</p>
+        )}
+        {activeTab === "sessions" && savedSessions.length > 0 && (
           <ChargingSessionsSection
             t={t}
-            sessions={sessions}
+            year={selectedYear}
+            sessions={savedSessions}
             sessionTotals={sessionTotals}
           />
         )}
-        {activeTab === "sessions" && sessions.length === 0 && (
+        {activeTab === "sessions" && !loadingSessions && savedSessions.length === 0 && (
           <div className="text-center py-16 text-muted-foreground">
             <Car className="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p className="text-sm font-medium">{t("dashboard.noSessions")}</p>
+            <p className="text-sm font-medium">
+              {t("dashboard.noSessions")} ({selectedYear})
+            </p>
             <p className="text-xs mt-2 max-w-xs mx-auto">{t("dashboard.noSessionsHint")}</p>
             <Button variant="outline" size="sm" className="mt-4" onClick={() => setActiveTab("import")}>
               <Upload />
@@ -713,6 +660,7 @@ export default function Home() {
             setRawInput={setRawInput}
             sessions={sessions}
             importedKeys={importedKeys}
+            countedKeys={countedKeys}
             evMsg={evMsg}
             handleParse={handleParse}
             handleSaveEv={handleSaveEv}

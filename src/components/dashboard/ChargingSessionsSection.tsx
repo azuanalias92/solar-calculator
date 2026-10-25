@@ -8,12 +8,14 @@ import { Car } from "lucide-react";
 
 interface ChargingSessionsSectionProps {
   t: (key: string) => string;
+  year: number;
   sessions: ChargingSession[];
   sessionTotals: { kwh: number; cost: number };
 }
 
 export default function ChargingSessionsSection({
   t,
+  year,
   sessions,
   sessionTotals,
 }: ChargingSessionsSectionProps) {
@@ -22,7 +24,7 @@ export default function ChargingSessionsSection({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Car className="w-4 h-4 text-link" />
-          {t("dashboard.chargingSessions")} ({sessions.length})
+          {t("dashboard.chargingSessions")} {year} ({sessions.length})
         </CardTitle>
         <div className="flex gap-4 text-sm">
           <span>
@@ -50,8 +52,8 @@ export default function ChargingSessionsSection({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sessions.map((s, i) => (
-                <TableRow key={i}>
+              {sessions.map((s) => (
+                <TableRow key={`${s.date} ${s.startTime}`}>
                   <TableCell className="font-medium">{s.date}</TableCell>
                   <TableCell>{s.startTime}</TableCell>
                   <TableCell>{s.endTime}</TableCell>

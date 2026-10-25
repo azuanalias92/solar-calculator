@@ -196,7 +196,10 @@
     "monitorSolar": "Pantau penjimatan solar anda",
     "noSessionsHint": "Pergi ke Import data, tampal penyata Easy Charging anda, dan tekan Parse Sesi.",
     "importData": "Import data",
-    "goToImport": "Import data"
+    "goToImport": "Import data",
+    "afaColumn": "AFA (sen/kWj)",
+    "afaNote": "Anggaran mengikut peraturan tarif TNB dan menggunakan kadar AFA setiap bulan, dikemas kini setiap hari daripada myTNB. AFA, cukai perkhidmatan dan caj peruncitan hanya dikenakan melebihi 600 kWj sebulan (800 kWj dari September hingga Disember 2026).",
+    "afaEstimatedNote": "* Belum diumumkan; kadar terkini yang diketahui digunakan."
   },
   "settings": {
     "account": "Akaun",
@@ -378,6 +381,7 @@
     "importedBadge": "Diimport",
     "allImported": "Semua sesi ini sudah diimport. Tiada apa ditambah.",
     "skippedImported": "sudah diimport, dilangkau",
-    "recordFailed": "Rekod import tidak dapat dikemas kini. Elakkan menyimpan penyata ini sekali lagi."
+    "recordFailed": "Rekod import tidak dapat dikemas kini. Elakkan menyimpan penyata ini sekali lagi.",
+    "countedBadge": "kWj dikira"
   }
 }

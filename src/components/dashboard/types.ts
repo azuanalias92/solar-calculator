@@ -5,6 +5,9 @@ export type DailyUsageSummaryItem = {
   offPeakKwh: number;
   totalKwh: number;
   billAmount: number | null;
+  /** AFA used for this month's estimate (RM/kWh); estimated when TNB hasn't announced it yet. */
+  afaRate?: number | null;
+  afaEstimated?: boolean | null;
 };
 export type MonthSummary = { month: number; totalKwh: number; evKwh: number; nonEvKwh: number };
 export type ChargingSession = { date: string; startTime: string; endTime: string; duration: string; kwh: number; cost: number };

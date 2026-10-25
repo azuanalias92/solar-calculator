@@ -228,6 +228,7 @@ export default function DailyUsageSection({
                               <TableHead className="text-right">{t("dashboard.peakKwh")}</TableHead>
                               <TableHead className="text-right">{t("dashboard.offPeakKwh")}</TableHead>
                               <TableHead className="text-right">{t("dashboard.totalKwh")}</TableHead>
+                              <TableHead className="text-right">{t("dashboard.afaColumn")}</TableHead>
                               <TableHead className="text-right">{t("dashboard.estBill")}</TableHead>
                             </TableRow>
                           </TableHeader>
@@ -238,12 +239,19 @@ export default function DailyUsageSection({
                                 <TableCell className="text-right">{formatKwh(s.peakKwh)}</TableCell>
                                 <TableCell className="text-right">{formatKwh(s.offPeakKwh)}</TableCell>
                                 <TableCell className="text-right font-medium">{formatKwh(s.totalKwh)}</TableCell>
+                                <TableCell className="text-right tabular-nums">
+                                  {s.afaRate != null ? `${s.afaRate > 0 ? "+" : ""}${(s.afaRate * 100).toFixed(2)}${s.afaEstimated ? "*" : ""}` : "—"}
+                                </TableCell>
                                 <TableCell className="text-right">{s.billAmount != null ? formatMoney(s.billAmount) : "—"}</TableCell>
                               </TableRow>
                             ))}
                           </TableBody>
                         </Table>
                       </div>
+                      <p className="mt-3 text-xs text-muted-foreground">
+                        {t("dashboard.afaNote")}
+                        {summaryData.some((s) => s.afaEstimated) ? ` ${t("dashboard.afaEstimatedNote")}` : ""}
+                      </p>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>

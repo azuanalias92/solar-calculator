@@ -196,7 +196,10 @@
     "monitorSolar": "Monitor your solar savings",
     "noSessionsHint": "Go to Import data, paste your Easy Charging statement, and press Parse Sessions.",
     "importData": "Import data",
-    "goToImport": "Import data"
+    "goToImport": "Import data",
+    "afaColumn": "AFA (sen/kWh)",
+    "afaNote": "Estimates follow TNB's tariff rules and use each month's AFA rate, updated daily from myTNB. AFA, service tax and the retail charge only apply above 600 kWh a month (800 kWh from September to December 2026).",
+    "afaEstimatedNote": "* Not announced yet; the latest known rate is used."
   },
   "settings": {
     "account": "Account",
@@ -378,6 +381,7 @@
     "importedBadge": "Imported",
     "allImported": "All of these sessions were already imported. Nothing was added.",
     "skippedImported": "already imported, skipped",
-    "recordFailed": "Couldn't update the import record. Avoid saving this statement again."
+    "recordFailed": "Couldn't update the import record. Avoid saving this statement again.",
+    "countedBadge": "kWh counted"
   }
 }
