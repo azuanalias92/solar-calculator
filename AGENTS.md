@@ -4,7 +4,7 @@ Guidance for AI coding agents working in this repository.
 
 ## Project
 
-Kira Solar (https://kirasolar.my) is a Malaysian solar / electricity toolkit: a solar panel calculator, an EV charging vs non-EV usage tracker, and a TNB tariff viewer. This repo is the **Next.js frontend only**. The API is a separate Cloudflare Workers service (Hono + D1). Don't try to implement backend endpoints here.
+Kira Solar (https://kirasolar.my) is a Malaysian solar / electricity toolkit: a solar panel calculator, an EV charging vs non-EV usage tracker, and a TNB tariff viewer. This repo is the **Next.js frontend only**. The API is a separate Cloudflare Workers service (Hono + D1). Don't try to implement backend endpoints here. The one exception is `src/app/api/auth/google/route.ts`, a thin bridge for Google's redirect sign-in that forwards the token to the API.
 
 ## Commands
 
@@ -70,6 +70,7 @@ public/                         # PWA manifest, sw.js, sitemaps, OG images, robo
 - After a failed request, always pass the response to `handleAuthFailure(res)` so a 401 clears the stale session.
 - Signed-out users keep working with local state. Signed-in users sync to the API with **debounced, silent background saves**: no toasts, badges or spinners for routine sync. Show toasts only for real errors.
 - Never put the API URL or raw backend errors in UI messages.
+- Google sign-in uses GIS **redirect mode** (no popups, which browsers and installed PWAs block). The button posts to `/api/auth/google`, which checks a nonce cookie against the ID token, calls the API's `POST /auth/google`, writes `kirasolar.auth` to localStorage and returns the user to where they started. Failures come back as `?auth=failed`. One Tap still uses the JS `callback`. Every origin's `/api/auth/google` must be listed under **Authorized redirect URIs** for the OAuth client in Google Cloud Console.
 - Existing endpoints: `POST /auth/google`, `GET/PUT /calculator/state`, `GET/PUT /ev-usage`, `GET /ev-usage/years`, `GET /tariff-rates`.
 
 ### Security headers

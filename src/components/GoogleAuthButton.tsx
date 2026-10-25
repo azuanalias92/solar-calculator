@@ -24,6 +24,11 @@ declare global {
             callback: (response: { credential: string }) => void;
             auto_select?: boolean;
             cancel_on_tap_outside?: boolean;
+            use_fedcm_for_prompt?: boolean;
+            itp_support?: boolean;
+            ux_mode?: "popup" | "redirect";
+            login_uri?: string;
+            nonce?: string;
           }) => void;
           renderButton: (
             parent: HTMLElement,
@@ -50,6 +55,21 @@ type Props = {
   locale?: string;
 };
 
+// Must match the cookie names read by src/app/api/auth/google/route.ts.
+const NONCE_COOKIE = "kirasolar_oauth_nonce";
+const RETURN_COOKIE = "kirasolar_oauth_return";
+
+function setOauthCookie(name: string, value: string) {
+  // SameSite=None so the cookie is sent on Google's cross-site POST back to us.
+  document.cookie = `${name}=${encodeURIComponent(value)}; Path=/; Max-Age=600; SameSite=None; Secure`;
+}
+
+function createNonce(): string {
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 const DEFAULT_GOOGLE_CLIENT_ID =
   "1004921240672-ong7k2d2fv3t1n6nfoen7d5cit6vptfi.apps.googleusercontent.com";
 
@@ -66,6 +86,15 @@ export default function GoogleAuthButton(_: Props) {
     [],
   );
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
+
+  // The redirect sign-in route sends people back with ?auth=failed when it couldn't sign them in.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("auth") !== "failed") return;
+    toast.error(t("auth.failed"));
+    url.searchParams.delete("auth");
+    window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+  }, [t]);
 
   useEffect(() => {
     const refresh = () => setAuth(getAuthState());
@@ -91,8 +120,14 @@ export default function GoogleAuthButton(_: Props) {
       if (canceled) return;
       if (!window.google?.accounts?.id) return;
 
+      // Ties Google's redirect POST to this browser; checked against the ID token by the route.
+      const nonce = createNonce();
+      setOauthCookie(NONCE_COOKIE, nonce);
+      setOauthCookie(RETURN_COOKIE, window.location.pathname);
+
       window.google.accounts.id.initialize({
         client_id: clientId,
+        nonce,
         callback: async ({ credential }) => {
           if (!credential) {
             toast.error(t("auth.failed"));
@@ -120,9 +155,19 @@ export default function GoogleAuthButton(_: Props) {
         },
         auto_select: false,
         cancel_on_tap_outside: false,
+        // The button redirects to Google and back instead of opening a popup, which browsers
+        // and installed PWAs often block. Google POSTs the ID token to login_uri.
+        ux_mode: "redirect",
+        login_uri: `${window.location.origin}/api/auth/google`,
+        // One Tap still uses `callback`, via the browser's built-in sign-in UI where supported.
+        use_fedcm_for_prompt: true,
+        itp_support: true,
       });
 
       initializedRef.current = true;
+
+      // One Tap: a second, popup-free way in. Skipped when already signed in.
+      if (!getAuthState()) window.google.accounts.id.prompt();
     };
 
     void init();

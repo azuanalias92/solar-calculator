@@ -39,6 +39,13 @@ GOOGLE_SITE_VERIFICATION=        # optional
 
 Restart `npm run dev` after changing env vars.
 
+### Google Sign-In
+
+Sign-in uses Google's redirect flow, so it works in every browser without popups. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials), the OAuth client must list each origin under **Authorized JavaScript origins** and its `/api/auth/google` URL under **Authorized redirect URIs**, for example:
+
+- `https://kirasolar.my` and `https://kirasolar.my/api/auth/google`
+- `http://localhost:3000` and `http://localhost:3000/api/auth/google`
+
 ### Scripts
 
 | Command | Description |
