@@ -66,23 +66,15 @@ export type SaveSessionsResult = { saved: number; skipped: number; countedKwh: n
 
 const SESSIONS_PER_REQUEST = 100; // the API accepts up to 200
 
-/**
- * Saves sessions in chunks. `alreadyCounted` keys are stored without adding their kWh to
- * the monthly totals again. Re-sending is safe: the API skips sessions it already has.
- */
-export async function saveSessions(
-  apiBaseUrl: string,
-  token: string,
-  sessions: ChargingSession[],
-  alreadyCounted: Set<string>,
-): Promise<SaveSessionsResult> {
+/** Saves sessions in chunks. Re-sending is safe: the API skips sessions it already has. */
+export async function saveSessions(apiBaseUrl: string, token: string, sessions: ChargingSession[]): Promise<SaveSessionsResult> {
   const total: SaveSessionsResult = { saved: 0, skipped: 0, countedKwh: 0, years: [] };
   for (let i = 0; i < sessions.length; i += SESSIONS_PER_REQUEST) {
     const chunk = sessions.slice(i, i + SESSIONS_PER_REQUEST);
     const res = await fetch(`${apiBaseUrl}/ev-sessions`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ sessions: chunk, alreadyCounted: chunk.map(sessionKey).filter((k) => alreadyCounted.has(k)) }),
+      body: JSON.stringify({ sessions: chunk }),
     });
     if (!res.ok) throw new ApiError(res);
     const r = (await res.json()) as SaveSessionsResult;
@@ -92,29 +84,4 @@ export async function saveSessions(
     total.years = Array.from(new Set([...total.years, ...r.years])).sort((a, b) => a - b);
   }
   return total;
-}
-
-// ── Legacy import record ──
-// Before sessions were stored, saving only added kWh to the monthly totals and kept each
-// session's start time in a hidden note per year ("kirasolar:ev-sessions:<year>"). Those
-// sessions' kWh is already counted, so re-importing them must store details only.
-
-const LEGACY_NOTE_PREFIX = "kirasolar:ev-sessions:";
-
-/** Start times recorded by the old flow. Throws if notes can't be read, so callers don't save blind. */
-export async function loadLegacyCountedKeys(apiBaseUrl: string, token: string): Promise<Set<string>> {
-  const res = await fetch(`${apiBaseUrl}/notes?limit=200`, { headers: { Authorization: `Bearer ${token}` } });
-  if (!res.ok) throw new ApiError(res);
-  const { data } = (await res.json()) as { data: Array<{ title: string; content: string }> };
-  const keys = new Set<string>();
-  for (const note of data ?? []) {
-    if (!note.title.startsWith(LEGACY_NOTE_PREFIX)) continue;
-    try {
-      const parsed = JSON.parse(note.content) as { keys?: unknown };
-      if (Array.isArray(parsed.keys)) for (const k of parsed.keys) if (typeof k === "string") keys.add(k);
-    } catch {
-      /* ignore a malformed note */
-    }
-  }
-  return keys;
 }

@@ -27,7 +27,7 @@ const ChargingSessionsSection = dynamic(() => import("@/components/dashboard/Cha
 const ImportDataSection = dynamic(() => import("@/components/dashboard/ImportDataSection"), { ssr: false });
 import type { DailyUsageItem, DailyUsageSummaryItem, MonthSummary, ChargingSession } from "@/components/dashboard/types";
 import { monthLabel } from "@/components/dashboard/utils";
-import { ApiError, fetchSavedKeys, fetchSavedSessions, loadLegacyCountedKeys, parseEasyCharging, saveSessions, sessionKey } from "@/lib/evSessions";
+import { ApiError, fetchSavedKeys, fetchSavedSessions, parseEasyCharging, saveSessions } from "@/lib/evSessions";
 
 export default function Home() {
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
@@ -325,8 +325,6 @@ export default function Home() {
   const [rawInput, setRawInput] = useState("");
   // Keys of parsed sessions that are already saved, for the import preview.
   const [importedKeys, setImportedKeys] = useState<Set<string>>(new Set());
-  // Parsed sessions whose kWh the old flow already counted (details were never stored).
-  const [countedKeys, setCountedKeys] = useState<Set<string>>(new Set());
 
   // Saved sessions for the selected year (Sessions tab).
   const [savedSessions, setSavedSessions] = useState<ChargingSession[]>([]);
@@ -358,7 +356,6 @@ export default function Home() {
     const parsed = parseEasyCharging(rawInput);
     setSessions(parsed);
     setImportedKeys(new Set());
-    setCountedKeys(new Set());
     if (parsed.length === 0) {
       setEvMsg(t("dashboard.noSessions"));
       return;
@@ -367,12 +364,7 @@ export default function Home() {
     if (!auth?.token) return;
     // Preview only: the API skips saved sessions on Save regardless.
     try {
-      const [saved, legacy] = await Promise.all([
-        fetchSavedKeys(apiBaseUrl, auth.token, parsed),
-        loadLegacyCountedKeys(apiBaseUrl, auth.token),
-      ]);
-      setImportedKeys(saved);
-      setCountedKeys(new Set(parsed.map(sessionKey).filter((k) => legacy.has(k) && !saved.has(k))));
+      setImportedKeys(await fetchSavedKeys(apiBaseUrl, auth.token, parsed));
     } catch {
       /* the preview just won't mark anything */
     }
@@ -390,15 +382,12 @@ export default function Home() {
     setSaving(true);
     setEvMsg(null);
     try {
-      // Sessions counted by the old flow must not have their kWh added again.
-      const legacy = await loadLegacyCountedKeys(apiBaseUrl, token);
-      const result = await saveSessions(apiBaseUrl, token, sessions, legacy);
+      const result = await saveSessions(apiBaseUrl, token, sessions);
 
       setAvailableYears((prev) => Array.from(new Set([...prev, ...result.years])).sort((x, y) => y - x));
       setEvRefreshKey((k) => k + 1);
       setSessions([]);
       setImportedKeys(new Set());
-      setCountedKeys(new Set());
       setRawInput("");
       setEvMsg(
         [
@@ -660,7 +649,6 @@ export default function Home() {
             setRawInput={setRawInput}
             sessions={sessions}
             importedKeys={importedKeys}
-            countedKeys={countedKeys}
             evMsg={evMsg}
             handleParse={handleParse}
             handleSaveEv={handleSaveEv}

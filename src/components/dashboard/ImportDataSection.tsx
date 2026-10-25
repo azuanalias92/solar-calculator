@@ -14,7 +14,6 @@ interface ImportDataSectionProps {
   setRawInput: (v: string) => void;
   sessions: ChargingSession[];
   importedKeys: Set<string>;
-  countedKeys: Set<string>;
   evMsg: string | null;
   handleParse: () => void | Promise<void>;
   handleSaveEv: () => Promise<void>;

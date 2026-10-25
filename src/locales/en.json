@@ -381,8 +381,7 @@
     "importedBadge": "Imported",
     "allImported": "All of these sessions were already imported. Nothing was added.",
     "skippedImported": "already imported, skipped",
-    "recordFailed": "Couldn't update the import record. Avoid saving this statement again.",
-    "countedBadge": "kWh counted"
+    "recordFailed": "Couldn't update the import record. Avoid saving this statement again."
   },
   "afa": {
     "title": "AFA rates",
