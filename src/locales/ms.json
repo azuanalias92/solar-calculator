@@ -383,5 +383,27 @@
     "skippedImported": "sudah diimport, dilangkau",
     "recordFailed": "Rekod import tidak dapat dikemas kini. Elakkan menyimpan penyata ini sekali lagi.",
     "countedBadge": "kWj dikira"
+  },
+  "afa": {
+    "title": "Kadar AFA",
+    "description": "Pelarasan Bahan Api Automatik berubah setiap bulan mengikut kos bahan api: rebat mengurangkan bil anda, surcaj menambahnya.",
+    "unit": "sen/kWj",
+    "rebate": "Rebat",
+    "surcharge": "Surcaj",
+    "noChange": "Tiada perubahan",
+    "notAnnounced": "bulan ini belum diumumkan",
+    "chartLabel": "Kadar AFA bulanan dalam sen sekWj; rebat di bawah sifar, surcaj di atas",
+    "allMonths": "Semua bulan",
+    "month": "Bulan",
+    "type": "Jenis",
+    "thisMonth": "bulan ini",
+    "exemptionNote": "AFA hanya dikenakan apabila sesebuah rumah menggunakan lebih daripada 600 kWj sebulan (800 kWj dari September hingga Disember 2026), dan dikenakan pada semua penggunaan bulan itu.",
+    "source": "Sumber: TNB, dikemas kini setiap hari",
+    "lastUpdated": "kali terakhir berubah",
+    "loadFailed": "Kadar AFA tidak dapat dimuatkan.",
+    "retry": "Cuba lagi",
+    "noData": "Tiada kadar AFA lagi.",
+    "monthlySeeBelow": "Berubah setiap bulan, lihat di bawah",
+    "incentiveTiered": "Berperingkat ikut penggunaan (−0.25 hingga 0)"
   }
 }

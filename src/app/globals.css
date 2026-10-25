@@ -46,6 +46,9 @@
     --chart-3: 44 89.9% 61%;           /* warning */
     --chart-4: 10 77.9% 53.9%;         /* danger */
     --chart-5: 0 0% 53.7%;             /* ash */
+    /* AFA polarity (validated pair: CVD-safe, >=3:1 on card) */
+    --chart-rebate: 156 93.7% 24.7%;   /* #047a4a */
+    --chart-surcharge: 10 75% 43.9%;   /* #c4381c */
     --overlay: 0 0% 0% / 0.4;
     --radius: 0.5rem;                  /* rounded.md 8px */
   }
@@ -79,6 +82,8 @@
     --chart-3: 44 89.9% 61%;
     --chart-4: 10 77.9% 53.9%;
     --chart-5: 0 0% 53.7%;
+    --chart-rebate: 154 60% 41.2%;     /* #2aa872 */
+    --chart-surcharge: 10 77.9% 53.9%; /* #e54d2e */
     --overlay: 0 0% 0% / 0.7;
   }
 }

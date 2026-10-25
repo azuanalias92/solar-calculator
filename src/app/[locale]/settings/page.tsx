@@ -15,6 +15,10 @@ import { Coffee, Github, Sun, Zap, Info } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import AppHeader from "@/components/AppHeader";
+import dynamic from "next/dynamic";
+
+// Includes a chart, so load it separately.
+const AfaRatesCard = dynamic(() => import("@/components/settings/AfaRatesCard"), { ssr: false });
 
 interface SolarConfig {
   peakSunHours: number;
@@ -137,11 +141,16 @@ function RateTable({ rate, t }: { rate: TariffRate; t: (key: string) => string }
         </TableRow>
         <TableRow>
           <TableCell>{t("settings.rateAfaRate")}</TableCell>
-          <TableCell className="text-right">{formatNumber(rate.afa_rate)}</TableCell>
+          <TableCell className="text-right">
+            {/* AFA changes monthly; the tariff record's value is not what bills use. */}
+            <a href="#afa-rates" className="text-link underline-offset-4 hover:underline">
+              {t("afa.monthlySeeBelow")}
+            </a>
+          </TableCell>
         </TableRow>
         <TableRow>
           <TableCell>{t("settings.rateEfficiencyIncentive")}</TableCell>
-          <TableCell className="text-right">{formatNumber(rate.efficiency_incentive_rate)}</TableCell>
+          <TableCell className="text-right">{t("afa.incentiveTiered")}</TableCell>
         </TableRow>
         <TableRow>
           <TableCell>{t("settings.rateServiceTax")}</TableCell>
@@ -508,6 +517,11 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+
+        <Separator className="my-2" />
+
+        {/* Monthly AFA rates */}
+        <AfaRatesCard t={t} locale={locale} apiBaseUrl={apiBaseUrl} />
       </div>
 
       <footer className="border-t bg-background mt-4">

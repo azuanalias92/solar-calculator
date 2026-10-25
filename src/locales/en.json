@@ -383,5 +383,27 @@
     "skippedImported": "already imported, skipped",
     "recordFailed": "Couldn't update the import record. Avoid saving this statement again.",
     "countedBadge": "kWh counted"
+  },
+  "afa": {
+    "title": "AFA rates",
+    "description": "The Automatic Fuel Adjustment changes every month with fuel costs: a rebate lowers your bill, a surcharge raises it.",
+    "unit": "sen/kWh",
+    "rebate": "Rebate",
+    "surcharge": "Surcharge",
+    "noChange": "No change",
+    "notAnnounced": "this month not announced yet",
+    "chartLabel": "Monthly AFA rate in sen per kWh; rebates below zero, surcharges above",
+    "allMonths": "All months",
+    "month": "Month",
+    "type": "Type",
+    "thisMonth": "this month",
+    "exemptionNote": "AFA only applies when a home uses more than 600 kWh in a month (800 kWh from September to December 2026), and then to all of that month's usage.",
+    "source": "Source: TNB, updated daily",
+    "lastUpdated": "last changed",
+    "loadFailed": "Couldn't load AFA rates.",
+    "retry": "Try again",
+    "noData": "No AFA rates available yet.",
+    "monthlySeeBelow": "Changes monthly, see below",
+    "incentiveTiered": "Tiered by usage (−0.25 to 0)"
   }
 }
