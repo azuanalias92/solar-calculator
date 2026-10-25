@@ -292,13 +292,24 @@
   "auth": {
     "signIn": "Sign in with Google",
     "signingIn": "Signing in...",
-    "login": "Login",
-    "logout": "Logout",
+    "login": "Sign in",
+    "logout": "Sign out",
     "loading": "Google sign-in is still loading",
     "notConfigured": "Google sign-in is not configured",
     "promptUnavailable": "Google sign-in prompt could not be shown",
     "failed": "Google sign-in failed",
-    "signInPrompt": "Sign in to access your dashboard"
+    "signInPrompt": "Sign in to access your dashboard",
+    "welcomeTitle": "Welcome to Kira Solar",
+    "welcomeSubtitle": "Sign in to see your electricity usage, solar savings and EV charging costs.",
+    "heroTitle": "Know where every kWh goes.",
+    "heroSubtitle": "Upload your TNB usage, compare EV and household consumption, and size a solar system for your home.",
+    "featureUsage": "Daily usage from your TNB CSV",
+    "featureSolar": "Solar panel sizing for your appliances",
+    "featureEv": "EV charging vs household consumption",
+    "privacyNote": "We only use your Google name, email and photo to save your data. You can sign out at any time.",
+    "tryWithoutAccount": "or try without an account",
+    "signedOut": "You've been signed out",
+    "accountMenu": "Account menu"
   },
   "theme": {
     "light": "Light",

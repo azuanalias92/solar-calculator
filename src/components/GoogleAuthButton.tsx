@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
+import { useTheme } from "next-themes";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { clearAuthState, getAuthState, setAuthState, type AuthState } from "@/lib/auth";
+import { getAuthState, setAuthState, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 
 type GooglePromptNotification = {
@@ -55,6 +55,7 @@ const DEFAULT_GOOGLE_CLIENT_ID =
 
 export default function GoogleAuthButton(_: Props) {
   const { t } = useTranslation();
+  const { resolvedTheme } = useTheme();
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [signingIn, setSigningIn] = useState(false);
   const initializedRef = useRef(false);
@@ -93,9 +94,6 @@ export default function GoogleAuthButton(_: Props) {
       window.google.accounts.id.initialize({
         client_id: clientId,
         callback: async ({ credential }) => {
-          // #region debug-point C:google-callback
-          fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"google-fetch-failure",runId:"pre-fix",hypothesisId:"C",location:"GoogleAuthButton.tsx:callback",msg:"[DEBUG] Google callback fired",data:{origin:window.location.origin,apiBaseUrl,credentialPresent:Boolean(credential),credentialLength:credential?.length ?? 0},ts:Date.now()})}).catch(()=>{});
-          // #endregion
           if (!credential) {
             toast.error(t("auth.failed"));
             return;
@@ -103,31 +101,19 @@ export default function GoogleAuthButton(_: Props) {
 
           setSigningIn(true);
           try {
-            // #region debug-point B:request-start
-            fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"google-fetch-failure",runId:"pre-fix",hypothesisId:"B",location:"GoogleAuthButton.tsx:fetch-start",msg:"[DEBUG] Starting auth exchange",data:{origin:window.location.origin,url:`${apiBaseUrl}/auth/google`},ts:Date.now()})}).catch(()=>{});
-            // #endregion
             const response = await fetch(`${apiBaseUrl}/auth/google`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ credential }),
             });
 
-            // #region debug-point D:response
-            fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"google-fetch-failure",runId:"pre-fix",hypothesisId:"D",location:"GoogleAuthButton.tsx:fetch-response",msg:"[DEBUG] Auth exchange responded",data:{ok:response.ok,status:response.status,statusText:response.statusText,type:response.type,url:response.url},ts:Date.now()})}).catch(()=>{});
-            // #endregion
-
-            if (!response.ok) {
-              const errorPayload = (await response.json().catch(() => null)) as { error?: string } | null;
-              throw new Error(errorPayload?.error ?? t("auth.failed"));
-            }
+            if (!response.ok) throw new Error(`auth/google responded ${response.status}`);
 
             const payload = (await response.json()) as { token: string; user: AuthState["user"] };
             setAuthState({ token: payload.token, user: payload.user });
-          } catch (error) {
-            // #region debug-point D:fetch-error
-            fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"google-fetch-failure",runId:"pre-fix",hypothesisId:"D",location:"GoogleAuthButton.tsx:catch",msg:"[DEBUG] Auth exchange threw",data:{name:error instanceof Error ? error.name : typeof error,message:error instanceof Error ? error.message : String(error),origin:window.location.origin,url:`${apiBaseUrl}/auth/google`},ts:Date.now()})}).catch(()=>{});
-            // #endregion
-            toast.error(error instanceof Error ? error.message : t("auth.failed"));
+          } catch {
+            // Don't surface raw backend errors to the user.
+            toast.error(t("auth.failed"));
           } finally {
             setSigningIn(false);
           }
@@ -160,17 +146,15 @@ export default function GoogleAuthButton(_: Props) {
       const parent = buttonRef.current;
       if (!idApi || !parent) return;
 
-      // #region debug-point E:render-button
-      fetch("http://127.0.0.1:7777/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId:"google-fetch-failure",runId:"post-fix",hypothesisId:"E",location:"GoogleAuthButton.tsx:render-button",msg:"[DEBUG] Rendering Google button instead of prompt",data:{origin:window.location.origin,clientIdPresent:Boolean(clientId)},ts:Date.now()})}).catch(()=>{});
-      // #endregion
       parent.innerHTML = "";
       idApi.renderButton(parent, {
-        theme: "outline",
+        theme: resolvedTheme === "dark" ? "filled_black" : "outline",
         size: "large",
-        text: "signin_with",
-        shape: "pill",
-        logo_alignment: "left",
-        width: 240,
+        text: "continue_with",
+        shape: "rectangular",
+        logo_alignment: "center",
+        // Google caps the button at 400px; fill the container up to that.
+        width: Math.min(400, Math.max(200, parent.offsetWidth || 320)),
       });
     };
 
@@ -178,54 +162,28 @@ export default function GoogleAuthButton(_: Props) {
     return () => {
       canceled = true;
     };
-  }, [auth, clientId]);
+  }, [auth, clientId, resolvedTheme]);
 
-  if (auth) {
-    return (
-      <div className="flex items-center gap-2">
-        {auth.user.picture ? (
-          <Image
-            src={auth.user.picture}
-            alt={auth.user.name ?? "User"}
-            width={36}
-            height={36}
-            className="h-9 w-9 rounded-full border-2 border-primary/30"
-            unoptimized
-          />
-        ) : (
-          <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-link">
-            {(auth.user.name ?? "U")[0]}
-          </div>
-        )}
-        <span className="text-sm text-muted-foreground hidden sm:inline max-w-[120px] truncate">
-          {auth.user.name ?? auth.user.email ?? ""}
-        </span>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            window.google?.accounts?.id?.disableAutoSelect?.();
-            clearAuthState();
-          }}
-        >
-          {t("auth.logout")}
-        </Button>
-      </div>
-    );
-  }
+  // Signed-in state is shown by UserMenu in the header.
+  if (auth) return null;
 
   if (!clientId) {
     return (
-      <Button variant="outline" size="sm" disabled>
-        {t("auth.login")}
+      <Button variant="outline" className="w-full" disabled>
+        {t("auth.notConfigured")}
       </Button>
     );
   }
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      <div ref={buttonRef} className={signingIn ? "pointer-events-none opacity-70" : ""} />
-      {signingIn ? <span className="text-xs text-muted-foreground">{t("auth.signingIn")}</span> : null}
+    <div className="flex w-full flex-col items-center gap-2">
+      {/* Reserve the button's height so the layout doesn't jump while Google's script loads. */}
+      <div
+        ref={buttonRef}
+        className={`flex min-h-10 w-full max-w-[400px] justify-center [color-scheme:normal] ${signingIn ? "pointer-events-none opacity-60" : ""}`}
+        aria-busy={signingIn}
+      />
+      {signingIn ? <span className="text-xs text-muted-foreground" role="status">{t("auth.signingIn")}</span> : null}
     </div>
   );
 }

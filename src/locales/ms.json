@@ -292,13 +292,24 @@
   "auth": {
     "signIn": "Log masuk dengan Google",
     "signingIn": "Sedang log masuk...",
-    "login": "Log Masuk",
-    "logout": "Log Keluar",
+    "login": "Log masuk",
+    "logout": "Log keluar",
     "loading": "Log masuk Google masih dimuatkan",
     "notConfigured": "Log masuk Google belum dikonfigurasi",
     "promptUnavailable": "Prompt log masuk Google tidak dapat dipaparkan",
     "failed": "Log masuk Google gagal",
-    "signInPrompt": "Log masuk untuk mengakses papan pemuka anda"
+    "signInPrompt": "Log masuk untuk mengakses papan pemuka anda",
+    "welcomeTitle": "Selamat datang ke Kira Solar",
+    "welcomeSubtitle": "Log masuk untuk melihat penggunaan elektrik, penjimatan solar dan kos pengecasan EV anda.",
+    "heroTitle": "Ketahui ke mana setiap kWh pergi.",
+    "heroSubtitle": "Muat naik penggunaan TNB anda, bandingkan penggunaan EV dan rumah, dan anggarkan sistem solar untuk rumah anda.",
+    "featureUsage": "Penggunaan harian daripada CSV TNB anda",
+    "featureSolar": "Anggaran panel solar untuk peralatan anda",
+    "featureEv": "Pengecasan EV berbanding penggunaan rumah",
+    "privacyNote": "Kami hanya menggunakan nama, e-mel dan foto Google anda untuk menyimpan data anda. Anda boleh log keluar pada bila-bila masa.",
+    "tryWithoutAccount": "atau cuba tanpa akaun",
+    "signedOut": "Anda telah log keluar",
+    "accountMenu": "Menu akaun"
   },
   "theme": {
     "light": "Terang",

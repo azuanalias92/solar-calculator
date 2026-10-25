@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getAuthState, clearAuthState, handleAuthFailure, type AuthState } from "@/lib/auth";
+import { getAuthState, handleAuthFailure, signOut, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import { toast } from "sonner";
 import { ModeToggle } from "@/components/ModeToggle";
@@ -382,12 +382,12 @@ export default function SettingsPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      window.google?.accounts?.id?.disableAutoSelect?.();
-                      clearAuthState();
+                      signOut();
+                      toast.success(t("auth.signedOut"));
                     }}
                     className="w-full justify-center text-destructive border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
                   >
-                    <LogOut className="w-3.5 h-3.5 mr-1.5" />
+                    <LogOut />
                     {t("settings.signOut")}
                   </Button>
                 </div>

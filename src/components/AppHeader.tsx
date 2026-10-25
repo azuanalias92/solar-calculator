@@ -1,6 +1,7 @@
 "use client";
 
 import NavBar from "@/components/NavBar";
+import UserMenu from "@/components/UserMenu";
 
 type Props = {
   locale: string;
@@ -18,8 +19,11 @@ export default function AppHeader({ locale, title, description, logoAlt }: Props
             <img src="/logo.svg" alt={logoAlt} className="w-8 h-8 sm:w-10 sm:h-10" />
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-normal tracking-tight text-foreground">{title}</h1>
           </div>
-          <div className="hidden md:flex justify-center items-center">
-            <NavBar locale={locale} />
+          <div className="flex items-center gap-2">
+            <div className="hidden md:flex justify-center items-center">
+              <NavBar locale={locale} />
+            </div>
+            <UserMenu locale={locale} />
           </div>
         </div>
         <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2 items-start">{description}</p>

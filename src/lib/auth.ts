@@ -51,3 +51,9 @@ export function clearAuthState(): void {
   window.localStorage.removeItem(STORAGE_KEY)
   window.dispatchEvent(new Event('kirasolar:auth'))
 }
+
+/** Signs the user out and stops Google One Tap from silently signing them back in. */
+export function signOut(): void {
+  window.google?.accounts?.id?.disableAutoSelect?.()
+  clearAuthState()
+}

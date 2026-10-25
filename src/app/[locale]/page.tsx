@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { getAuthState, handleAuthFailure, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import { toast } from "sonner";
-import { BarChart3, Fuel, Car, Sun, Zap } from "lucide-react";
+import { BarChart3, Fuel, Car, Sun, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import GoogleAuthButton from "@/components/GoogleAuthButton";
 import {
   Select,
@@ -34,10 +36,14 @@ export default function Home() {
   const currentYear = useMemo(() => new Date().getFullYear(), []);
 
   const [auth, setAuth] = useState<AuthState | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
   // ── Auth ──
   useEffect(() => {
-    const refresh = () => setAuth(getAuthState());
+    const refresh = () => {
+      setAuth(getAuthState());
+      setAuthChecked(true);
+    };
     refresh();
     window.addEventListener("storage", refresh);
     window.addEventListener("kirasolar:auth", refresh);
@@ -454,43 +460,95 @@ export default function Home() {
     { id: "sessions" as const, label: t("dashboard.chargingSessions"), icon: Car },
   ];
 
-  // ── Not logged in → show login wall ──
-  if (!auth?.token) {
+  // ── Auth not read yet → keep the layout without flashing the sign-in screen ──
+  if (!authChecked) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen p-2 sm:p-6 lg:p-8 bg-background">
         <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
-        <div className="flex-1 flex items-center justify-center p-4">
-          <Card className="w-full max-w-md border-primary/30">
-            <CardContent className="pt-8 pb-8 space-y-6 text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <Sun className="w-8 h-8 text-link" />
-              </div>
-              <div className="space-y-2">
-                <h2 className="text-xl font-medium tracking-tight">{t("common.title")}</h2>
-                <p className="text-sm text-muted-foreground">{t("common.description")}</p>
-              </div>
-              <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                  <Zap className="w-3.5 h-3.5 text-link" />
-                  <span>{t("dashboard.trackEnergy") ?? "Track your energy usage"}</span>
+      </div>
+    );
+  }
+
+  // ── Not logged in → show sign-in screen ──
+  if (!auth?.token) {
+    const features = [
+      { icon: BarChart3, label: t("auth.featureUsage") },
+      { icon: Sun, label: t("auth.featureSolar") },
+      { icon: Fuel, label: t("auth.featureEv") },
+    ];
+
+    return (
+      <div className="flex flex-col min-h-screen p-2 sm:p-6 lg:p-8 bg-background">
+        <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
+        <div className="flex-1 w-full max-w-6xl mx-auto grid gap-4 lg:grid-cols-2 lg:gap-6 lg:items-stretch">
+          {/* Sign-in card first on mobile so the action is above the fold */}
+          <section aria-labelledby="sign-in-title" className="flex items-center justify-center lg:order-2">
+            <Card className="w-full max-w-md">
+              <CardContent className="p-6 sm:p-8 space-y-6">
+                <div className="space-y-2">
+                  <h2 id="sign-in-title" className="text-2xl font-normal tracking-tight">
+                    {t("auth.welcomeTitle")}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">{t("auth.welcomeSubtitle")}</p>
                 </div>
-                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                  <BarChart3 className="w-3.5 h-3.5 text-link" />
-                  <span>{t("dashboard.monitorSolar") ?? "Monitor your solar savings"}</span>
-                </div>
-                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                  <Fuel className="w-3.5 h-3.5 text-link" />
-                  <span>{t("dashboard.evCharging") ?? "Manage EV charging costs"}</span>
-                </div>
-              </div>
-              <div className="pt-2">
+
                 <GoogleAuthButton locale={locale} />
+
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="h-px flex-1 bg-border" />
+                  <span>{t("auth.tryWithoutAccount")}</span>
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <Button asChild variant="outline" className="w-full">
+                    <Link href={`/${locale}/solar-calculator`}>
+                      <Sun />
+                      {t("nav.solarCalculator")}
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link href={`/${locale}/ev-calculator`}>
+                      <Car />
+                      {t("nav.evCalculator")}
+                    </Link>
+                  </Button>
+                </div>
+
+                <p className="flex gap-2 text-xs text-muted-foreground">
+                  <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden />
+                  <span>{t("auth.privacyNote")}</span>
+                </p>
+              </CardContent>
+            </Card>
+          </section>
+
+          <section className="relative overflow-hidden rounded-xl border bg-card p-6 sm:p-10 flex flex-col justify-center lg:order-1">
+            {/* Hero glow: the one decorative depth effect Design.md allows */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl"
+            />
+            <div className="relative space-y-6">
+              <Badge>{t("common.title")}</Badge>
+              <div className="space-y-3">
+                <p className="text-3xl sm:text-4xl font-normal leading-tight tracking-tight text-balance">
+                  {t("auth.heroTitle")}
+                </p>
+                <p className="text-sm sm:text-base text-muted-foreground max-w-prose">{t("auth.heroSubtitle")}</p>
               </div>
-              <p className="text-[11px] text-muted-foreground/70">
-                {t("auth.signInPrompt") ?? "Sign in to access your dashboard"}
-              </p>
-            </CardContent>
-          </Card>
+              <ul className="space-y-3">
+                {features.map(({ icon: Icon, label }) => (
+                  <li key={label} className="flex items-center gap-3 text-sm">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border bg-background">
+                      <Icon className="h-4 w-4 text-link" aria-hidden />
+                    </span>
+                    {label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
         </div>
         <Footer />
       </div>
