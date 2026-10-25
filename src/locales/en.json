@@ -342,5 +342,24 @@
     "description": "Add it to your home screen for quick access, even offline.",
     "action": "Install",
     "dismiss": "Not now"
+  },
+  "import": {
+    "trigger": "Import from myTNB",
+    "title": "Import usage from myTNB",
+    "description": "Bring in your daily peak and off-peak usage from your TNB smart meter.",
+    "step1": "Sign in to myTNB Smart Living.",
+    "openMyTnb": "Open myTNB Smart Living",
+    "step2": "Open your energy usage and switch to the daily view for the month you want.",
+    "step3": "Download it as a CSV file. Repeat for each month you want to import.",
+    "step4": "Drop the CSV files below. You can add several at once.",
+    "dropFiles": "Drop CSV files here or click to choose",
+    "dropHint": "Nothing is saved until you press Import.",
+    "fileNotRecognised": "No usage rows found. Is this the daily usage CSV from myTNB?",
+    "daysFound": "days",
+    "rowsSkipped": "rows skipped",
+    "removeFile": "Remove",
+    "ready": "Ready to import",
+    "importAction": "Import",
+    "days": "days"
   }
 }

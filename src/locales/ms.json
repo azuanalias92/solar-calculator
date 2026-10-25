@@ -342,5 +342,24 @@
     "description": "Tambah ke skrin utama untuk akses pantas, walaupun di luar talian.",
     "action": "Pasang",
     "dismiss": "Bukan sekarang"
+  },
+  "import": {
+    "trigger": "Import dari myTNB",
+    "title": "Import penggunaan dari myTNB",
+    "description": "Bawa masuk penggunaan harian puncak dan luar puncak daripada meter pintar TNB anda.",
+    "step1": "Log masuk ke myTNB Smart Living.",
+    "openMyTnb": "Buka myTNB Smart Living",
+    "step2": "Buka penggunaan tenaga anda dan tukar ke paparan harian untuk bulan yang dikehendaki.",
+    "step3": "Muat turun sebagai fail CSV. Ulang untuk setiap bulan yang ingin diimport.",
+    "step4": "Lepaskan fail CSV di bawah. Anda boleh menambah beberapa fail sekaligus.",
+    "dropFiles": "Lepaskan fail CSV di sini atau klik untuk memilih",
+    "dropHint": "Tiada apa disimpan sehingga anda tekan Import.",
+    "fileNotRecognised": "Tiada baris penggunaan ditemui. Adakah ini CSV penggunaan harian dari myTNB?",
+    "daysFound": "hari",
+    "rowsSkipped": "baris dilangkau",
+    "removeFile": "Buang",
+    "ready": "Sedia untuk diimport",
+    "importAction": "Import",
+    "days": "hari"
   }
 }

@@ -3,12 +3,12 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
 import type { AuthState } from "@/lib/auth";
-import { BarChart3, Loader2, Upload } from "lucide-react";
+import { BarChart3, Loader2 } from "lucide-react";
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import type { DailyUsageItem, DailyUsageSummaryItem } from "./types";
 import { monthLabel, formatKwh, formatMoney, formatDisplayDate, getDay } from "./utils";
+import UsageImportDialog from "./UsageImportDialog";
 
 interface DailyUsageSectionProps {
   auth: AuthState | null;
@@ -17,13 +17,11 @@ interface DailyUsageSectionProps {
   selectedMonth: number;
   loadingDaily: boolean;
   loadingSummary: boolean;
-  uploading: boolean;
-  usageMsg: string | null;
   dailyData: DailyUsageItem[];
   summaryData: DailyUsageSummaryItem[];
   dailyTotals: { peak: number; offPeak: number; total: number };
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
-  handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
+  locale: string;
+  onImport: (rows: DailyUsageItem[]) => Promise<boolean>;
 }
 
 export default function DailyUsageSection({
@@ -33,13 +31,11 @@ export default function DailyUsageSection({
   selectedMonth,
   loadingDaily,
   loadingSummary,
-  uploading,
-  usageMsg,
   dailyData,
   summaryData,
   dailyTotals,
-  fileInputRef,
-  handleFileUpload,
+  locale,
+  onImport,
 }: DailyUsageSectionProps) {
   const maxDailyTotal = dailyData.reduce((max, d) => Math.max(max, d.peakKwh + d.offPeakKwh), 0);
 
@@ -57,13 +53,8 @@ export default function DailyUsageSection({
               <span className="text-sm text-muted-foreground">
                 {!auth?.token ? t("dashboard.loginToView") : ""}
                 {loadingDaily ? <Loader2 className="w-3 h-3 inline animate-spin ml-1" /> : null}
-                {usageMsg ? <span className="text-foreground ml-2">{usageMsg}</span> : null}
               </span>
-              <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleFileUpload} />
-              <Button variant="secondary" size="sm" className="flex-1 sm:flex-none" disabled={!auth?.token || uploading} onClick={() => fileInputRef.current?.click()}>
-                {uploading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Upload className="w-4 h-4 mr-1" />}
-                {t("dashboard.uploadCsv")}
-              </Button>
+              <UsageImportDialog t={t} locale={locale} disabled={!auth?.token} onImport={onImport} triggerClassName="flex-1 sm:flex-none" />
             </div>
           </div>
           {auth?.token && (
@@ -95,7 +86,14 @@ export default function DailyUsageSection({
           <CardContent className="space-y-6">
             {/* ── Bar chart ── */}
             {dailyData.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8 text-sm">{loadingDaily ? t("dashboard.loading") : t("dashboard.noDataThisMonth")}</p>
+              loadingDaily ? (
+                <p className="text-center text-muted-foreground py-8 text-sm">{t("dashboard.loading")}</p>
+              ) : (
+                <div className="flex flex-col items-center gap-3 py-8 text-center">
+                  <p className="text-sm text-muted-foreground">{t("dashboard.noDataThisMonth")}</p>
+                  <UsageImportDialog t={t} locale={locale} onImport={onImport} />
+                </div>
+              )
             ) : (
               <div className="w-full overflow-x-auto" style={{ height: 300 }}>
                 <BarChart

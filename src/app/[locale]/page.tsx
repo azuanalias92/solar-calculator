@@ -25,7 +25,7 @@ const DailyUsageSection = dynamic(() => import("@/components/dashboard/DailyUsag
 const EvUsageSection = dynamic(() => import("@/components/dashboard/EvUsageSection"), { ssr: false });
 const ChargingSessionsSection = dynamic(() => import("@/components/dashboard/ChargingSessionsSection"), { ssr: false });
 import type { DailyUsageItem, DailyUsageSummaryItem, MonthSummary, ChargingSession, MonthUsage } from "@/components/dashboard/types";
-import { monthLabel, parseCsvDate, emptyYearData } from "@/components/dashboard/utils";
+import { monthLabel, emptyYearData } from "@/components/dashboard/utils";
 
 export default function Home() {
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
@@ -135,16 +135,12 @@ export default function Home() {
   const [summaryData, setSummaryData] = useState<DailyUsageSummaryItem[]>([]);
   const [loadingDaily, setLoadingDaily] = useState(false);
   const [loadingSummary, setLoadingSummary] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [usageMsg, setUsageMsg] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!auth?.token) return;
     let canceled = false;
     const run = async () => {
       setLoadingDaily(true);
-      setUsageMsg(null);
       try {
         const res = await fetch(`${apiBaseUrl}/daily-usage?year=${selectedYear}&month=${selectedMonth}`, {
           headers: { Authorization: `Bearer ${auth.token}` },
@@ -200,86 +196,46 @@ export default function Home() {
     return { peak, offPeak, total: peak + offPeak };
   }, [dailyData]);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !auth?.token) return;
-    setUploading(true);
-    setUsageMsg(null);
+  /** Saves imported daily usage, then shows the newest imported month. */
+  const importUsage = async (rows: DailyUsageItem[]): Promise<boolean> => {
+    if (!auth?.token || rows.length === 0) return false;
     try {
-      const text = await file.text();
-      // Bound ingestion: reject oversized payloads early to protect the backend.
-      const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
-      if (text.length > MAX_BYTES) {
-        setUsageMsg(t("dashboard.csvTooLarge"));
-        setUploading(false);
-        return;
-      }
-      const lines = text.split("\n").filter((l) => l.trim());
-      if (lines.length < 2) {
-        setUsageMsg(t("dashboard.csvEmpty"));
-        setUploading(false);
-        return;
-      }
-      const rows: DailyUsageItem[] = [];
-      const MAX_ROWS = 10000;
-      for (let i = 1; i < lines.length && rows.length < MAX_ROWS; i++) {
-        const line = lines[i].trim();
-        if (!line) continue;
-        const cols = line.split('","').map((c) => c.replace(/^"|"$/g, "").trim());
-        if (cols.length < 4) continue;
-        const date = parseCsvDate(cols[0]);
-        if (!date) continue;
-        if (date > new Date().toISOString().slice(0, 10)) continue;
-        const peakKwh = Math.max(0, Number.parseFloat(cols[1]) || 0);
-        const offPeakKwh = Math.max(0, Number.parseFloat(cols[2]) || 0);
-        rows.push({ date, peakKwh, offPeakKwh });
-      }
-      if (rows.length === 0) {
-        setUsageMsg(t("dashboard.noValidRows"));
-        setUploading(false);
-        return;
-      }
       const res = await fetch(`${apiBaseUrl}/daily-usage`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
         body: JSON.stringify({ data: rows }),
       });
-      if (handleAuthFailure(res)) {
-        setUploading(false);
-        return;
-      }
-      if (!res.ok) {
-        setUsageMsg(t("dashboard.uploadFailed"));
-        setUploading(false);
-        return;
-      }
-      setUsageMsg(`${t("dashboard.uploaded")} ${rows.length} ${t("dashboard.days")}!`);
-      const [dailyRes, summaryRes] = await Promise.all([
-        fetch(`${apiBaseUrl}/daily-usage?year=${selectedYear}&month=${selectedMonth}`, {
-          headers: { Authorization: `Bearer ${auth.token}` },
-        }),
-        fetch(`${apiBaseUrl}/daily-usage/summary?year=${selectedYear}`, {
-          headers: { Authorization: `Bearer ${auth.token}` },
-        }),
-      ]);
-      if (handleAuthFailure(dailyRes) || handleAuthFailure(summaryRes)) {
-        setUploading(false);
-        return;
-      }
-      if (dailyRes.ok) {
-        const p = (await dailyRes.json()) as { data: DailyUsageItem[] };
-        setDailyData(p.data ?? []);
-      }
-      if (summaryRes.ok) {
-        const p = (await summaryRes.json()) as { data: DailyUsageSummaryItem[] };
-        setSummaryData(p.data ?? []);
-      }
+      if (handleAuthFailure(res) || !res.ok) return false;
     } catch {
-      setUsageMsg(t("dashboard.failedToParse"));
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      return false;
     }
+
+    const latest = rows[rows.length - 1].date;
+    const year = Number.parseInt(latest.slice(0, 4), 10);
+    const month = Number.parseInt(latest.slice(5, 7), 10);
+    setAvailableYears((prev) => (prev.includes(year) ? prev : [...prev, year].sort((x, y) => y - x)));
+    toast.success(`${t("dashboard.uploaded")} ${rows.length} ${t("import.days")}`);
+
+    if (year !== selectedYear || month !== selectedMonth) {
+      // The fetch effects reload data for the new month and year.
+      setSelectedYear(year);
+      setSelectedMonth(month);
+      return true;
+    }
+
+    const headers = { Authorization: `Bearer ${auth.token}` };
+    try {
+      const [dailyRes, summaryRes] = await Promise.all([
+        fetch(`${apiBaseUrl}/daily-usage?year=${selectedYear}&month=${selectedMonth}`, { headers }),
+        fetch(`${apiBaseUrl}/daily-usage/summary?year=${selectedYear}`, { headers }),
+      ]);
+      if (handleAuthFailure(dailyRes) || handleAuthFailure(summaryRes)) return true;
+      if (dailyRes.ok) setDailyData(((await dailyRes.json()) as { data: DailyUsageItem[] }).data ?? []);
+      if (summaryRes.ok) setSummaryData(((await summaryRes.json()) as { data: DailyUsageSummaryItem[] }).data ?? []);
+    } catch {
+      /* the data is saved; the next load will show it */
+    }
+    return true;
   };
 
   // ═══════════════════════════════════════════════
@@ -627,13 +583,11 @@ export default function Home() {
             selectedMonth={selectedMonth}
             loadingDaily={loadingDaily}
             loadingSummary={loadingSummary}
-            uploading={uploading}
-            usageMsg={usageMsg}
             dailyData={dailyData}
             summaryData={summaryData}
             dailyTotals={dailyTotals}
-            fileInputRef={fileInputRef}
-            handleFileUpload={handleFileUpload}
+            locale={locale}
+            onImport={importUsage}
           />
         )}
 
