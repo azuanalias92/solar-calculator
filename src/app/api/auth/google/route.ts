@@ -4,8 +4,12 @@ import { NextRequest, NextResponse } from "next/server";
  * Google Sign-In redirect target (GIS `ux_mode: "redirect"`).
  *
  * Google POSTs the ID token here as a form, so sign-in works without popups in every
- * browser. We exchange it with the API, then hand the session to the client the same way
- * the popup flow does (localStorage "kirasolar.auth") and send the user back where they were.
+ * browser. After checking the nonce, we hand the token to the browser, which exchanges it
+ * with the API itself, stores the session the same way the popup flow does
+ * (localStorage "kirasolar.auth") and returns the user to where they were.
+ *
+ * The exchange must run in the browser: the API rate-limits /auth/* per client IP, and
+ * calling it from here would put every user behind Vercel's few shared IPs.
  */
 
 export const dynamic = "force-dynamic";
@@ -59,25 +63,10 @@ export async function POST(request: NextRequest) {
   const expectedNonce = request.cookies.get(NONCE_COOKIE)?.value;
   if (!expectedNonce || nonceFromIdToken(credential) !== expectedNonce) return fail(request, returnPath);
 
-  let session: { token: string; user: unknown };
-  try {
-    const res = await fetch(`${API_BASE_URL}/auth/google`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ credential }),
-      cache: "no-store",
-    });
-    if (!res.ok) return fail(request, returnPath);
-    session = (await res.json()) as { token: string; user: unknown };
-    if (typeof session?.token !== "string") return fail(request, returnPath);
-  } catch {
-    return fail(request, returnPath);
-  }
-
-  // Escape "<" so the JSON can't close the script tag.
-  const authJson = JSON.stringify(JSON.stringify({ token: session.token, user: session.user })).replace(/</g, "\\u003c");
-  const returnJson = JSON.stringify(returnPath).replace(/</g, "\\u003c");
-  const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Kira Solar</title></head><body><script>try{localStorage.setItem("kirasolar.auth",${authJson})}catch(e){}location.replace(${returnJson});</script></body></html>`;
+  // Escape "<" so the values can't close the script tag.
+  const js = (value: unknown) => JSON.stringify(value).replace(/</g, "\\u003c");
+  const script = `(function(){var ret=${js(returnPath)};function fail(){var u=new URL(ret,location.origin);u.searchParams.set("auth","failed");location.replace(u.toString());}fetch(${js(`${API_BASE_URL}/auth/google`)},{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({credential:${js(credential)}})}).then(function(r){return r.ok?r.json():null}).then(function(s){if(!s||typeof s.token!=="string")return fail();try{localStorage.setItem("kirasolar.auth",JSON.stringify({token:s.token,user:s.user}))}catch(e){}location.replace(ret);}).catch(fail);})();`;
+  const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="robots" content="noindex"><title>Kira Solar</title></head><body><script>${script}</script></body></html>`;
 
   return clearOauthCookies(
     new NextResponse(html, {

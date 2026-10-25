@@ -200,13 +200,18 @@ export default function Home() {
   /** Saves imported daily usage, then shows the newest imported month. */
   const importUsage = async (rows: DailyUsageItem[]): Promise<boolean> => {
     if (!auth?.token || rows.length === 0) return false;
+    // Send a month at a time to stay within the API's per-request database limits.
+    // Days are upserted, so re-sending a chunk after a failure is safe.
+    const CHUNK_DAYS = 31;
     try {
-      const res = await fetch(`${apiBaseUrl}/daily-usage`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
-        body: JSON.stringify({ data: rows }),
-      });
-      if (handleAuthFailure(res) || !res.ok) return false;
+      for (let i = 0; i < rows.length; i += CHUNK_DAYS) {
+        const res = await fetch(`${apiBaseUrl}/daily-usage`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${auth.token}` },
+          body: JSON.stringify({ data: rows.slice(i, i + CHUNK_DAYS) }),
+        });
+        if (handleAuthFailure(res) || !res.ok) return false;
+      }
     } catch {
       return false;
     }
