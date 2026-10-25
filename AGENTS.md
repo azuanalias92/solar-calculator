@@ -71,7 +71,9 @@ public/                         # PWA manifest, sw.js, sitemaps, OG images, robo
 - Signed-out users keep working with local state. Signed-in users sync to the API with **debounced, silent background saves**: no toasts, badges or spinners for routine sync. Show toasts only for real errors.
 - Never put the API URL or raw backend errors in UI messages.
 - Google sign-in uses GIS **redirect mode** (no popups, which browsers and installed PWAs block). The button posts to `/api/auth/google`, which checks a nonce cookie against the ID token, calls the API's `POST /auth/google`, writes `kirasolar.auth` to localStorage and returns the user to where they started. Failures come back as `?auth=failed`. One Tap still uses the JS `callback`. Every origin's `/api/auth/google` must be listed under **Authorized redirect URIs** for the OAuth client in Google Cloud Console.
-- Existing endpoints: `POST /auth/google`, `GET/PUT /calculator/state`, `GET/PUT /ev-usage`, `GET /ev-usage/years`, `GET /tariff-rates`.
+- Endpoints used: `POST /auth/google`, `GET/PUT /calculator/state`, `GET/PUT /ev-usage`, `GET /ev-usage/years`, `GET/PUT /daily-usage`, `GET /daily-usage/summary`, `GET /daily-usage/years`, `GET /tariff-rates`, `GET/POST/PUT /notes`. The full list is at `${API}/openapi.json`.
+- The API stores EV usage only as monthly totals. To stop a charging session being counted twice, `src/lib/evSessions.ts` keeps imported session keys (start date and time) in one hidden note per year titled `kirasolar:ev-sessions:<year>`. Saving loads that record first and skips known sessions; don't save EV kWh without it.
+- myTNB daily usage CSVs are parsed by `src/lib/tnbCsv.ts` (header-based columns, several date formats). Keep new import formats there, not in components.
 
 ### Security headers
 - `next.config.mjs` defines a strict CSP. If you add a third-party script, image host or API origin, update the matching CSP directive (`script-src`, `img-src`, `connect-src`, and so on), or the browser will block it in production.

@@ -149,7 +149,7 @@
     "monthlyBreakdownKwh": "Pecahan Bulanan (kWh)",
     "evChargingImport": "Import Pengecasan EV",
     "pasteInstructions": "Tampal teks PDF Easy Charging di bawah. Pengekstrak tarikh, kWh, dan kos.",
-    "pastePlaceholder": "Tampal data Easy Charging di sini...\n\nContoh:\n254902721  Azuan Alias  2026-05-24  00:06:39  2026-05-24  10:13:03  10H06M  61.0  17.57",
+    "pastePlaceholder": "Tampal data Easy Charging di sini...\n\nContoh:\n123456789  Nama Anda  2026-05-24  00:06:39  2026-05-24  10:13:03  10H06M  61.0  17.57",
     "parseSessions": "Parse Sesi",
     "saving": "Menyimpan...",
     "saveTo": "Simpan ke",
@@ -361,5 +361,21 @@
     "ready": "Sedia untuk diimport",
     "importAction": "Import",
     "days": "hari"
+  },
+  "evImport": {
+    "trigger": "Import pengecasan",
+    "step1": "Buka penyata PDF Easy Charging anda.",
+    "step2": "Pilih semua teks dan salin (Ctrl+A, kemudian Ctrl+C). Pada telefon, tekan lama, kemudian Pilih semua dan Salin.",
+    "step3": "Tampal di bawah dan tekan Parse Sesi untuk menyemak sesi sebelum menyimpan.",
+    "helpTitle": "Tidak dapat menyalin?",
+    "copyTip": "Sesetengah PDF tidak membenarkan salinan. Tukar PDF kepada teks dahulu, contohnya dengan",
+    "expectedFormat": "Setiap sesi sepatutnya berada pada satu baris, seperti ini:",
+    "more": "lagi",
+    "newSessions": "sesi baharu",
+    "alreadyImported": "sudah diimport",
+    "importedBadge": "Diimport",
+    "allImported": "Semua sesi ini sudah diimport. Tiada apa ditambah.",
+    "skippedImported": "sudah diimport, dilangkau",
+    "recordFailed": "Rekod import tidak dapat dikemas kini. Elakkan menyimpan penyata ini sekali lagi."
   }
 }

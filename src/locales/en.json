@@ -149,7 +149,7 @@
     "monthlyBreakdownKwh": "Monthly Breakdown (kWh)",
     "evChargingImport": "EV Charging Import",
     "pasteInstructions": "Paste Easy Charging PDF text below. The parser extracts dates, kWh, and costs.",
-    "pastePlaceholder": "Paste Easy Charging data here...\n\nExample:\n254902721  Azuan Alias  2026-05-24  00:06:39  2026-05-24  10:13:03  10H06M  61.0  17.57",
+    "pastePlaceholder": "Paste Easy Charging data here...\n\nExample:\n123456789  Your Name  2026-05-24  00:06:39  2026-05-24  10:13:03  10H06M  61.0  17.57",
     "parseSessions": "Parse Sessions",
     "saving": "Saving...",
     "saveTo": "Save to",
@@ -361,5 +361,21 @@
     "ready": "Ready to import",
     "importAction": "Import",
     "days": "days"
+  },
+  "evImport": {
+    "trigger": "Import charging",
+    "step1": "Open your Easy Charging PDF statement.",
+    "step2": "Select all the text and copy it (Ctrl+A, then Ctrl+C). On a phone, long-press, then Select all and Copy.",
+    "step3": "Paste it below and press Parse Sessions to check the sessions before saving.",
+    "helpTitle": "Copying doesn't work?",
+    "copyTip": "Some PDFs don't allow copying. Convert the PDF to text first, for example with",
+    "expectedFormat": "Each session should be on one line, like this:",
+    "more": "more",
+    "newSessions": "new sessions",
+    "alreadyImported": "already imported",
+    "importedBadge": "Imported",
+    "allImported": "All of these sessions were already imported. Nothing was added.",
+    "skippedImported": "already imported, skipped",
+    "recordFailed": "Couldn't update the import record. Avoid saving this statement again."
   }
 }
