@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
+import InstallPrompt from "@/components/InstallPrompt";
 const DailyUsageSection = dynamic(() => import("@/components/dashboard/DailyUsageSection"), { ssr: false });
 const EvUsageSection = dynamic(() => import("@/components/dashboard/EvUsageSection"), { ssr: false });
 const ChargingSessionsSection = dynamic(() => import("@/components/dashboard/ChargingSessionsSection"), { ssr: false });
@@ -480,6 +481,7 @@ export default function Home() {
     return (
       <div className="flex flex-col min-h-screen p-2 sm:p-6 lg:p-8 bg-background">
         <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
+        <InstallPrompt />
         <div className="flex-1 w-full max-w-6xl mx-auto grid gap-4 lg:grid-cols-2 lg:gap-6 lg:items-stretch">
           {/* Sign-in card first on mobile so the action is above the fold */}
           <section aria-labelledby="sign-in-title" className="flex items-center justify-center lg:order-2">
@@ -558,6 +560,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen p-2 sm:p-6 lg:p-8 bg-background">
       <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
+      <InstallPrompt />
 
       {/* ── Global Year/Month Filter ── */}
       <div className="w-full max-w-6xl mx-auto py-4 flex items-center justify-end gap-3">

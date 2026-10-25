@@ -244,7 +244,15 @@
     "tariffTnbDomesticAmDesc": "Kadar rata",
     "tnbDomesticAm": "TNB Domestik Am",
     "tnbDomesticToU": "TNB Domestic ToU",
-    "unableToReachApi": "Tidak dapat mencapai API di"
+    "unableToReachApi": "Tidak dapat mencapai API di",
+    "preferences": "Keutamaan",
+    "preferencesDesc": "Disimpan pada peranti ini. Tiada akaun diperlukan.",
+    "languageDesc": "Digunakan di seluruh aplikasi.",
+    "appearance": "Penampilan",
+    "appearanceDesc": "Cerah, gelap, atau ikut peranti anda.",
+    "notSignedIn": "Belum log masuk. Data anda kekal pada peranti ini.",
+    "accountSignedInDesc": "Data anda disegerakkan ke awan semasa anda log masuk.",
+    "synced": "Disegerakkan"
   },
   "evCalc": {
     "title": "Kalkulator Kos Pengecasan EV",
@@ -328,5 +336,11 @@
   "offline": {
     "banner": "Anda berada di luar talian. Sesetengah fungsi mungkin tidak berfungsi.",
     "retry": "Cuba lagi"
+  },
+  "install": {
+    "title": "Pasang Kira Solar",
+    "description": "Tambah ke skrin utama untuk akses pantas, walaupun di luar talian.",
+    "action": "Pasang",
+    "dismiss": "Bukan sekarang"
   }
 }

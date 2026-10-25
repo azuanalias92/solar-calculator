@@ -244,7 +244,15 @@
     "tariffTnbDomesticAmDesc": "Flat rate",
     "tnbDomesticAm": "TNB Domestik Am",
     "tnbDomesticToU": "TNB Domestic ToU",
-    "unableToReachApi": "Unable to reach API at"
+    "unableToReachApi": "Unable to reach API at",
+    "preferences": "Preferences",
+    "preferencesDesc": "Saved on this device. No account needed.",
+    "languageDesc": "Used across the whole app.",
+    "appearance": "Appearance",
+    "appearanceDesc": "Light, dark, or match your device.",
+    "notSignedIn": "Not signed in. Your data stays on this device.",
+    "accountSignedInDesc": "Your data syncs to the cloud while you're signed in.",
+    "synced": "Synced"
   },
   "evCalc": {
     "title": "EV Charging Cost Calculator",
@@ -328,5 +336,11 @@
   "offline": {
     "banner": "You are offline. Some features may not work.",
     "retry": "Retry"
+  },
+  "install": {
+    "title": "Install Kira Solar",
+    "description": "Add it to your home screen for quick access, even offline.",
+    "action": "Install",
+    "dismiss": "Not now"
   }
 }

@@ -132,6 +132,12 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Kira Solar" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="application-name" content="Kira Solar" />
+        {/* Capture the one-time install event early; InstallPrompt (homepage only) decides whether to show it. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__kiraInstallPrompt=e;window.dispatchEvent(new Event("kirasolar:installable"));});window.addEventListener("appinstalled",function(){window.__kiraInstallPrompt=null;window.dispatchEvent(new Event("kirasolar:installable"));});`,
+          }}
+        />
       </head>
       <body className={`${poppins.variable} ${sourceCodePro.variable}`}>
         <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-background focus:border focus:rounded-md focus:text-foreground focus:outline-none">
@@ -141,9 +147,6 @@ export default function RootLayout({
         {/* Deferred non-critical scripts */}
         <Script id="sw-register" strategy="lazyOnload">
           {`if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js');});}`}
-        </Script>
-        <Script id="pwa-install" strategy="lazyOnload">
-          {`let deferredPrompt;window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;var btn=document.createElement('button');btn.textContent='Install App';btn.className='fixed bottom-4 right-4 z-50 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50';btn.onclick=function(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(function(r){if(r.outcome==='accepted'){btn.remove();}});}};document.body.appendChild(btn);});`}
         </Script>
         <Script id="offline-detect" strategy="lazyOnload">
           {`window.addEventListener('offline',function(){document.body.setAttribute('data-offline','true');});window.addEventListener('online',function(){document.body.removeAttribute('data-offline');});if(!navigator.onLine){document.body.setAttribute('data-offline','true');}`}

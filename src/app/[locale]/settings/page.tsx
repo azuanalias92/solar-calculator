@@ -1,18 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
-import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getAuthState, handleAuthFailure, signOut, type AuthState } from "@/lib/auth";
+import { getAuthState, handleAuthFailure, type AuthState } from "@/lib/auth";
 import { useTranslation } from "@/lib/useTranslation";
 import { toast } from "sonner";
-import { ModeToggle } from "@/components/ModeToggle";
-import GoogleAuthButton from "@/components/GoogleAuthButton";
-import { Coffee, Github, Globe, LogOut, Sun, Zap, Info } from "lucide-react";
+import AccountCard from "@/components/settings/AccountCard";
+import PreferencesCard from "@/components/settings/PreferencesCard";
+import { Coffee, Github, Sun, Zap, Info } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import AppHeader from "@/components/AppHeader";
@@ -158,7 +157,7 @@ function RateTable({ rate, t }: { rate: TariffRate; t: (key: string) => string }
 }
 
 export default function SettingsPage() {
-  const { t, locale, switchLanguage } = useTranslation();
+  const { t, locale } = useTranslation();
   const apiBaseUrl = useMemo(() => process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8787", []);
 
   const [auth, setAuth] = useState<AuthState | null>(null);
@@ -332,69 +331,8 @@ export default function SettingsPage() {
       <AppHeader locale={locale} title={t("common.title")} description={t("common.description")} logoAlt={t("common.logoAlt")} />
 
       <div className="flex-1 w-full max-w-6xl mx-auto space-y-6">
-        {/* Account Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("settings.account")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {!auth?.token ? (
-              <div className="flex flex-col items-center gap-3 py-6">
-                <p className="text-sm text-muted-foreground">{t("settings.signInPrompt")}</p>
-                <GoogleAuthButton locale={locale} />
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center gap-4 rounded-lg border p-4">
-                  {auth.user.picture ? (
-                    <Image
-                      src={auth.user.picture}
-                      alt={auth.user.name ?? t("settings.defaultUsername")}
-                      width={48}
-                      height={48}
-                      className="h-12 w-12 rounded-full border-2 border-primary/30"
-                      unoptimized
-                    />
-                  ) : (
-                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-lg font-medium text-link">
-                      {(auth.user.name ?? t("settings.defaultUsername"))[0]}
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{auth.user.name ?? t("settings.defaultUsername")}</p>
-                    <p className="text-sm text-muted-foreground truncate">{auth.user.email ?? ""}</p>
-                    <p className="text-xs text-link mt-0.5">{t("settings.syncingStatus")}</p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => switchLanguage(locale === "en" ? "ms" : "en")}
-                    className="w-full justify-center gap-2"
-                  >
-                    <Globe className="w-4 h-4" />
-                    {locale === "en" ? "BM" : "EN"}
-                  </Button>
-                  <ModeToggle />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      signOut();
-                      toast.success(t("auth.signedOut"));
-                    }}
-                    className="w-full justify-center text-destructive border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
-                  >
-                    <LogOut />
-                    {t("settings.signOut")}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <AccountCard auth={auth} locale={locale} />
+        <PreferencesCard />
 
         <Separator className="my-2" />
 
