@@ -1,129 +1,125 @@
 # Kira Solar
 
-A solar calculator + utility billing toolkit (Next.js frontend) backed by a Cloudflare Workers API (Hono + D1).
+A solar calculator and electricity tracking toolkit for Malaysian households — live at [kirasolar.my](https://kirasolar.my).
+
+This repo is the Next.js frontend. It talks to a separate Cloudflare Workers API (Hono + D1).
 
 ## Features
 
-- **Solar Calculator**: Track appliances and estimate daily kWh + recommended solar panels
-- **EV vs Non‑EV Usage**: Track monthly EV charging vs non‑EV usage (saved per-year)
-- **Tariff Rates Viewer**: Preview current TNB tariff rates (as-of a selected date)
-- **Google Login**: Sign in with Google (stores a session token client-side)
-- **Backend Sync**: Saves calculator state and EV usage to the API when logged in
-- **Multi-language Support**: English and Malay
+- **Dashboard**: Track monthly EV charging vs non‑EV usage (saved per year), daily usage via CSV upload, and charging sessions
+- **Solar Calculator**: Add appliances to estimate daily kWh and get a recommended solar panel setup
+- **EV Charging Cost Calculator**: Estimate charging cost from battery capacity, charge levels, and rate, with quick presets
+- **Settings & Tariffs**: Choose a tariff and preview current TNB rates (as of a selected date)
+- **Google Login**: Sign in with Google; data syncs to the API in the background when logged in
 - **PDF Export**: Generate detailed reports of your solar calculations
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
+- **Bilingual**: Bahasa Malaysia (default) and English
+- **PWA**: Installable, with a service worker for offline support
+- **Responsive, Light/Dark Mode**: Mobile-first layout with a floating bottom nav on phones
 
 ## Getting Started
 
-First, install the dependencies:
+Requires Node 22 (see `.nvmrc`).
 
 ```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
-```
-
-Then, run the development server:
-
-```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Pages
+### Environment Variables
 
-- `/ms` or `/en`: Solar calculator
-- `/ms/bill-ev` or `/en/bill-ev`: EV vs Non‑EV monthly usage
-- `/ms/rates` or `/en/rates`: Tariff rate preview (calls the backend)
-
-## Environment Variables
-
-Create `/Users/azuanalias/Desktop/Personal/solar-calculator/.env.local`:
+Create `.env.local` in the project root:
 
 ```bash
 NEXT_PUBLIC_API_BASE_URL=http://localhost:8787
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID
+GOOGLE_SITE_VERIFICATION=        # optional
 ```
 
 Restart `npm run dev` after changing env vars.
+
+### Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the dev server |
+| `npm run lint` | Run ESLint |
+| `npm run build` | Production build (includes type-checking) |
+| `npm run start` | Serve the production build |
+
+## Pages
+
+All routes are locale-prefixed (`/ms/...` or `/en/...`). Visiting `/` redirects based on your saved preference or browser language.
+
+| Route | Page |
+| --- | --- |
+| `/{locale}` | Dashboard |
+| `/{locale}/solar-calculator` | Solar calculator |
+| `/{locale}/ev-calculator` | EV charging cost calculator |
+| `/{locale}/settings` | Tariff settings and rates |
+
+Legacy routes (`/bill-ev`, `/ev`, `/usage`, `/rates`) redirect to their current equivalents.
 
 ## Backend API
 
 The frontend expects the API to expose:
 
-- `POST /auth/google` (exchange Google ID token for session token)
-- `GET/PUT /calculator/state` (store the calculator state)
-- `GET/PUT /ev-usage` and `GET /ev-usage/years` (EV usage by year)
-- `GET /tariff-rates` (rate preview)
-- `GET /docs` (Swagger UI)
+- `POST /auth/google` — exchange a Google ID token for a session token
+- `GET/PUT /calculator/state` — store the calculator state
+- `GET/PUT /ev-usage` and `GET /ev-usage/years` — EV usage by year
+- `GET /tariff-rates` — rate preview
+- `GET /docs` — Swagger UI
 
 ## Technology Stack
 
-- **Framework**: Next.js 16 (App Router) with TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: Radix UI primitives
-- **Form Handling**: React Hook Form with Zod validation
+- **Framework**: Next.js 16 (App Router), React 19, TypeScript
+- **Styling**: Tailwind CSS, shadcn/ui on Radix UI primitives, next-themes
+- **Forms**: React Hook Form with Zod validation
+- **Charts**: Recharts
 - **PDF Generation**: jsPDF with AutoTable
 - **Icons**: Lucide React
+- **Notifications**: Sonner
 - **Analytics**: Vercel Analytics and Speed Insights
 
 ## Project Structure
 
 ```
 src/
-├── app/                 # Next.js app directory
-│   └── [locale]/       # Internationalized routes
-│       ├── bill-ev/     # EV usage tracker
-│       └── rates/       # Tariff rates preview
-├── components/         # React components
-│   ├── ui/            # Reusable UI components
-│   ├── GoogleAuthButton.tsx
-│   └── LanguageSwitcher.tsx
-├── lib/               # Utility functions
-│   ├── auth.ts        # Client auth storage helpers
-│   ├── pdfExport.ts   # PDF generation logic
-│   ├── useTranslation.ts # Translation hook
-│   └── utils.ts       # General utilities
-├── locales/           # Translation files
-│   ├── en.json        # English translations
-│   └── ms.json        # Malay translations
-├── proxy.ts           # Locale routing proxy helper
+├── app/
+│   ├── layout.tsx            # Root layout, metadata, service worker
+│   └── [locale]/             # Internationalized routes
+│       ├── page.tsx          # Dashboard
+│       ├── solar-calculator/
+│       ├── ev-calculator/
+│       ├── settings/
+│       └── items/            # Appliance form
+├── components/
+│   ├── ui/                   # shadcn/ui components
+│   ├── dashboard/            # Dashboard sections
+│   └── ...                   # Header, nav, footer, auth button, etc.
+├── lib/
+│   ├── auth.ts               # Client auth storage helpers
+│   ├── pdfExport.ts          # PDF generation
+│   ├── useTranslation.ts     # Translation hook
+│   └── utils.ts
+├── locales/                  # en.json, ms.json
+└── proxy.ts                  # Locale routing
+public/                       # PWA manifest, service worker, sitemaps, OG images
 ```
 
 ## Internationalization
 
-The application supports multiple languages:
-- English (en)
-- Malay (ms)
+Translations live in `src/locales/en.json` and `src/locales/ms.json`. Add new keys to both files and use them via `t("section.key")` from `useTranslation`. Missing keys fall back to English.
 
-Language files are located in the `src/locales/` directory.
+## Deployment
 
-## Building for Production
-
-```bash
-npm run build
-npm run start
-```
+Deployed on [Vercel](https://vercel.com). Security headers (including CSP) are configured in `next.config.mjs` — update the CSP when adding new external origins.
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please open a Pull Request. AI coding agents should read [AGENTS.md](AGENTS.md).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+This project is licensed under the Apache License 2.0 — see the [LICENSE](LICENSE) file for details.
