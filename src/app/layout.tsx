@@ -38,12 +38,12 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://kirasolar.my"),
+  metadataBase: new URL("https://kira-solar.vercel.app"),
   openGraph: {
     title: "Kira Solar - Calculate Your Solar Energy Needs",
     description:
       "Free solar panel calculator to estimate how many solar panels you need for your home. Calculate energy consumption, solar system requirements, and potential savings.",
-    url: "https://kirasolar.my",
+    url: "https://kira-solar.vercel.app",
     siteName: "Kira Solar",
     images: [
       {
@@ -98,7 +98,7 @@ export default function RootLayout({
     name: "Kira Solar",
     description:
       "Free solar panel calculator to estimate how many solar panels you need for your home. Calculate energy consumption, solar system requirements, and potential savings.",
-    url: "https://kirasolar.my",
+    url: "https://kira-solar.vercel.app",
     applicationCategory: "UtilityApplication",
     operatingSystem: "Web Browser",
     offers: {

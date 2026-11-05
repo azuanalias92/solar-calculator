@@ -415,7 +415,7 @@
     "policy": {
       "title": "Privacy Policy",
       "metaDescription": "How Kira Solar collects, uses and protects your data, including Google sign-in, electricity usage imports and charging sessions.",
-      "intro": "Kira Solar (\"we\", \"us\") is a free solar and electricity toolkit for Malaysian households. This policy explains what data we handle when you use kirasolar.my, why, and the choices you have. We follow the principles of Malaysia's Personal Data Protection Act 2010 (PDPA).",
+      "intro": "Kira Solar (\"we\", \"us\") is a free solar and electricity toolkit for Malaysian households. This policy explains what data we handle when you use Kira Solar, why, and the choices you have. We follow the principles of Malaysia's Personal Data Protection Act 2010 (PDPA).",
       "sections": {
         "collect": {
           "title": "1. Data we collect",
@@ -466,7 +466,7 @@
     "terms": {
       "title": "Terms of Service",
       "metaDescription": "The terms for using Kira Solar's solar calculator, EV charging tracker and TNB tariff tools.",
-      "intro": "These terms apply to your use of Kira Solar at kirasolar.my. By using the service, you agree to them. If you do not agree, please do not use Kira Solar.",
+      "intro": "These terms apply to your use of Kira Solar. By using the service, you agree to them. If you do not agree, please do not use Kira Solar.",
       "sections": {
         "service": {
           "title": "1. The service",

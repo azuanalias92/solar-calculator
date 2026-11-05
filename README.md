@@ -1,6 +1,6 @@
 # Kira Solar
 
-A solar calculator and electricity tracking toolkit for Malaysian households — live at [kirasolar.my](https://kirasolar.my).
+A solar calculator and electricity tracking toolkit for Malaysian households — live at [kira-solar.vercel.app](https://kira-solar.vercel.app).
 
 This repo is the Next.js frontend. It talks to a separate Cloudflare Workers API (Hono + D1).
 
@@ -43,7 +43,7 @@ Restart `npm run dev` after changing env vars.
 
 Sign-in uses Google's redirect flow, so it works in every browser without popups. In [Google Cloud Console](https://console.cloud.google.com/apis/credentials), the OAuth client must list each origin under **Authorized JavaScript origins** and its `/api/auth/google` URL under **Authorized redirect URIs**, for example:
 
-- `https://kirasolar.my` and `https://kirasolar.my/api/auth/google`
+- `https://kira-solar.vercel.app` and `https://kira-solar.vercel.app/api/auth/google`
 - `http://localhost:3000` and `http://localhost:3000/api/auth/google`
 
 ### Scripts

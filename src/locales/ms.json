@@ -415,7 +415,7 @@
     "policy": {
       "title": "Dasar Privasi",
       "metaDescription": "Cara Kira Solar mengumpul, menggunakan dan melindungi data anda, termasuk log masuk Google, import penggunaan elektrik dan sesi pengecasan.",
-      "intro": "Kira Solar (\"kami\") ialah set alat solar dan elektrik percuma untuk isi rumah di Malaysia. Dasar ini menerangkan data yang kami kendalikan apabila anda menggunakan kirasolar.my, sebabnya, dan pilihan yang anda ada. Kami mematuhi prinsip Akta Perlindungan Data Peribadi 2010 (PDPA) Malaysia.",
+      "intro": "Kira Solar (\"kami\") ialah set alat solar dan elektrik percuma untuk isi rumah di Malaysia. Dasar ini menerangkan data yang kami kendalikan apabila anda menggunakan Kira Solar, sebabnya, dan pilihan yang anda ada. Kami mematuhi prinsip Akta Perlindungan Data Peribadi 2010 (PDPA) Malaysia.",
       "sections": {
         "collect": {
           "title": "1. Data yang kami kumpul",
@@ -466,7 +466,7 @@
     "terms": {
       "title": "Terma Perkhidmatan",
       "metaDescription": "Terma penggunaan kalkulator solar, penjejak pengecasan EV dan alat tarif TNB Kira Solar.",
-      "intro": "Terma ini terpakai pada penggunaan Kira Solar di kirasolar.my. Dengan menggunakan perkhidmatan ini, anda bersetuju dengan terma ini. Jika anda tidak bersetuju, sila jangan gunakan Kira Solar.",
+      "intro": "Terma ini terpakai pada penggunaan Kira Solar. Dengan menggunakan perkhidmatan ini, anda bersetuju dengan terma ini. Jika anda tidak bersetuju, sila jangan gunakan Kira Solar.",
       "sections": {
         "service": {
           "title": "1. Perkhidmatan",

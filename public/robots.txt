@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://solar-calculator.vercel.app/sitemap.xml
+Sitemap: https://kira-solar.vercel.app/sitemap.xml

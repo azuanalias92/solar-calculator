@@ -4,7 +4,7 @@ Guidance for AI coding agents working in this repository.
 
 ## Project
 
-Kira Solar (https://kirasolar.my) is a Malaysian solar / electricity toolkit: a solar panel calculator, an EV charging vs non-EV usage tracker, and a TNB tariff viewer. This repo is the **Next.js frontend only**. The API is a separate Cloudflare Workers service (Hono + D1). Don't try to implement backend endpoints here. The one exception is `src/app/api/auth/google/route.ts`, a thin bridge for Google's redirect sign-in that forwards the token to the API.
+Kira Solar (https://kira-solar.vercel.app) is a Malaysian solar / electricity toolkit: a solar panel calculator, an EV charging vs non-EV usage tracker, and a TNB tariff viewer. This repo is the **Next.js frontend only**. The API is a separate Cloudflare Workers service (Hono + D1). Don't try to implement backend endpoints here. The one exception is `src/app/api/auth/google/route.ts`, a thin bridge for Google's redirect sign-in that forwards the token to the API.
 
 ## Commands
 
@@ -88,7 +88,7 @@ public/                         # PWA manifest, sw.js, sitemaps, OG images, robo
 
 ### Performance and SEO
 - Lazy-load heavy client-only modules (forms, PDF, charts) with `next/dynamic`. `optimizePackageImports` already covers recharts, lucide and Radix.
-- Canonical URLs and `hreflang` alternates are set in `src/app/[locale]/layout.tsx` against `https://kirasolar.my`. Update `public/sitemap*.xml` when you add a page.
+- Canonical URLs and `hreflang` alternates are set in `src/app/[locale]/layout.tsx` against `https://kira-solar.vercel.app`. Update `public/sitemap*.xml` when you add a page.
 - If you change cached static assets in `public/sw.js`, bump `CACHE_NAME`.
 
 ### Code style

@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     keywords: t.seo.keywords,
     authors: [{ name: "Solar Calculator Team" }],
     publisher: "Solar Calculator",
-    metadataBase: new URL("https://kirasolar.my"),
+    metadataBase: new URL("https://kira-solar.vercel.app"),
     alternates: {
       canonical: `/${locale === "ms" ? "ms" : locale}`,
       languages: {
@@ -89,7 +89,7 @@ export default async function LocaleLayout({
     "@type": "WebApplication",
     name: t.seo.title,
     description: t.seo.description,
-    url: `https://kirasolar.my/${locale === "ms" ? "ms" : locale}`,
+    url: `https://kira-solar.vercel.app/${locale === "ms" ? "ms" : locale}`,
     applicationCategory: "UtilityApplication",
     operatingSystem: "Web Browser",
     inLanguage: locale === "ms" ? "ms-MY" : "en-US",
@@ -113,7 +113,7 @@ export default async function LocaleLayout({
           "@type": "LocalBusiness",
           name: "Kira Solar",
           description: "Perkhidmatan kalkulator panel solar terbaik di Malaysia",
-          url: "https://kirasolar.my/ms",
+          url: "https://kira-solar.vercel.app/ms",
           areaServed: {
             "@type": "Country",
             name: "Malaysia",

@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://solar-calculator.vercel.app/ms</loc>
+    <loc>https://kira-solar.vercel.app/ms</loc>
     <lastmod>2024-01-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://solar-calculator.vercel.app/en" />
-    <xhtml:link rel="alternate" hreflang="ms" href="https://solar-calculator.vercel.app/ms" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://solar-calculator.vercel.app" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://kira-solar.vercel.app/en" />
+    <xhtml:link rel="alternate" hreflang="ms" href="https://kira-solar.vercel.app/ms" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://kira-solar.vercel.app" />
   </url>
   <url>
-    <loc>https://kirasolar.my/ms/policy</loc>
+    <loc>https://kira-solar.vercel.app/ms/policy</loc>
     <lastmod>2026-11-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://kirasolar.my/en/policy" />
-    <xhtml:link rel="alternate" hreflang="ms" href="https://kirasolar.my/ms/policy" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://kirasolar.my/ms/policy" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://kira-solar.vercel.app/en/policy" />
+    <xhtml:link rel="alternate" hreflang="ms" href="https://kira-solar.vercel.app/ms/policy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://kira-solar.vercel.app/ms/policy" />
   </url>
   <url>
-    <loc>https://kirasolar.my/ms/terms</loc>
+    <loc>https://kira-solar.vercel.app/ms/terms</loc>
     <lastmod>2026-11-05</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://kirasolar.my/en/terms" />
-    <xhtml:link rel="alternate" hreflang="ms" href="https://kirasolar.my/ms/terms" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://kirasolar.my/ms/terms" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://kira-solar.vercel.app/en/terms" />
+    <xhtml:link rel="alternate" hreflang="ms" href="https://kira-solar.vercel.app/ms/terms" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://kira-solar.vercel.app/ms/terms" />
   </url>
 </urlset>
