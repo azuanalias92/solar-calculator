@@ -404,5 +404,119 @@
     "noData": "Tiada kadar AFA lagi.",
     "monthlySeeBelow": "Berubah setiap bulan, lihat di bawah",
     "incentiveTiered": "Berperingkat ikut penggunaan (−0.25 hingga 0)"
+  },
+  "legal": {
+    "lastUpdated": "Kemas kini terakhir",
+    "updatedDate": "5 November 2026",
+    "privacyPolicy": "Dasar Privasi",
+    "termsOfService": "Terma Perkhidmatan",
+    "navLabel": "Undang-undang",
+    "seeAlso": "Lihat juga",
+    "policy": {
+      "title": "Dasar Privasi",
+      "metaDescription": "Cara Kira Solar mengumpul, menggunakan dan melindungi data anda, termasuk log masuk Google, import penggunaan elektrik dan sesi pengecasan.",
+      "intro": "Kira Solar (\"kami\") ialah set alat solar dan elektrik percuma untuk isi rumah di Malaysia. Dasar ini menerangkan data yang kami kendalikan apabila anda menggunakan kirasolar.my, sebabnya, dan pilihan yang anda ada. Kami mematuhi prinsip Akta Perlindungan Data Peribadi 2010 (PDPA) Malaysia.",
+      "sections": {
+        "collect": {
+          "title": "1. Data yang kami kumpul",
+          "body": "- Butiran akaun: apabila anda log masuk dengan Google, kami menerima nama, alamat e-mel, gambar profil dan ID akaun Google anda.\n- Data yang anda masukkan atau import: senarai perkakas dan input kalkulator solar, pilihan tarif, penggunaan EV bulanan, penggunaan elektrik harian yang diimport daripada fail CSV myTNB, dan sesi pengecasan EV.\n- Data teknikal: paparan halaman dan metrik prestasi tanpa nama yang dikumpul oleh Vercel Analytics dan Speed Insights, serta log pelayan biasa (seperti alamat IP dan jenis pelayar) untuk keselamatan dan had kadar permintaan."
+        },
+        "local": {
+          "title": "2. Menggunakan Kira Solar tanpa log masuk",
+          "body": "Anda boleh menggunakan kalkulator tanpa akaun. Dalam keadaan ini, input anda kekal dalam storan setempat pelayar pada peranti anda dan tidak dihantar ke pelayan kami. Mengosongkan data pelayar akan memadamkannya."
+        },
+        "use": {
+          "title": "3. Cara kami menggunakan data anda",
+          "body": "- Untuk menyediakan perkhidmatan: menyimpan dan menyegerakkan data anda merentas peranti, serta mengira anggaran bil berdasarkan tarif TNB dan kadar AFA.\n- Untuk memastikan perkhidmatan selamat dan boleh dipercayai, termasuk mencegah penyalahgunaan.\n- Untuk memahami, secara agregat, ciri yang digunakan supaya kami boleh menambah baiknya.\n\nKami tidak menjual data anda, menggunakannya untuk pengiklanan, atau berkongsinya dengan pihak ketiga untuk tujuan pemasaran mereka."
+        },
+        "storage": {
+          "title": "4. Tempat data anda disimpan",
+          "body": "Laman web ini dihoskan di Vercel. Data pengguna yang log masuk disimpan di Cloudflare (Workers dan D1). Penyedia ini mungkin memproses data di luar Malaysia, tertakluk kepada komitmen keselamatan dan privasi mereka sendiri. Log masuk dikendalikan oleh Google di bawah Dasar Privasi Google."
+        },
+        "cookies": {
+          "title": "5. Kuki dan storan setempat",
+          "body": "- Kuki preferred_lang: mengingati pilihan bahasa anda.\n- Kuki log masuk jangka pendek: melindungi log masuk Google daripada permintaan palsu.\n- Storan setempat: menyimpan sesi anda (kirasolar.auth), pilihan tarif dan data kalkulator pada peranti anda.\n\nKami tidak menggunakan kuki pengiklanan atau penjejakan merentas laman."
+        },
+        "retention": {
+          "title": "6. Tempoh penyimpanan data",
+          "body": "Kami menyimpan data akaun anda selagi anda menggunakan Kira Solar. Jika anda meminta akaun anda dipadam, kami akan memadam akaun dan data yang berkaitan dalam tempoh yang munasabah, kecuali jika kami perlu menyimpannya untuk memenuhi kewajipan undang-undang."
+        },
+        "rights": {
+          "title": "7. Hak anda",
+          "body": "Anda boleh meminta untuk mengakses, membetulkan atau memadam data peribadi anda, atau menarik balik persetujuan dengan berhenti menggunakan perkhidmatan dan meminta kami memadam akaun anda. Log keluar akan membuang sesi anda daripada peranti yang sedang digunakan."
+        },
+        "security": {
+          "title": "8. Keselamatan",
+          "body": "Kami menggunakan HTTPS, pengesahan berasaskan token, Dasar Keselamatan Kandungan (CSP) yang ketat dan had kadar permintaan untuk melindungi data anda. Tiada perkhidmatan dalam talian yang selamat sepenuhnya, jadi kami tidak dapat menjamin keselamatan mutlak."
+        },
+        "children": {
+          "title": "9. Kanak-kanak",
+          "body": "Kira Solar tidak ditujukan kepada kanak-kanak di bawah umur 13 tahun, dan kami tidak sengaja mengumpul data peribadi mereka."
+        },
+        "changes": {
+          "title": "10. Perubahan dasar ini",
+          "body": "Kami mungkin mengemas kini dasar ini dari semasa ke semasa. Kami akan menukar tarikh \"Kemas kini terakhir\" di atas, dan perubahan besar akan dipaparkan di laman ini."
+        },
+        "contact": {
+          "title": "11. Hubungi kami",
+          "body": "Untuk soalan atau permintaan berkaitan privasi, hubungi Azuan Alias melalui azuanalias.com."
+        }
+      }
+    },
+    "terms": {
+      "title": "Terma Perkhidmatan",
+      "metaDescription": "Terma penggunaan kalkulator solar, penjejak pengecasan EV dan alat tarif TNB Kira Solar.",
+      "intro": "Terma ini terpakai pada penggunaan Kira Solar di kirasolar.my. Dengan menggunakan perkhidmatan ini, anda bersetuju dengan terma ini. Jika anda tidak bersetuju, sila jangan gunakan Kira Solar.",
+      "sections": {
+        "service": {
+          "title": "1. Perkhidmatan",
+          "body": "Kira Solar menyediakan alat percuma untuk menganggar keperluan panel solar, menjejak pengecasan EV dan penggunaan elektrik isi rumah, serta melihat tarif TNB. Kami boleh mengubah, menggantung atau menghentikan mana-mana ciri pada bila-bila masa."
+        },
+        "estimates": {
+          "title": "2. Anggaran sahaja",
+          "body": "Keputusan, termasuk cadangan solar, penjimatan, tempoh pulangan modal dan anggaran bil, ialah anggaran untuk makluman sahaja. Ia bergantung pada data yang anda berikan serta kadar tarif dan AFA yang mungkin berubah atau dianggarkan. Ia bukan nasihat kewangan, kejuruteraan atau profesional. Bil TNB sebenar anda ialah angka yang muktamad. Dapatkan nasihat pemasang berlesen sebelum membeli sistem solar."
+        },
+        "affiliation": {
+          "title": "3. Tiada gabungan",
+          "body": "Kira Solar ialah projek bebas. Ia tidak bergabung dengan, disokong oleh atau dikendalikan oleh Tenaga Nasional Berhad (TNB), myTNB, Suruhanjaya Tenaga atau mana-mana penyedia pengecasan EV. Nama mereka digunakan hanya untuk menerangkan data dan tarif yang serasi."
+        },
+        "account": {
+          "title": "4. Akaun anda",
+          "body": "Anda boleh log masuk dengan akaun Google untuk menyegerakkan data anda. Anda bertanggungjawab atas aktiviti pada akaun anda dan memastikan akaun Google anda selamat."
+        },
+        "use": {
+          "title": "5. Penggunaan yang dibenarkan",
+          "body": "- Jangan gunakan perkhidmatan ini untuk apa-apa tujuan yang menyalahi undang-undang.\n- Jangan cuba mengganggu, membebankan, memintas had kadar permintaan, atau mendapatkan akses tanpa kebenaran kepada perkhidmatan atau API-nya.\n- Jangan gunakan alat automatik untuk mengikis atau menyalahgunakan perkhidmatan.\n\nKami boleh menggantung akses yang melanggar terma ini."
+        },
+        "data": {
+          "title": "6. Data anda",
+          "body": "Anda kekal sebagai pemilik data yang anda masukkan atau import. Anda memberi kami kebenaran untuk menyimpan dan memprosesnya hanya untuk menyediakan perkhidmatan kepada anda, seperti yang diterangkan dalam Dasar Privasi kami."
+        },
+        "ip": {
+          "title": "7. Harta intelek",
+          "body": "Nama, logo dan reka bentuk laman Kira Solar adalah milik kami. Kod sumber yang diterbitkan dalam repositori GitHub awam kami tertakluk kepada lesen dalam repositori tersebut."
+        },
+        "warranty": {
+          "title": "8. Tiada waranti",
+          "body": "Kira Solar disediakan \"seadanya\" dan \"mengikut ketersediaan\", tanpa sebarang waranti, termasuk ketepatan, ketersediaan atau kesesuaian untuk tujuan tertentu."
+        },
+        "liability": {
+          "title": "9. Had liabiliti",
+          "body": "Setakat yang dibenarkan oleh undang-undang, kami tidak bertanggungjawab atas sebarang kerugian atau kerosakan akibat penggunaan atau pergantungan anda pada Kira Solar, termasuk keputusan membeli sistem solar, EV atau pelan elektrik."
+        },
+        "law": {
+          "title": "10. Undang-undang yang terpakai",
+          "body": "Terma ini ditadbir oleh undang-undang Malaysia, dan mahkamah Malaysia mempunyai bidang kuasa ke atas sebarang pertikaian."
+        },
+        "changes": {
+          "title": "11. Perubahan terma ini",
+          "body": "Kami mungkin mengemas kini terma ini dari semasa ke semasa. Penggunaan berterusan Kira Solar selepas perubahan bermakna anda menerima terma yang dikemas kini."
+        },
+        "contact": {
+          "title": "12. Hubungi kami",
+          "body": "Untuk soalan tentang terma ini, hubungi Azuan Alias melalui azuanalias.com."
+        }
+      }
+    }
   }
 }

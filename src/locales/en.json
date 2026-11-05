@@ -404,5 +404,119 @@
     "noData": "No AFA rates available yet.",
     "monthlySeeBelow": "Changes monthly, see below",
     "incentiveTiered": "Tiered by usage (−0.25 to 0)"
+  },
+  "legal": {
+    "lastUpdated": "Last updated",
+    "updatedDate": "5 November 2026",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "navLabel": "Legal",
+    "seeAlso": "See also",
+    "policy": {
+      "title": "Privacy Policy",
+      "metaDescription": "How Kira Solar collects, uses and protects your data, including Google sign-in, electricity usage imports and charging sessions.",
+      "intro": "Kira Solar (\"we\", \"us\") is a free solar and electricity toolkit for Malaysian households. This policy explains what data we handle when you use kirasolar.my, why, and the choices you have. We follow the principles of Malaysia's Personal Data Protection Act 2010 (PDPA).",
+      "sections": {
+        "collect": {
+          "title": "1. Data we collect",
+          "body": "- Account details: when you sign in with Google, we receive your name, email address, profile picture and a Google account ID.\n- Data you enter or import: appliance lists and solar calculator inputs, tariff selection, monthly EV usage, daily electricity usage imported from myTNB CSV files, and EV charging sessions.\n- Technical data: anonymous page views and performance metrics collected by Vercel Analytics and Speed Insights, and standard server logs (such as IP address and browser type) used for security and rate limiting."
+        },
+        "local": {
+          "title": "2. Using Kira Solar without signing in",
+          "body": "You can use the calculators without an account. In that case your inputs stay in your browser's local storage on your device and are not sent to our servers. Clearing your browser data removes them."
+        },
+        "use": {
+          "title": "3. How we use your data",
+          "body": "- To provide the service: save and sync your data across devices, and calculate bill estimates from TNB tariffs and AFA rates.\n- To keep the service secure and reliable, including preventing abuse.\n- To understand, in aggregate, which features are used so we can improve them.\n\nWe do not sell your data, use it for advertising, or share it with third parties for their own marketing."
+        },
+        "storage": {
+          "title": "4. Where your data is stored",
+          "body": "This website is hosted on Vercel. Signed-in data is stored on Cloudflare (Workers and D1). These providers may process data outside Malaysia, under their own security and privacy commitments. Google handles sign-in under Google's Privacy Policy."
+        },
+        "cookies": {
+          "title": "5. Cookies and local storage",
+          "body": "- preferred_lang cookie: remembers your language choice.\n- A short-lived sign-in cookie: protects Google sign-in from forged requests.\n- Local storage: keeps your session (kirasolar.auth), tariff choice and calculator data on your device.\n\nWe do not use advertising or cross-site tracking cookies."
+        },
+        "retention": {
+          "title": "6. How long we keep data",
+          "body": "We keep your account data for as long as you use Kira Solar. If you ask us to delete your account, we delete your account and the data linked to it within a reasonable time, except where we must keep it to meet legal obligations."
+        },
+        "rights": {
+          "title": "7. Your rights",
+          "body": "You can ask to access, correct or delete your personal data, or withdraw your consent by no longer using the service and asking us to delete your account. Signing out removes your session from the device you are using."
+        },
+        "security": {
+          "title": "8. Security",
+          "body": "We use HTTPS, token-based authentication, a strict Content Security Policy and rate limiting to protect your data. No online service is completely secure, so we cannot guarantee absolute security."
+        },
+        "children": {
+          "title": "9. Children",
+          "body": "Kira Solar is not directed at children under 13, and we do not knowingly collect their personal data."
+        },
+        "changes": {
+          "title": "10. Changes to this policy",
+          "body": "We may update this policy from time to time. We will change the \"Last updated\" date above, and significant changes will be shown on the site."
+        },
+        "contact": {
+          "title": "11. Contact",
+          "body": "For privacy questions or requests, contact Azuan Alias through azuanalias.com."
+        }
+      }
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "metaDescription": "The terms for using Kira Solar's solar calculator, EV charging tracker and TNB tariff tools.",
+      "intro": "These terms apply to your use of Kira Solar at kirasolar.my. By using the service, you agree to them. If you do not agree, please do not use Kira Solar.",
+      "sections": {
+        "service": {
+          "title": "1. The service",
+          "body": "Kira Solar provides free tools for estimating solar panel needs, tracking EV charging and household electricity usage, and viewing TNB tariffs. We may change, suspend or stop any feature at any time."
+        },
+        "estimates": {
+          "title": "2. Estimates only",
+          "body": "Results, including solar recommendations, savings, payback periods and bill estimates, are estimates for information only. They depend on the data you provide and on tariff and AFA rates that may change or be estimated. They are not financial, engineering or professional advice. Your actual TNB bill is the authoritative figure. Consult a licensed installer before buying a solar system."
+        },
+        "affiliation": {
+          "title": "3. No affiliation",
+          "body": "Kira Solar is an independent project. It is not affiliated with, endorsed by or operated by Tenaga Nasional Berhad (TNB), myTNB, the Energy Commission (Suruhanjaya Tenaga) or any EV charging provider. Their names are used only to describe compatible data and tariffs."
+        },
+        "account": {
+          "title": "4. Your account",
+          "body": "You can sign in with a Google account to sync your data. You are responsible for activity on your account and for keeping your Google account secure."
+        },
+        "use": {
+          "title": "5. Acceptable use",
+          "body": "- Do not use the service for anything unlawful.\n- Do not try to disrupt, overload, bypass rate limits on, or gain unauthorised access to the service or its API.\n- Do not use automated tools to scrape or abuse the service.\n\nWe may suspend access that breaks these terms."
+        },
+        "data": {
+          "title": "6. Your data",
+          "body": "You keep ownership of the data you enter or import. You give us permission to store and process it only to provide the service to you, as described in our Privacy Policy."
+        },
+        "ip": {
+          "title": "7. Intellectual property",
+          "body": "The Kira Solar name, logo and site design belong to us. Source code published in our public GitHub repository is covered by the licence in that repository."
+        },
+        "warranty": {
+          "title": "8. No warranty",
+          "body": "Kira Solar is provided \"as is\" and \"as available\", without warranties of any kind, including accuracy, availability or fitness for a particular purpose."
+        },
+        "liability": {
+          "title": "9. Limitation of liability",
+          "body": "To the extent permitted by law, we are not liable for any loss or damage arising from your use of, or reliance on, Kira Solar, including decisions about purchasing solar systems, EVs or electricity plans."
+        },
+        "law": {
+          "title": "10. Governing law",
+          "body": "These terms are governed by the laws of Malaysia, and the courts of Malaysia have jurisdiction over any dispute."
+        },
+        "changes": {
+          "title": "11. Changes to these terms",
+          "body": "We may update these terms from time to time. Continuing to use Kira Solar after changes means you accept the updated terms."
+        },
+        "contact": {
+          "title": "12. Contact",
+          "body": "For questions about these terms, contact Azuan Alias through azuanalias.com."
+        }
+      }
+    }
   }
 }

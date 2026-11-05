@@ -11,10 +11,11 @@ import { useTranslation } from "@/lib/useTranslation";
 import { toast } from "sonner";
 import AccountCard from "@/components/settings/AccountCard";
 import PreferencesCard from "@/components/settings/PreferencesCard";
-import { Coffee, Github, Sun, Zap, Info } from "lucide-react";
+import { Sun, Zap, Info } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import AppHeader from "@/components/AppHeader";
+import Footer from "@/components/Footer";
 import dynamic from "next/dynamic";
 
 // Includes a chart, so load it separately.
@@ -524,39 +525,7 @@ export default function SettingsPage() {
         <AfaRatesCard t={t} locale={locale} apiBaseUrl={apiBaseUrl} />
       </div>
 
-      <footer className="border-t bg-background mt-4">
-        <div className="w-full max-w-6xl mx-auto flex flex-col gap-3 sm:gap-4 mt-3 sm:mt-4 md:flex-row md:justify-between md:items-center px-2 sm:px-0">
-          <div className="text-base sm:text-lg font-medium text-link text-center md:text-left">{t("common.title")}</div>
-
-          <div className="text-xs sm:text-sm text-muted-foreground text-center md:text-left order-3 md:order-2">
-            {t("footer.madeBy")}{" "}
-            <a href="https://azuanalias.com" target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-link hover:underline underline-offset-4 transition-colors">
-              Azuan Alias
-            </a>
-          </div>
-
-          <div className="flex items-center justify-center gap-3 sm:gap-4 order-2 md:order-3">
-            <a
-              href="https://github.com/azuanalias92"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-link transition-colors"
-            >
-              <Github className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t("footer.github")}</span>
-            </a>
-            <a
-              href="https://ko-fi.com/azuanalias"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-xs sm:text-sm text-muted-foreground hover:text-link transition-colors"
-            >
-              <Coffee className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t("footer.buyMeCoffee")}</span>
-            </a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

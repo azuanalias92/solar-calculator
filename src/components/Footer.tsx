@@ -5,7 +5,7 @@ import { Coffee, Github } from "lucide-react";
 import { useTranslation } from "@/lib/useTranslation";
 
 export default function Footer() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   return (
     <footer className="border-t bg-background mt-4">
@@ -47,6 +47,21 @@ export default function Footer() {
           </a>
         </div>
       </div>
+
+      <nav aria-label={t("legal.navLabel")} className="w-full max-w-6xl mx-auto flex items-center justify-center md:justify-start gap-4 mt-2 pb-2 px-2 sm:px-0">
+        <Link
+          href={`/${locale}/policy`}
+          className="inline-flex min-h-11 items-center text-xs sm:text-sm text-muted-foreground hover:text-link transition-colors"
+        >
+          {t("legal.privacyPolicy")}
+        </Link>
+        <Link
+          href={`/${locale}/terms`}
+          className="inline-flex min-h-11 items-center text-xs sm:text-sm text-muted-foreground hover:text-link transition-colors"
+        >
+          {t("legal.termsOfService")}
+        </Link>
+      </nav>
     </footer>
   );
 }
